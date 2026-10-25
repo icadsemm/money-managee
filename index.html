@@ -174,6 +174,13 @@ h2{font-family:var(--display);font-size:17px;margin:0;font-weight:700;letter-spa
 @media (min-width:560px){.mods{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (min-width:760px){.kvs.k4{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media (prefers-reduced-motion:no-preference){.bar i,.mb i{transition:width .5s ease,height .5s ease}}
+/* net worth chart */
+.seg.s4{grid-template-columns:repeat(4,1fr)}.seg.s4 button{padding:8px 2px;min-height:38px;font-size:12.5px}
+.nwc{touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.nwr{font-size:12.5px;color:var(--mute);min-height:34px;line-height:1.35}.nwr b{color:var(--ink)}
+.nwc svg{display:block;width:100%;height:auto;overflow:visible}
+.nwc text{font-family:var(--body);font-size:9px;fill:var(--mute)}
+.nwleg{display:flex;gap:14px;font-size:11.5px;color:var(--mute)}.nwleg i{display:inline-block;width:14px;height:0;border-top:2.5px solid var(--accent);vertical-align:middle;margin-right:5px}.nwleg i.m{border-top:2px dashed var(--mute)}
 </style>
 
 <header class="top"><div class="wrap">
@@ -281,10 +288,11 @@ const DEF={
 };
 const state={};DOCS.forEach(n=>state[n]=DEF[n]());
 const last={},dirty=new Set(),writing={},again={},timers={};
-let db=null,loaded=false,dbErr='',bilTab='spay',localMode=false;
+let db=null,loaded=false,dbErr='',bilTab='spay',localMode=false,nwRange='all';
 const KEY='duit-icad-v1';
 const SEED=null;
 try{bilTab=localStorage.getItem('bilTab')||'spay'}catch(e){}
+try{nwRange=localStorage.getItem('nwRange')||'all'}catch(e){}
 
 /* ---------- calculations ---------- */
 function calc(){
@@ -340,6 +348,54 @@ const head=(t,hint='')=>`<div><h2>${t}</h2>${hint?`<p class="hint">${hint}</p>`:
 const chev='<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>';
 
 /* ---------- views ---------- */
+function nwFmt(n){const a=Math.abs(n);return 'RM'+(a>=1e6?(n/1e6).toFixed(2)+'J':a>=1e3?(n/1e3).toFixed(a>=1e5?0:1)+'K':Math.round(n))}
+function nwChange(cur,prev){if(prev==null)return null;const d=cur-prev;return {d,p:prev>0?d/prev:null}}
+function nwView(C){
+  const cur=nowYm(),h=state.saving.history;
+  const map={};h.forEach(x=>{if(x&&x.ym&&(+x.nilai>0||+x.modal>0))map[x.ym]={ym:x.ym,n:+x.nilai||0,m:+x.modal||0}});
+  if(C.nilai>0||C.modal>0)map[cur]={ym:cur,n:C.nilai,m:C.modal};
+  let all=Object.values(map).sort((a,b)=>a.ym<b.ym?-1:1);
+  const near=ym=>{let b=null,bd=9;all.forEach(x=>{if(x.ym===cur)return;const d=Math.abs((+x.ym.slice(0,4)*12+ +x.ym.slice(5,7))-(+ym.slice(0,4)*12+ +ym.slice(5,7)));if(d<bd){bd=d;b=x}});return bd<=1?b:null};
+  const mm=map[addYm(cur,-1)]||null,yy=near(addYm(cur,-12));
+  const lastNow=map[cur]?map[cur].n:null;
+  const cmp=(prev,lab)=>{if(!prev||lastNow==null)return `<div class="kv"><span>${lab}</span><b>-</b><small style="color:var(--mute)">Belum cukup data</small></div>`;
+    const c=nwChange(lastNow,prev.n);const cl=c.d>0?'good':c.d<0?'bad':'';
+    return `<div class="kv ${cl}"><span>${lab}</span><b class="num">${c.d>0?'+':''}${rm(c.d,0)}</b><small style="color:var(--mute)">${c.p==null?'':(c.d>0?'+':'')+pc(c.p,2)+' dari '}${ymLab(prev.ym)}</small></div>`};
+  const N={'3':3,'6':6,'12':12};
+  let pts=all;if(N[nwRange])pts=all.filter(x=>x.ym>=addYm(cur,-N[nwRange]));
+  const seg=`<div class="seg s4" role="group" aria-label="Julat masa">${[['3','3 Bulan'],['6','6 Bulan'],['12','1 Tahun'],['all','Semua']].map(([v,t])=>`<button data-act="nwr" data-v="${v}" aria-pressed="${nwRange===v}">${t}</button>`).join('')}</div>`;
+  let body;
+  if(pts.length<2){
+    body=`<p class="empty">${all.length<2?'Graf akan keluar bila ada sekurang-kurangnya 2 bulan snapshot. Tekan <b>Simpan snapshot</b> kat tab Simpanan hujung setiap bulan.':'Tak cukup data dalam julat ni. Cuba pilih Semua.'}</p>`;
+  }else{
+    const W=320,H=170,L=42,R=8,T=8,B=20,iw=W-L-R,ih=H-T-B;
+    const vals=[];pts.forEach(x=>{vals.push(x.n);if(x.m>0)vals.push(x.m)});
+    let lo=Math.min(...vals),hi=Math.max(...vals);const pad=(hi-lo)*0.12||Math.abs(hi)*0.1||1;
+    lo-=pad;hi+=pad;if(Math.min(...vals)>=0)lo=Math.max(lo,0);
+    const X=i=>L+(pts.length===1?iw/2:i*iw/(pts.length-1)),Y=v=>T+ih-(v-lo)/(hi-lo)*ih;
+    const grid=[0,1,2,3].map(g=>{const v=lo+(hi-lo)*g/3,y=Y(v);return `<line x1="${L}" x2="${W-R}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}" style="stroke:var(--line);stroke-width:1"/><text x="${L-5}" y="${(y+3).toFixed(1)}" text-anchor="end">${nwFmt(v)}</text>`}).join('');
+    const line=pts.map((x,i)=>`${X(i).toFixed(1)},${Y(x.n).toFixed(1)}`).join(' ');
+    const area=`M${X(0).toFixed(1)},${(T+ih)} L${pts.map((x,i)=>`${X(i).toFixed(1)},${Y(x.n).toFixed(1)}`).join(' L')} L${X(pts.length-1).toFixed(1)},${(T+ih)} Z`;
+    const mpts=pts.map((x,i)=>x.m>0?`${X(i).toFixed(1)},${Y(x.m).toFixed(1)}`:null).filter(Boolean).join(' ');
+    const idx=[0,Math.floor((pts.length-1)/2),pts.length-1].filter((v,i,a)=>a.indexOf(v)===i);
+    const xl=idx.map(i=>`<text x="${X(i).toFixed(1)}" y="${H-5}" text-anchor="${i===0?'start':i===pts.length-1?'end':'middle'}">${ymLab(pts[i].ym)}</text>`).join('');
+    const data=pts.map((x,i)=>({x:+X(i).toFixed(1),y:+Y(x.n).toFixed(1),l:ymLab(x.ym),n:x.n,m:x.m}));
+    const lp=data[data.length-1];
+    body=`<div class="nwc" data-pts="${esc(JSON.stringify(data))}">
+      <div class="nwr">${nwRead(lp)}</div>
+      <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Graf nilai aset mengikut bulan">${grid}
+        <path d="${area}" style="fill:var(--accent);fill-opacity:.12"/>
+        ${mpts?`<polyline points="${mpts}" style="fill:none;stroke:var(--mute);stroke-width:1.6;stroke-dasharray:4 3"/>`:''}
+        <polyline points="${line}" style="fill:none;stroke:var(--accent);stroke-width:2.4;stroke-linejoin:round;stroke-linecap:round"/>
+        <line class="nwl" x1="${lp.x}" x2="${lp.x}" y1="${T}" y2="${T+ih}" style="stroke:var(--mute);stroke-width:1;stroke-dasharray:3 3"/>
+        <circle class="nwd" cx="${lp.x}" cy="${lp.y}" r="4.5" style="fill:var(--accent);stroke:var(--surface);stroke-width:2"/>
+        ${xl}</svg></div>
+      <div class="nwleg"><span><i></i>Nilai</span><span><i class="m"></i>Modal</span></div>`;
+  }
+  return `<section class="panel">${head('Trend aset','Sentuh atau seret graf untuk lihat nilai tiap bulan.')}${seg}${body}
+    <div class="kvs">${cmp(mm,'Bulan ke bulan')}${cmp(yy,'Tahun ke tahun')}</div></section>`;
+}
+function nwRead(p){const pr=p.n-p.m;return `<b>${p.l}</b> · Nilai <b>${rm(p.n)}</b>${p.m>0?`<br>Modal ${rm(p.m)} · Profit <span style="color:var(${pr<0?'--bad':'--good'})">${pr>0?'+':''}${rm(pr)}</span>`:''}`}
 function vRingkasan(C){
   const s=state.saving,k=state.komitmen,p=state.spaylater,a=state.advance;
   const serial=Math.floor(Date.UTC(new Date().getFullYear(),new Date().getMonth(),new Date().getDate())/86400000)+25569;
@@ -373,6 +429,7 @@ function vRingkasan(C){
     <p>${C.next?`Seterusnya: ${esc(C.next.icon)} ${esc(C.next.name)} (${rm(C.next.amt,0)}) · lagi ${rm(C.toNext,0)}${C.nextMonths!=null?` · anggaran ${C.nextMonths} bulan`:''}`:'Level tertinggi, target dah tercapai!'}</p>
   </section>
   <p class="quote">${QUOTES[serial%10]}</p>
+  ${nwView(C)}
   ${empty&&loaded?`<p class="empty">Belum ada data lagi. Isi di tab Simpanan, Komitmen, Bil dan Delivery.</p>`:''}
   <section class="panel"><div class="sec-h">${head('Perlu perhatian')}</div>
     ${att.length?`<ul class="att">${att.map(x=>`<li><a href="#${x.to}" data-s="${x.s}"><span class="dot"></span><span><b>${x.t}</b><small>${x.d||''}</small></span>${chev}</a></li>`).join('')}</ul>`:'<p class="empty">Tiada apa-apa lagi.</p>'}
@@ -662,6 +719,7 @@ document.addEventListener('change',e=>{const t=e.target;if(t.id!=='imp'||!t.file
 document.addEventListener('click',e=>{
   const b=e.target.closest('[data-act]');if(!b)return;
   const act=b.dataset.act;
+  if(act==='nwr'){nwRange=b.dataset.v;try{localStorage.setItem('nwRange',nwRange)}catch(x){}later();return}
   if(act==='seg'){bilTab=b.dataset.v;try{localStorage.setItem('bilTab',bilTab)}catch(x){}later();return}
   if(act==='add'){const k=b.dataset.k;const [doc,arr]=getArr(k);arr.push(NEW[k]());touch(doc);pendingFocus=k+'.'+(arr.length-1);later();return}
   if(act==='del'){
@@ -673,6 +731,20 @@ document.addEventListener('click',e=>{
     const local=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'application/json'}));a.download=fn;document.body.appendChild(a);a.click();a.remove()};
     Promise.resolve().then(()=>typeof claude!=='undefined'?claude.use('downloads'):null).then(dl=>dl?dl.save({filename:fn,data:txt}).catch(()=>{}):local()).catch(local);return}
 });
+
+/* net worth chart scrub */
+function nwScrub(e){
+  const w=e.target.closest&&e.target.closest('.nwc');if(!w)return;
+  if(e.type==='pointermove'&&e.pointerType==='mouse'&&!e.buttons&&false)return;
+  let pts;try{pts=JSON.parse(w.dataset.pts)}catch(x){return}
+  const sv=w.querySelector('svg'),r=sv.getBoundingClientRect(),vx=(e.clientX-r.left)/r.width*320;
+  let b=pts[0];pts.forEach(p=>{if(Math.abs(p.x-vx)<Math.abs(b.x-vx))b=p});
+  const l=w.querySelector('.nwl'),d=w.querySelector('.nwd');
+  l.setAttribute('x1',b.x);l.setAttribute('x2',b.x);d.setAttribute('cx',b.x);d.setAttribute('cy',b.y);
+  w.querySelector('.nwr').innerHTML=nwRead(b);
+}
+document.addEventListener('pointerdown',nwScrub);
+document.addEventListener('pointermove',e=>{if(e.pointerType==='mouse'&&!e.buttons&&!(e.target.closest&&e.target.closest('.nwc')))return;nwScrub(e)});
 
 /* ---------- boot ---------- */
 render();
