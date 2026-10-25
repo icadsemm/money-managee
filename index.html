@@ -189,6 +189,62 @@ h2{font-family:var(--display);font-size:17px;margin:0;font-weight:700;letter-spa
   <a href="#delivery" data-tab="delivery"><svg viewBox="0 0 24 24"><circle cx="6" cy="16.5" r="3"/><circle cx="18" cy="16.5" r="3"/><path d="M6 16.5l3.5-7h5l3.5 7"/><path d="M9.5 9.5h-2"/></svg><span>Delivery</span></a>
 </div></nav>
 
+<div id="login" hidden style="position:fixed;inset:0;z-index:100;background:#0F172A;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center;font-family:system-ui,sans-serif">
+<div style="font-size:30px;font-weight:700">Money Manage</div>
+<div style="color:#94A3B8;font-size:14px;max-width:300px">Log masuk dengan akaun Google supaya data sync automatik di semua fon.</div>
+<button id="loginBtn" style="background:#34D399;color:#04130C;border:0;border-radius:12px;padding:14px 22px;font-size:15px;font-weight:700">Log masuk dengan Google</button>
+<div id="loginErr" style="color:#F87171;font-size:12.5px;min-height:18px"></div>
+</div>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+(function(){
+var cfg={apiKey:"AIzaSyBLIav5hacsI-gV6zz5SQN5ar0LidFw7Og",authDomain:"money-manage-38a74.firebaseapp.com",projectId:"money-manage-38a74",messagingSenderId:"183837622600",appId:"1:183837622600:web:384a65afc27d8454e7f37d"};
+var LK='duit-icad-v1',migrated=false;
+window.claude={use:function(k){
+  if(k!=='db')return Promise.reject(new Error('unsupported'));
+  if(typeof firebase==='undefined')return Promise.reject(new Error('firebase not loaded'));
+  firebase.initializeApp(cfg);
+  var auth=firebase.auth(),fs=firebase.firestore();
+  try{fs.enablePersistence({synchronizeTabs:true}).catch(function(){})}catch(e){}
+  var box=document.getElementById('login'),err=document.getElementById('loginErr');
+  document.getElementById('loginBtn').onclick=function(){
+    err.textContent='';
+    var p=new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(p).catch(function(e){
+      if(e&&(e.code==='auth/popup-blocked'||e.code==='auth/operation-not-supported-in-this-environment'))auth.signInWithRedirect(p);
+      else err.textContent='Gagal log masuk ('+((e&&e.code)||'ralat')+')';
+    });
+  };
+  return new Promise(function(res){
+    var done=false;
+    auth.onAuthStateChanged(function(u){
+      if(!u){box.hidden=false;return}
+      box.hidden=true;
+      if(done)return;done=true;
+      var base='users/'+u.uid+'/';
+      res({
+        doc:function(p){return{set:function(b){return fs.doc(base+p).set(b)}}},
+        collection:function(p){return{onSnapshot:function(cb,eb){
+          return fs.collection(base+p).onSnapshot({includeMetadataChanges:true},function(snap){
+            cb(snap);
+            if(!migrated&&!snap.metadata.fromCache){
+              migrated=true;
+              if(snap.empty){try{
+                var raw=localStorage.getItem(LK);
+                if(raw){var o=JSON.parse(raw),b=fs.batch();
+                  Object.keys(o).forEach(function(n){if(o[n]&&typeof o[n]==='object')b.set(fs.doc(base+p+'/'+n),o[n])});
+                  b.commit().catch(function(){});}
+              }catch(e){}}
+            }
+          },eb)}}}
+      });
+    });
+  });
+}};
+})();
+</script>
 <script>
 (function(){
 'use strict';
