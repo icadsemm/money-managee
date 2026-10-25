@@ -125,6 +125,12 @@ h2{font-family:var(--display);font-size:17px;margin:0;font-weight:700;letter-spa
 /* account cards */
 .acc{border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px;background:var(--surface2)}
 .acc-h{display:grid;grid-template-columns:minmax(0,1fr) 36px;gap:8px;align-items:center}
+.acc-h.lg{grid-template-columns:42px minmax(0,1fr) 36px}
+.logo{width:42px;height:42px;border-radius:11px;border:1px dashed var(--mute);display:grid;place-content:center;overflow:hidden;cursor:pointer;background:var(--surface);color:var(--mute);font-size:20px;line-height:1}
+.logo.has{border:1px solid var(--line)}
+.logo img{width:100%;height:100%;object-fit:cover;display:block}
+.logo:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+.lnk{background:none;border:0;padding:0;color:var(--mute);font-size:11.5px;text-decoration:underline;cursor:pointer;margin-left:auto}
 .acc-g{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .res{display:flex;justify-content:space-between;font-size:12.5px;color:var(--mute)}
 .res b{font-weight:700}.pos{color:var(--good)}.neg{color:var(--bad)}
@@ -444,15 +450,24 @@ function vRingkasan(C){
   </section>`;
 }
 
+const okLogo=v=>typeof v==='string'&&/^data:image\/(png|jpeg|webp);base64,/.test(v);
+async function toLogo(file){
+  let src,w,h,rev=()=>{};
+  try{src=await createImageBitmap(file);w=src.width;h=src.height}
+  catch(e){const u=URL.createObjectURL(file);src=await new Promise((ok,no)=>{const im=new Image();im.onload=()=>ok(im);im.onerror=no;im.src=u});w=src.naturalWidth;h=src.naturalHeight;rev=()=>URL.revokeObjectURL(u)}
+  const m=Math.min(w,h),c=document.createElement('canvas');c.width=c.height=96;
+  const g=c.getContext('2d');g.drawImage(src,(w-m)/2,(h-m)/2,m,m,0,0,96,96);rev();
+  const out=c.toDataURL('image/png');return out.length>60000?c.toDataURL('image/jpeg',.8):out;
+}
 function vSimpanan(C){
   const s=state.saving;
   const accs=s.accounts.map((x,i)=>{
     const pr=(+x.nilai||0)-(+x.modal||0),roi=x.modal>0?pr/x.modal:0,share=C.nilai>0?(+x.nilai||0)/C.nilai:0;
     return `<div class="acc">
-      <div class="acc-h">${inT(`saving.accounts.${i}.name`,x.name,'Nama akaun','Nama akaun')}${del('saving.accounts',i,x.name||'akaun')}</div>
+      <div class="acc-h lg"><label class="logo ${okLogo(x.logo)?'has':''}" title="Letak logo"><input type="file" accept="image/*" hidden data-logo="${i}" aria-label="Letak logo ${esc(x.name)}">${okLogo(x.logo)?`<img src="${esc(x.logo)}" alt="Logo ${esc(x.name)}">`:'<span aria-hidden="true">+</span>'}</label>${inT(`saving.accounts.${i}.name`,x.name,'Nama akaun','Nama akaun')}${del('saving.accounts',i,x.name||'akaun')}</div>
       <div class="acc-g"><label class="lab">Modal (RM)${inN(`saving.accounts.${i}.modal`,x.modal,'Modal '+(x.name||''))}</label><label class="lab">Nilai sekarang (RM)${inN(`saving.accounts.${i}.nilai`,x.nilai,'Nilai '+(x.name||''))}</label></div>
       <div class="res"><span>Profit <b class="${pr<0?'neg':pr>0?'pos':''}">${rm(pr)}</b></span><span>ROI <b class="${pr<0?'neg':pr>0?'pos':''}">${pc(roi,2)}</b></span></div>
-      <div class="share">${bar(share)}<span>${pc(share,1)} daripada jumlah</span></div>
+      <div class="share">${bar(share)}<span>${pc(share,1)} daripada jumlah</span>${okLogo(x.logo)?`<button class="lnk" data-act="logo-clear" data-i="${i}">Buang logo</button>`:''}</div>
     </div>`}).join('');
   const ladder=C.lv.slice(1).map((l,i)=>{const idx=i+1;const done=C.nilai>=l.amt,isNext=idx===C.li+1;
     return `<div class="lv ${done?'done':isNext?'next':'lock'}"><span class="ic" aria-hidden="true">${esc(l.icon)}</span><span class="nm">${esc(l.name)}<small>${rm(l.amt,0)}</small></span><span class="st">${done?'Capai':isNext?'Seterusnya':'Terkunci'}</span>${bar(l.amt>0?C.nilai/l.amt:0)}</div>`}).join('');
@@ -716,9 +731,16 @@ document.addEventListener('change',e=>{
 });
 document.addEventListener('change',e=>{const t=e.target;if(t.id!=='imp'||!t.files||!t.files[0])return;
   t.files[0].text().then(tx=>{try{const o=JSON.parse(tx);DOCS.forEach(n=>{if(o[n]){state[n]=Object.assign(DEF[n](),o[n]);touch(n)}});dbErr=localMode?dbErr:'';later()}catch(x){dbErr='Fail sandaran tak sah.';later()}})});
+document.addEventListener('change',e=>{
+  const t=e.target;if(!t.dataset||t.dataset.logo==null||!t.files||!t.files[0])return;
+  const i=+t.dataset.logo,f=t.files[0];
+  toLogo(f).then(d=>{const a=state.saving.accounts[i];if(!a)return;a.logo=d;touch('saving');later()})
+   .catch(()=>{dbErr='Logo tak dapat dimuat. Cuba gambar lain.';later()});
+});
 document.addEventListener('click',e=>{
   const b=e.target.closest('[data-act]');if(!b)return;
   const act=b.dataset.act;
+  if(act==='logo-clear'){const a=state.saving.accounts[+b.dataset.i];if(a){delete a.logo;touch('saving');later()}return}
   if(act==='nwr'){nwRange=b.dataset.v;try{localStorage.setItem('nwRange',nwRange)}catch(x){}later();return}
   if(act==='seg'){bilTab=b.dataset.v;try{localStorage.setItem('bilTab',bilTab)}catch(x){}later();return}
   if(act==='add'){const k=b.dataset.k;const [doc,arr]=getArr(k);arr.push(NEW[k]());touch(doc);pendingFocus=k+'.'+(arr.length-1);later();return}
