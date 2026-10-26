@@ -237,6 +237,14 @@ main.enter>*:nth-child(5){animation-delay:.28s}main.enter>*:nth-child(6){animati
 main.enter.fwd>*{animation-name:slideF}main.enter.back>*{animation-name:slideB}
 @keyframes slideF{from{opacity:0;transform:translateX(38px)}to{opacity:1;transform:none}}
 @keyframes slideB{from{opacity:0;transform:translateX(-38px)}to{opacity:1;transform:none}}
+/* menu bawah: lebih jelas + masuk dari bawah */
+.tabs{left:14px;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));
+  background:linear-gradient(160deg,var(--nav1),var(--nav2));border:1px solid var(--g-brd);
+  box-shadow:inset 0 1px 0 var(--g-hi),0 14px 34px -8px var(--g-sh);
+  animation:navUp .7s cubic-bezier(.2,.9,.3,1) 1s both}
+main{padding-bottom:calc(120px + env(safe-area-inset-bottom,0px))}
+:root{--nav1:var(--g-bg);--nav2:var(--g-bg2)}
+@keyframes navUp{from{opacity:0;transform:translateY(40px) scale(.96)}to{opacity:1;transform:none}}
 /* tajuk */
 .top h1 .ch{display:inline-block;opacity:0;animation:chIn .7s cubic-bezier(.2,.8,.2,1) forwards,chWave 6s ease-in-out 2s 2;animation-delay:calc(var(--i)*45ms + .9s),calc(var(--i)*70ms + 2.2s)}
 .top h1 .sp{display:inline-block;width:.28em}
