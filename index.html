@@ -1414,7 +1414,7 @@ function vAdd(items){
     const words=it.w.filter(w=>!V_FILL.has(w));
     if(!words.length&&it.amt==null)return;
     const c=vCat(words),txt=words.join(' '),r=NEW['belanja.rows']();
-    r.d=dd;r.amt=it.amt;
+    r.d=dd;r.amt=it.amt;r.vid=Date.now().toString(36)+Math.random().toString(36).slice(2,6);
     if(c){r.cat=c.n;r.name=(c.e?c.e+' ':'')+(txt&&txt!==String(c.n).toLowerCase()?cap(txt):c.n)}
     else r.name=cap(txt)||'Belanja';
     state.belanja.rows.push(r);added.push(r)});
@@ -1424,13 +1424,13 @@ function vAdd(items){
   const last=added[added.length-1];
   if(last.amt==null)pendingFocus='belanja.rows.'+(state.belanja.rows.length-1)+'.amt';
   later();
-  const lab=added.map(r=>r.name.replace(/^\p{Extended_Pictographic}\uFE0F?\s*/u,'')+(r.amt!=null?' '+rm(r.amt):'')).join(', ');
-  setUndo('Ditambah: '+lab+(items.off!=null?' · '+fmtISO(dd):'')+(last.amt==null?' (isi harga)':''),()=>{added.forEach(r=>{const ix=state.belanja.rows.indexOf(r);if(ix>=0)state.belanja.rows.splice(ix,1)});touch('belanja');later()});
-  vc.edit=added;document.getElementById('toast').classList.add('vt');document.getElementById('toastE').style.display='';
+  const ids=added.map(r=>r.vid),lab=added.map(r=>r.name.replace(/^\p{Extended_Pictographic}\uFE0F?\s*/u,'')+(r.amt!=null?' '+rm(r.amt):'')).join(', ');
+  setUndo('Ditambah: '+lab+(items.off!=null?' · '+fmtISO(dd):'')+(last.amt==null?' (isi harga)':''),()=>{ids.forEach(id=>{const ix=state.belanja.rows.findIndex(x=>x.vid===id);if(ix>=0)state.belanja.rows.splice(ix,1)});touch('belanja');later()});
+  vc.edit=ids;document.getElementById('toast').classList.add('vt');document.getElementById('toastE').style.display='';
   clearTimeout(undoT);undoT=setTimeout(()=>{document.getElementById('toast').classList.remove('on');undoFn=null},12000);
   return true}
 function voiceEdit(){
-  const rows=(vc.edit||[]).filter(r=>state.belanja.rows.includes(r));if(!rows.length)return;
+  const ids=(vc.edit||[]),rows=ids.map(id=>state.belanja.rows.find(x=>x.vid===id)).filter(Boolean);if(!rows.length)return;
   let O=document.getElementById('vedit');
   if(!O){
     document.body.insertAdjacentHTML('beforeend','<div id="vedit" hidden role="dialog" aria-modal="true" aria-label="Ubah catatan"><div class="shc"><h2>Ubah catatan</h2><div id="veL" style="display:flex;flex-direction:column;gap:10px"></div><div class="btns"><button class="btn" id="veOk" type="button">Simpan perubahan</button><button class="btn ghost" id="veNo" type="button">Batal</button></div></div></div>');
@@ -1438,13 +1438,13 @@ function voiceEdit(){
     O.addEventListener('click',e=>{if(e.target===O)O.hidden=true});
     document.getElementById('veNo').onclick=()=>{O.hidden=true};
     document.getElementById('veOk').onclick=()=>{
-      const rs=O._rows||[];let ld=null;
+      const rs=(O._ids||[]).map(id=>state.belanja.rows.find(x=>x.vid===id)).filter(Boolean);let ld=null;
       O.querySelectorAll('.ver').forEach((el,i)=>{const r=rs[i];if(!r)return;
         const nm=el.querySelector('[data-f=n]').value.trim(),am=parseFloat(String(el.querySelector('[data-f=a]').value).replace(',','.')),dt=el.querySelector('[data-f=d]').value;
         if(nm)r.name=nm;r.amt=isFinite(am)?am:null;if(/^\d{4}-\d{2}-\d{2}$/.test(dt))r.d=dt;ld=r.d});
       if(ld){blSel=ld;blMonth=ld.slice(0,7)}
       touch('belanja');O.hidden=true;document.getElementById('toast').classList.remove('on');undoFn=null;later()}}
-  O._rows=rows;
+  O._ids=rows.map(r=>r.vid);
   document.getElementById('veL').innerHTML=rows.map(r=>`<div class="ver"><label class="lab nm">Nama<input class="in t" data-f="n" autocomplete="off" value="${esc(r.name)}"></label><label class="lab">Jumlah harga<input class="in n" data-f="a" inputmode="decimal" autocomplete="off" value="${r.amt==null?'':esc(r.amt)}" placeholder="0.00"></label><label class="lab">Tarikh<input class="in t" data-f="d" type="date" value="${esc(r.d)}"></label></div>`).join('');
   O.hidden=false}
 document.getElementById('toastE').addEventListener('click',voiceEdit);
