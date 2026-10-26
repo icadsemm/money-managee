@@ -296,6 +296,7 @@ select.in{appearance:none;-webkit-appearance:none;background:transparent;font-si
 @keyframes logoIn{from{opacity:0;transform:scale(.5) rotate(-8deg)}to{opacity:1;transform:none}}
 @keyframes splashOut{to{opacity:0;visibility:hidden;transform:scale(1.06)}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;transition:none!important}.top h1 .ch{opacity:1}}
+.edtx{margin:10px 0 2px}.edtx summary{cursor:pointer;color:var(--accent);font-weight:700;font-size:13px;padding:6px 0;min-height:32px}.edtx .lab{margin-top:10px}
 </style>
 
 <div id="lock" hidden role="dialog" aria-modal="true" aria-label="Kunci app"><div class="lk"><div class="lkt" id="lkT">Masukkan PIN</div><div class="dots" id="lkD"></div><div class="lkm" id="lkM" role="status"></div><div class="pad" id="lkP"></div><div class="lkb"><button id="lkBio" hidden>Guna cap jari</button><button id="lkX" hidden>Batal</button><button id="lkF" hidden>Lupa PIN? Log keluar</button></div></div></div>
@@ -401,8 +402,8 @@ const DEF={
     monthly:[],history:[],updated:todayISO()}),
   delivery:()=>({rows:[]}),
   komitmen:()=>({label:ML[new Date().getMonth()]+' '+new Date().getFullYear(),income:[],items:[],notes:[],history:[]}),
-  spaylater:()=>({name:'',target:0,entries:[],ryt:'',spay:'',notes:[]}),
-  advance:()=>({name:'',month:nowYm(),amount:0,items:[],notes:[]})
+  spaylater:()=>({name:'',desc:'',emptyMsg:'',logTitle:'',target:0,entries:[],ryt:'',spay:'',notes:[]}),
+  advance:()=>({name:'',desc:'',emptyMsg:'',boxTitle:'',month:nowYm(),amount:0,items:[],notes:[]})
 };
 const state={};DOCS.forEach(n=>state[n]=DEF[n]());
 const last={},dirty=new Set(),writing={},again={},timers={};
@@ -413,6 +414,8 @@ try{bilTab=localStorage.getItem('bilTab')||'spay'}catch(e){}
 try{nwRange=localStorage.getItem('nwRange')||'all'}catch(e){}
 try{dvRange=localStorage.getItem('dvRange')||'d'}catch(e){}
 
+let edOpen=false;
+const sx=(o,k,d)=>String(o&&o[k]||'').trim()||d;
 const pn=()=>String(state.spaylater.name||'').trim()||'SPayLater',an=()=>String(state.advance.name||'').trim()||'Advance';
 /* ---------- calculations ---------- */
 function calc(){
@@ -709,8 +712,13 @@ function vBil(C){
     const ent=p.entries.map((x,i)=>`<div class="row">${inT(`spaylater.entries.${i}.name`,x.name,'Keterangan','Keterangan')}${inN(`spaylater.entries.${i}.amt`,x.amt,'Amaun '+(x.name||''))}${del('spaylater.entries',i,x.name||'catatan')}</div>`).join('');
     return seg+`
     <section class="panel">
-      ${head(esc(pn()),'Kumpul duit dalam RYTBANK sampai cukup untuk bayar bil.')}
+      ${head(esc(pn()),esc(sx(p,'desc','Kumpul duit sampai cukup untuk bayar bil.')))}
       <label class="lab" style="max-width:240px">Nama tab${inT('spaylater.name',p.name,'Nama tab','SPayLater')}</label>
+      <details class="edtx" ${edOpen?'open':''}><summary>Ubah suai tulisan</summary><p class="hint" style="margin:2px 0 0">Tukar ikut cara anda guna tab ni. Kosongkan kotak untuk guna tulisan asal.</p>
+        <label class="lab">Tulisan bawah tajuk${inT('spaylater.desc',p.desc,'Tulisan bawah tajuk','Kumpul duit sampai cukup untuk bayar bil.')}</label>
+        <label class="lab">Tulisan bila target belum diisi${inT('spaylater.emptyMsg',p.emptyMsg,'Tulisan bila target belum diisi','Isi target bil dulu')}</label>
+        <label class="lab">Tajuk senarai duit masuk${inT('spaylater.logTitle',p.logTitle,'Tajuk senarai duit masuk','Log duit masuk')}</label>
+      </details>
       <div class="kvs">
         <div class="kv"><span>Target (RM)</span>${inN('spaylater.target',p.target,'Target bil SPayLater')}</div>
         ${kv('Terkumpul',rm(C.p.got))}
@@ -718,10 +726,10 @@ function vBil(C){
         ${kv('Progress',pc(C.p.prog))}
       </div>
       ${bar(C.p.prog)}
-      <p style="margin:0;font-weight:700" class="${C.p.got>=p.target&&p.target>0?'pos':''}">${p.target>0?(C.p.got>=p.target?'Dah cukup, boleh bayar bil':'Masih kurang, kumpul lagi'):'Isi target bil dulu'}</p>
+      <p style="margin:0;font-weight:700" class="${C.p.got>=p.target&&p.target>0?'pos':''}">${p.target>0?(C.p.got>=p.target?'Dah cukup, boleh bayar bil':'Masih kurang, kumpul lagi'):esc(sx(p,'emptyMsg','Isi target bil dulu'))}</p>
     </section>
     <section class="panel">
-      <div class="sec-h">${head('Log duit masuk','Tambah satu baris setiap kali ada duit masuk.')}${add('spaylater.entries','Duit masuk')}</div>
+      <div class="sec-h">${head(esc(sx(p,'logTitle','Log duit masuk')),'Tambah satu baris setiap kali ada duit masuk.')}${add('spaylater.entries','Duit masuk')}</div>
       <div class="list">${ent||'<p class="empty">Belum ada duit masuk.</p>'}</div>
       <div class="total"><span>Jumlah</span><b class="num">${rm(C.p.got)}</b></div>
     </section>
@@ -734,8 +742,14 @@ function vBil(C){
   const nt=a.notes.map((x,i)=>`<div class="row note">${inA(`advance.notes.${i}`,x,'Nota','Tulis nota')}${del('advance.notes',i,'nota')}</div>`).join('');
   return seg+`
   <section class="panel">
+    ${head(esc(an()),esc(sx(a,'desc','Catat belanja ikut kotak supaya advance tak melebihi had.')))}
     <label class="lab" style="max-width:240px">Nama tab${inT('advance.name',a.name,'Nama tab','Advance')}</label>
-    <div class="sec-h">${head(esc(an()))}<label class="lab" style="width:150px">Bulan<input class="in t" type="month" data-k="advance.month" data-t="d" value="${esc(a.month)}" aria-label="Bulan advance"></label></div>
+    <details class="edtx" ${edOpen?'open':''}><summary>Ubah suai tulisan</summary><p class="hint" style="margin:2px 0 0">Tukar ikut cara anda guna tab ni. Kosongkan kotak untuk guna tulisan asal.</p>
+      <label class="lab">Tulisan bawah tajuk${inT('advance.desc',a.desc,'Tulisan bawah tajuk','Catat belanja ikut kotak supaya advance tak melebihi had.')}</label>
+      <label class="lab">Tulisan bila jumlah belum diisi${inT('advance.emptyMsg',a.emptyMsg,'Tulisan bila jumlah belum diisi','Isi jumlah advance dulu')}</label>
+      <label class="lab">Tajuk senarai kotak belanja${inT('advance.boxTitle',a.boxTitle,'Tajuk senarai kotak belanja','Kotak belanja')}</label>
+    </details>
+    <label class="lab" style="max-width:240px">Bulan<input class="in t" type="month" data-k="advance.month" data-t="d" value="${esc(a.month)}" aria-label="Bulan advance"></label>
     <div class="kvs">
       <div class="kv"><span>Jumlah (RM)</span>${inN('advance.amount',a.amount,'Jumlah advance')}</div>
       ${kv('Jumlah guna',rm(C.a.used))}
@@ -743,10 +757,10 @@ function vBil(C){
       ${kv('Diguna',pc(C.a.prog))}
     </div>
     ${bar(C.a.prog,C.a.baki<0?'bad':'')}
-    <p style="margin:0;font-weight:700" class="${C.a.baki<0?'neg':'pos'}">${a.amount>0?(C.a.baki<0?'Melebihi advance, semak balik kotak':C.a.baki===0?'Advance dah habis diguna':'Masih ada baki'):'Isi jumlah advance dulu'}</p>
+    <p style="margin:0;font-weight:700" class="${C.a.baki<0?'neg':'pos'}">${a.amount>0?(C.a.baki<0?'Melebihi advance, semak balik kotak':C.a.baki===0?'Advance dah habis diguna':'Masih ada baki'):esc(sx(a,'emptyMsg','Isi jumlah advance dulu'))}</p>
   </section>
   <section class="panel">
-    <div class="sec-h">${head('Kotak belanja')}${add('advance.items','Kotak')}</div>
+    <div class="sec-h">${head(esc(sx(a,'boxTitle','Kotak belanja')))}${add('advance.items','Kotak')}</div>
     <div class="list">${it||'<p class="empty">Belum ada kotak.</p>'}</div>
     <div class="total"><span>Jumlah guna</span><b class="num">${rm(C.a.used)}</b></div>
   </section>
@@ -939,7 +953,7 @@ document.addEventListener('click',e=>{
     setUndo('Dipadam',()=>{const [d2,a2]=getArr(kk);a2.splice(Math.min(ix,a2.length),0,item);touch(d2);later()});return}
   if(act==='reset-paid'){state.komitmen.items.forEach(x=>x.paid=false);touch('komitmen');later();return}
   if(act==='snap'){const C=calc(),ym=nowYm();let h=state.saving.history.find(x=>x.ym===ym);if(!h){h={ym};state.saving.history.push(h)}h.modal=+C.modal.toFixed(2);h.nilai=+C.nilai.toFixed(2);touch('saving');later();return}
-  if(act==='backup'){const fn='duit-icad-sandaran-'+todayISO()+'.json',txt=JSON.stringify(state,null,2);
+  if(act==='backup'){const fn='money-manage-sandaran-'+todayISO()+'.json',txt=JSON.stringify(state,null,2);
     const local=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'application/json'}));a.download=fn;document.body.appendChild(a);a.click();a.remove()};
     Promise.resolve().then(()=>typeof claude!=='undefined'?claude.use('downloads'):null).then(dl=>dl?dl.save({filename:fn,data:txt}).catch(()=>{}):local()).catch(local);return}
 });
@@ -1073,6 +1087,8 @@ function ensureMonth(){
     if(n<0||n>=TABS.length)return;
     location.hash='#'+TABS[n]},{passive:true});
 })();
+
+document.addEventListener('toggle',e=>{const t=e.target;if(t&&t.classList&&t.classList.contains('edtx'))edOpen=t.open},true);
 
 /* ---------- boot ---------- */
 render();
