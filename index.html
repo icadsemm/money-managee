@@ -196,18 +196,16 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
   background:radial-gradient(60% 38% at 8% 2%,rgba(52,211,153,.30),transparent 70%),radial-gradient(50% 34% at 100% 32%,rgba(96,165,250,.24),transparent 70%),radial-gradient(60% 38% at 25% 100%,rgba(167,139,250,.20),transparent 70%)}
 @supports ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
   .panel,.mod{background:linear-gradient(145deg,var(--g-bg),var(--g-bg2));border:1px solid var(--g-brd);
-    -webkit-backdrop-filter:blur(18px) saturate(180%);backdrop-filter:blur(18px) saturate(180%);
     box-shadow:inset 0 1px 0 var(--g-hi),inset 0 -1px 0 var(--g-lo),0 10px 28px -10px var(--g-sh)}
   .seg{background:linear-gradient(145deg,var(--g-bg2),var(--g-lo));border:1px solid var(--g-brd);
-    -webkit-backdrop-filter:blur(14px) saturate(170%);backdrop-filter:blur(14px) saturate(170%);
     box-shadow:inset 0 1px 0 var(--g-hi),inset 0 -1px 0 var(--g-lo),0 4px 14px -6px var(--g-sh)}
   .seg button[aria-pressed="true"]{background:linear-gradient(160deg,var(--g-thumb),var(--g-bg));
     box-shadow:inset 0 1px 0 var(--g-hi),inset 0 -1px 0 var(--g-lo),0 4px 12px -2px var(--g-sh),0 0 0 1px var(--g-brd)}
   .top{position:sticky;top:env(safe-area-inset-top,0px);z-index:15;background:color-mix(in srgb,var(--navy) 66%,transparent);
-    -webkit-backdrop-filter:blur(20px) saturate(170%);backdrop-filter:blur(20px) saturate(170%);box-shadow:inset 0 -1px 0 rgba(255,255,255,.12)}
+    -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:inset 0 -1px 0 rgba(255,255,255,.12)}
   .tabs{left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom,0px));padding:6px;border-radius:26px;max-width:736px;margin:0 auto;
     background:linear-gradient(145deg,var(--g-bg),var(--g-bg2));border:1px solid var(--g-brd);
-    -webkit-backdrop-filter:blur(22px) saturate(190%);backdrop-filter:blur(22px) saturate(190%);
+    -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
     box-shadow:inset 0 1px 0 var(--g-hi),inset 0 -1px 0 var(--g-lo),0 14px 34px -8px var(--g-sh)}
   .tabs a{border-radius:20px}
   .tabs a[aria-current="page"]{background:linear-gradient(160deg,var(--g-thumb),var(--g-bg2));box-shadow:inset 0 1px 0 var(--g-hi),0 4px 12px -3px var(--g-sh)}
@@ -218,7 +216,7 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
 .tabs a,.seg button,.btn{transition:transform .15s ease,background .25s ease,color .25s ease}
 .tabs a:active,.seg button:active,.btn:active{transform:scale(.94)}
 @keyframes pop{0%{transform:scale(.88)}100%{transform:scale(1)}}
-@keyframes rise{from{opacity:0;transform:translateY(18px) scale(.98);filter:blur(6px)}to{opacity:1;transform:none;filter:none}}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 main.enter>*{animation:rise .65s cubic-bezier(.2,.8,.2,1) both}
 main.enter>*:nth-child(2){animation-delay:.07s}main.enter>*:nth-child(3){animation-delay:.14s}main.enter>*:nth-child(4){animation-delay:.21s}
 main.enter>*:nth-child(5){animation-delay:.28s}main.enter>*:nth-child(6){animation-delay:.35s}main.enter>*:nth-child(n+7){animation-delay:.42s}
@@ -236,17 +234,20 @@ main.enter>*:nth-child(5){animation-delay:.28s}main.enter>*:nth-child(6){animati
 .acc .lab{font-size:10.5px;letter-spacing:.09em}
 .acc .res b{font-family:var(--display);font-size:15px;letter-spacing:-.005em}
 .acc .share span{font-size:12px}
+main.enter.fwd>*{animation-name:slideF}main.enter.back>*{animation-name:slideB}
+@keyframes slideF{from{opacity:0;transform:translateX(38px)}to{opacity:1;transform:none}}
+@keyframes slideB{from{opacity:0;transform:translateX(-38px)}to{opacity:1;transform:none}}
 /* tajuk */
-.top h1 .ch{display:inline-block;opacity:0;animation:chIn .7s cubic-bezier(.2,.8,.2,1) forwards,chWave 9s ease-in-out 2s infinite;animation-delay:calc(var(--i)*55ms + 1.2s),calc(var(--i)*70ms + 2.4s)}
+.top h1 .ch{display:inline-block;opacity:0;animation:chIn .7s cubic-bezier(.2,.8,.2,1) forwards,chWave 6s ease-in-out 2s 2;animation-delay:calc(var(--i)*45ms + .9s),calc(var(--i)*70ms + 2.2s)}
 .top h1 .sp{display:inline-block;width:.28em}
-@keyframes chIn{from{opacity:0;transform:translateY(14px) scale(.8);filter:blur(8px)}to{opacity:1;transform:none;filter:none}}
+@keyframes chIn{from{opacity:0;transform:translateY(10px) scale(.85)}to{opacity:1;transform:none}}
 @keyframes chWave{0%,18%,100%{transform:none;color:inherit}6%{transform:translateY(-3px);color:var(--mint)}12%{transform:none}}
 /* splash */
 #splash{position:fixed;inset:0;z-index:300;background:radial-gradient(circle at 50% 42%,#12342A 0,#07100D 62%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;color:#fff;
-  animation:splashOut .6s ease 1.15s forwards}
+  animation:splashOut .45s ease .9s forwards}
 #splash img{width:104px;height:104px;border-radius:26px;object-fit:cover;box-shadow:0 0 0 1px rgba(255,255,255,.2),0 0 60px 6px rgba(52,211,153,.35);animation:logoIn .9s cubic-bezier(.2,1.2,.3,1) both}
 #splash b{font-family:var(--display);font-size:24px;letter-spacing:-.01em;animation:rise .7s cubic-bezier(.2,.8,.2,1) .25s both}
-@keyframes logoIn{from{opacity:0;transform:scale(.5) rotate(-8deg);filter:blur(10px)}to{opacity:1;transform:none;filter:none}}
+@keyframes logoIn{from{opacity:0;transform:scale(.5) rotate(-8deg)}to{opacity:1;transform:none}}
 @keyframes splashOut{to{opacity:0;visibility:hidden;transform:scale(1.06)}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;transition:none!important}.top h1 .ch{opacity:1}}
 </style>
@@ -753,11 +754,12 @@ function render(){
   if(pendingFocus){const el=[...main.querySelectorAll('[data-k]')].find(e=>e.dataset.k.startsWith(pendingFocus));pendingFocus=null;if(el)el.focus();}
   else if(key){const el=[...main.querySelectorAll('[data-k]')].find(e=>e.dataset.k===key);if(el){el.focus();try{if(ss!=null)el.setSelectionRange(ss,ss)}catch(e){}}}
 }
-let lastAnim=null;
+let lastAnim=null,prevTab=null;
 function animEnter(tab){
   const k=tab+(loaded?'1':'0');if(k===lastAnim)return;lastAnim=k;
-  main.classList.remove('enter');void main.offsetWidth;main.classList.add('enter');
-  clearTimeout(animEnter.t);animEnter.t=setTimeout(()=>main.classList.remove('enter'),1400);
+  const ti=TABS.indexOf(tab),dir=prevTab!=null&&prevTab!==ti?(ti>prevTab?'fwd':'back'):'';prevTab=ti;
+  main.classList.remove('enter','fwd','back');void main.offsetWidth;main.classList.add('enter');if(dir)main.classList.add(dir);
+  clearTimeout(animEnter.t);animEnter.t=setTimeout(()=>main.classList.remove('enter','fwd','back'),1400);
   const el=main.querySelector('.hero .big');
   if(el&&!matchMedia('(prefers-reduced-motion:reduce)').matches){
     const m=/^(-?)RM([\d,]+)\.(\d\d)$/.exec(el.textContent.trim());
@@ -769,7 +771,7 @@ function animEnter(tab){
 }
 (function(){const h=document.querySelector('.top h1');if(!h)return;const t=h.textContent;h.setAttribute('aria-label',t);h.textContent='';
   [...t].forEach((c,i)=>{const s=document.createElement('span');s.setAttribute('aria-hidden','true');s.style.setProperty('--i',i);if(c===' '){s.className='sp'}else{s.className='ch';s.textContent=c}h.appendChild(s)})})();
-setTimeout(()=>{const s=document.getElementById('splash');if(s)s.remove()},2000);
+setTimeout(()=>{const s=document.getElementById('splash');if(s)s.remove()},1600);
 let rq=0;const later=()=>{cancelAnimationFrame(rq);rq=requestAnimationFrame(()=>setTimeout(render,0))};
 window.addEventListener('hashchange',()=>{later();window.scrollTo(0,0)});
 
@@ -849,6 +851,32 @@ function nwScrub(e){
 document.addEventListener('pointerdown',nwScrub);
 document.addEventListener('pointermove',e=>{if(e.pointerType==='mouse'&&!e.buttons&&!(e.target.closest&&e.target.closest('.nwc')))return;nwScrub(e)});
 
+/* ---------- bulan semasa auto-muncul ---------- */
+let monthEnsured=false;
+function ensureMonth(){
+  if(monthEnsured)return;monthEnsured=true;
+  const a=state.saving.monthly;if(!a.length)return;
+  if(dirty.has('saving')||writing.saving)return;
+  const ym=nowYm();if(a.some(x=>x.ym===ym))return;
+  a.push({ym,amt:null});touch('saving');
+}
+/* ---------- leret kiri/kanan tukar tab ---------- */
+(function(){
+  let x0=0,y0=0,t0=0,ok=false;
+  const bad=el=>{for(let e=el;e&&e!==document.body;e=e.parentElement){if(e.classList&&e.classList.contains('nwc'))return true;if(e.scrollWidth>e.clientWidth+4&&/(auto|scroll)/.test(getComputedStyle(e).overflowX))return true}return false};
+  document.addEventListener('touchstart',e=>{
+    if(e.touches.length!==1){ok=false;return}
+    const t=e.touches[0];x0=t.clientX;y0=t.clientY;t0=Date.now();
+    ok=x0>28&&x0<window.innerWidth-28&&!bad(e.target)},{passive:true});
+  document.addEventListener('touchend',e=>{
+    if(!ok)return;ok=false;
+    const t=e.changedTouches[0],dx=t.clientX-x0,dy=t.clientY-y0;
+    if(Math.abs(dx)<80||Math.abs(dx)<Math.abs(dy)*2||Date.now()-t0>700)return;
+    const i=TABS.indexOf(curTab()),n=i+(dx<0?1:-1);
+    if(n<0||n>=TABS.length)return;
+    location.hash='#'+TABS[n]},{passive:true});
+})();
+
 /* ---------- boot ---------- */
 render();
 (async()=>{
@@ -856,7 +884,7 @@ render();
   if(!db){db=false;localMode=true;loaded=true;
     try{const raw=localStorage.getItem(KEY);const src=raw?JSON.parse(raw):SEED;if(src)DOCS.forEach(n=>{if(src[n])state[n]=Object.assign(DEF[n](),src[n])});dbErr='Mod peranti: data disimpan dalam browser ni sahaja dan tak sync dengan peranti lain. Guna Simpan fail untuk sandaran.'}
     catch(e){if(SEED)DOCS.forEach(n=>{if(SEED[n])state[n]=Object.assign(DEF[n](),SEED[n])});dbErr='Browser ni tak benarkan simpan data, jadi ubahan hilang bila ditutup. Guna Simpan fail untuk sandaran.'}
-    setSync('ok','Mod peranti');later();return}
+    ensureMonth();setSync('ok','Mod peranti');later();return}
   db.collection('m').onSnapshot(snap=>{
     snap.docs.forEach(doc=>{
       const n=doc.id;if(!DOCS.includes(n))return;
@@ -864,7 +892,7 @@ render();
       const raw=JSON.stringify(doc.data());if(raw===last[n])return;
       last[n]=raw;state[n]=Object.assign(DEF[n](),JSON.parse(raw));
     });
-    loaded=true;if(!dirty.size)setSync('ok','Tersimpan');
+    loaded=true;if(!snap.metadata.fromCache&&snap.docs.some(d=>d.id==='saving'))ensureMonth();if(!dirty.size)setSync('ok','Tersimpan');
     const ae=document.activeElement;
     if(ae&&/^(INPUT|TEXTAREA)$/.test(ae.tagName)&&ae.dataset.k){ae.addEventListener('blur',()=>later(),{once:true})}else later();
   },err=>{loaded=true;dbErr='Data tak dapat dimuat ('+(err&&err.code||'ralat')+').';setSync('err','Ralat');later()});
