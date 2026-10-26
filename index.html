@@ -314,6 +314,13 @@ select.in{appearance:none;-webkit-appearance:none;background:transparent;font-si
   background:linear-gradient(145deg,var(--g-in1,var(--surface2)),var(--g-in2,var(--surface2)));box-shadow:inset 0 1px 0 var(--g-hi,transparent),0 4px 12px -6px var(--g-sh,transparent);transition:transform .15s}
 .cat span{font-size:17px;line-height:1}.cat:active{transform:scale(.93)}
 .cat.edit{border-color:var(--bad);color:var(--bad)}.cat.add{border-style:dashed;color:var(--accent)}
+#rcp[hidden]{display:none}
+#rcp{position:fixed;inset:0;z-index:60;background:rgba(7,16,13,.45);display:flex;align-items:flex-end;justify-content:center;animation:fade .25s both}
+.rl{display:flex;flex-direction:column;gap:10px;max-height:46vh;overflow-y:auto;overscroll-behavior:contain}
+.rr{display:grid;grid-template-columns:26px minmax(0,1fr) 84px;gap:6px 8px;align-items:center;border:1px solid var(--line);border-radius:14px;padding:10px;background:var(--surface2)}
+.rr .in{border:0;border-bottom:1px dashed var(--line);border-radius:0;padding:6px 2px;background:transparent;min-height:0}
+.rr select.in{grid-column:2/4;border:1px solid var(--line);border-radius:10px;padding:6px 8px;font-size:13px}
+.rr.off{opacity:.45}.rtot{display:flex;justify-content:space-between;font-weight:700;padding:4px 2px}
 /* tajuk */
 .top h1 .ch{display:inline-block;opacity:0;animation:chIn .7s cubic-bezier(.2,.8,.2,1) forwards,chWave 6s ease-in-out 2s 2;animation-delay:calc(var(--i)*45ms + .9s),calc(var(--i)*70ms + 2.2s)}
 .top h1 .sp{display:inline-block;width:.28em}
@@ -330,6 +337,8 @@ select.in{appearance:none;-webkit-appearance:none;background:transparent;font-si
 .edtx{margin:10px 0 2px}.edtx summary{cursor:pointer;color:var(--accent);font-weight:700;font-size:13px;padding:6px 0;min-height:32px}.edtx .lab{margin-top:10px}
 </style>
 
+<input type="file" id="rcpF" accept="image/*" hidden>
+<div id="rcp" hidden role="dialog" aria-modal="true" aria-label="Imbas resit"><div class="shc"><h2>Imbas resit</h2><p class="hint" id="rcpS">Memuat...</p><div class="bar" id="rcpB" hidden><i style="width:0%"></i></div><div id="rcpL" class="rl"></div><div class="btns"><button class="btn" id="rcpOk" hidden>Tambah ke belanja</button><button class="btn ghost" id="rcpNo">Tutup</button></div></div></div>
 <div id="sheet" hidden role="dialog" aria-modal="true" aria-label="Tab baru"><div class="shc"><h2>Tab baru</h2><label class="lab">Nama tab<input class="in t" id="shN" maxlength="18" autocomplete="off" placeholder="cth Makan, Kereta, Hadiah"></label><div><p class="eyebrow" style="margin-bottom:8px">Pilih ikon</p><div class="emj" id="shE"></div></div><label class="lab">Atau taip emoji sendiri<input class="in t" id="shC" maxlength="6" autocomplete="off" placeholder="cth 🥭"></label><div class="btns"><button class="btn" id="shOk">Tambah tab</button><button class="btn ghost" id="shNo">Batal</button></div></div></div>
 <div id="lock" hidden role="dialog" aria-modal="true" aria-label="Kunci app"><div class="lk"><div class="lkt" id="lkT">Masukkan PIN</div><div class="dots" id="lkD"></div><div class="lkm" id="lkM" role="status"></div><div class="pad" id="lkP"></div><div class="lkb"><button id="lkBio" hidden>Guna cap jari</button><button id="lkX" hidden>Batal</button><button id="lkF" hidden>Lupa PIN? Log keluar</button></div></div></div>
 <div id="toast" role="status"><span id="toastT"></span><button id="toastB">Buat asal</button></div>
@@ -838,7 +847,7 @@ function vXtra(x,i){
 function catsHtml(){
   const cats=state.belanja.cats||DEFCATS;
   return `<div><div class="sec-h" style="margin-bottom:8px"><p class="eyebrow">${catEdit?'Mod ubah: tekan kategori untuk buang':'Tekan untuk tambah'}</p><button class="lnk" data-act="catedit" style="margin-left:0">${catEdit?'Siap':'Ubah'}</button></div>
-  <div class="cats" role="group" aria-label="Kategori belanja">${cats.map((c,i)=>`<button class="cat ${catEdit?'edit':''}" data-act="${catEdit?'catdel':'cat'}" data-i="${i}"><span aria-hidden="true">${esc(c.e)}</span>${esc(c.n)}${catEdit?'<b aria-hidden="true"> ×</b>':''}</button>`).join('')}${catEdit?'<button class="cat add" data-act="catadd">+ Kategori</button>':''}</div></div>`;
+  <div class="cats" role="group" aria-label="Kategori belanja">${cats.map((c,i)=>`<button class="cat ${catEdit?'edit':''}" data-act="${catEdit?'catdel':'cat'}" data-i="${i}"><span aria-hidden="true">${esc(c.e)}</span>${esc(c.n)}${catEdit?'<b aria-hidden="true"> ×</b>':''}</button>`).join('')}${catEdit?'<button class="cat add" data-act="catadd">+ Kategori</button>':''}</div><div class="btns" style="margin-top:10px"><button class="btn ghost" data-act="rcp">📷 Imbas resit</button></div></div>`;
 }
 const catOf=r=>(r.cat||String(r.name||'').replace(/^\p{Extended_Pictographic}\uFE0F?\s*/u,'').trim()||'Tanpa nama');
 function blInsight(rows,tot,bud){
@@ -1147,6 +1156,7 @@ document.addEventListener('click',e=>{
     if(!b.dataset.armed){b.dataset.armed='1';const o=b.textContent;b.textContent='Pasti?';setTimeout(()=>{if(b.isConnected){delete b.dataset.armed;b.textContent=o}},3000);return}
     const ix=+b.dataset.i,t=state.custom.tabs[ix];if(!t)return;state.custom.tabs.splice(ix,1);touch('custom');location.hash='#ringkasan';later();
     setUndo('Tab "'+t.name+'" dibuang',()=>{state.custom.tabs.splice(Math.min(ix,state.custom.tabs.length),0,t);touch('custom');later()});return}
+  if(act==='rcp'){document.getElementById('rcpF').click();return}
   if(act==='blr'){blRange=b.dataset.v;try{localStorage.setItem('blRange',blRange)}catch(x){}later();return}
   if(act==='catedit'){catEdit=!catEdit;later();return}
   if(act==='cat'){
@@ -1293,6 +1303,82 @@ document.addEventListener('visibilitychange',()=>{
   if(hasPin()&&L.el.hidden&&hiddenAt&&Date.now()-hiddenAt>45000)lkShow('unlock');
 });
 if(hasPin())lkShow('unlock');
+
+
+/* ---------- imbas resit (OCR dalam peranti) ---------- */
+const RC_PRICE=/(?:RM|MYR)?\s*(\d{1,5}[.,]\d{2})\s*[A-Za-z]{0,2}\s*$/i;
+const RC_SKIP=/\b(sub\s*-?\s*total|change|baki|cash|tunai|tax|sst|gst|service|svc|rounding|round|disc|discount|diskaun|visa|master|card|kad|qr|tng|payment|bayaran|received|terima|invoice|inv|receipt|resit|tel|phone|fax|reg|order|table|meja|cashier|kaunter|thank|wifi|date|tarikh|time|masa|mykad)\b/i;
+const RC_CAT=[['Minum',/\b(teh|tea|kopi|coffee|latte|milo|air|drink|juice|jus|sirap|boba|bubble|ais|ice|cola|100\s*plus|soda|milk|susu|mineral|cendol|nescafe|cappuccino|americano|mocha|smoothie|cincau)\b/i],
+ ['Makan',/\b(nasi|mee|mi|bihun|ayam|roti|burger|pizza|ikan|sup|lauk|telur|kuey|kueh|laksa|set|meal|rice|chicken|noodle|fries|nugget|cake|kek|donut|char|goreng|bakar|sambal|sate|satay|kari|curry|capati|tosai|thosai|maggi|sandwich|pasta|spaghetti|wrap|kfc|mcd)\b/i],
+ ['Minyak',/\b(petrol|ron\s*9\d|diesel|petron|petronas|shell|caltex|bhp|fuel|minyak)\b/i],
+ ['Parking / Tol',/\b(parking|park|tol|toll|tng)\b/i],
+ ['Ubat',/\b(ubat|pharmacy|farmasi|guardian|watson|panadol|vitamin|plaster)\b/i],
+ ['Topup',/\b(topup|top\s*up|reload|prepaid)\b/i]];
+const rcTitle=t=>t.toLowerCase().replace(/(^|\s)(\p{L})/gu,(m,a,b)=>a+b.toUpperCase());
+const rcGuess=n=>{for(const [c,re] of RC_CAT)if(re.test(n))return c;return 'Lain-lain'};
+function rcpParse(text){
+  const lines=String(text||'').split(/\r?\n/).map(l=>l.replace(/[|_~=]+/g,' ').replace(/\s+/g,' ').trim()).filter(Boolean);
+  let total=null,date=null;const items=[];
+  for(const l of lines){
+    if(!date){const m=/(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})/.exec(l);if(m){let d=+m[1],mo=+m[2],y=+m[3];if(y<100)y+=2000;if(mo>=1&&mo<=12&&d>=1&&d<=31&&y>=2020&&y<=2100)date=y+'-'+pad(mo)+'-'+pad(d)}}
+    const pm=RC_PRICE.exec(l);if(!pm)continue;
+    const amt=parseFloat(pm[1].replace(',','.'));
+    if(/\b(sub\s*-?\s*total)\b/i.test(l))continue;
+    if(/\b(total|jumlah)\b/i.test(l)){if(total==null||/grand/i.test(l))total=amt;continue}
+    if(RC_SKIP.test(l))continue;
+    let name=l.slice(0,pm.index).trim().replace(/\s+\d+\s*[xX@]\s*[\d.,]+$/,'').replace(/^\d+\s*[xX@]?\s+/,'').replace(/[^\p{L}\p{N}\s&'\/\-\.\(\)]/gu,' ').replace(/\s+/g,' ').trim();
+    if(name.length<2||!/\p{L}{2}/u.test(name)||amt<=0||amt>5000)continue;
+    items.push({name:rcTitle(name),amt,cat:rcGuess(name)});
+  }
+  if(!items.length&&total)items.push({name:'Resit',amt:total,cat:'Lain-lain'});
+  return {items,total,date};
+}
+window._rcpParse=rcpParse;
+let rcpData=null;
+(function(){
+  const F=document.getElementById('rcpF'),O=document.getElementById('rcp'),S=document.getElementById('rcpS'),Bw=document.getElementById('rcpB'),L=document.getElementById('rcpL'),OK=document.getElementById('rcpOk');
+  const close=()=>{O.hidden=true;rcpData=null};
+  document.getElementById('rcpNo').onclick=close;O.addEventListener('click',e=>{if(e.target===O)close()});
+  const loadTess=()=>window.Tesseract?Promise.resolve():new Promise((ok,no)=>{const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';sc.onload=ok;sc.onerror=()=>no(new Error('load'));document.head.appendChild(sc)});
+  const bmpOf=async f=>{try{return await createImageBitmap(f)}catch(e){const u=URL.createObjectURL(f);return await new Promise((ok,no)=>{const im=new Image();im.onload=()=>ok(im);im.onerror=no;im.src=u})}};
+  async function prep(f){
+    const b=await bmpOf(f),w0=b.width||b.naturalWidth,h0=b.height||b.naturalHeight,k=Math.min(2200/Math.max(w0,h0),Math.max(1,1300/w0));
+    const c=document.createElement('canvas');c.width=Math.round(w0*k);c.height=Math.round(h0*k);const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(b,0,0,c.width,c.height);
+    const im=g.getImageData(0,0,c.width,c.height),d=im.data,hist=new Uint32Array(256);
+    for(let i=0;i<d.length;i+=4){const v=(d[i]*299+d[i+1]*587+d[i+2]*114)/1000|0;d[i]=v;hist[v]++}
+    const n=c.width*c.height;let a=0,lo=0,hi=255;for(lo=0;lo<255&&(a+=hist[lo])<n*.02;lo++);a=0;for(hi=255;hi>0&&(a+=hist[hi])<n*.02;hi--);if(hi-lo<30){lo=0;hi=255}
+    for(let i=0;i<d.length;i+=4){const v=Math.max(0,Math.min(255,(d[i]-lo)*255/(hi-lo)));d[i]=d[i+1]=d[i+2]=v}
+    g.putImageData(im,0,0);return c;
+  }
+  const cats=()=>state.belanja.cats||DEFCATS;
+  function draw(){
+    const r=rcpData;if(!r)return;const opts=['<option value="">Tanpa kategori</option>'].concat(cats().map(c=>`<option value="${esc(c.n)}">${esc(c.e)} ${esc(c.n)}</option>`)).join('');
+    L.innerHTML=`<label class="lab" style="max-width:200px">Tarikh<input class="in t" type="date" id="rcpD" value="${esc(r.date)}"></label>`+r.items.map((x,i)=>`<div class="rr ${x.on?'':'off'}" data-i="${i}"><input type="checkbox" class="tick" ${x.on?'checked':''} aria-label="Masukkan ${esc(x.name)}"><input class="in t" data-f="name" value="${esc(x.name)}" aria-label="Nama"><input class="in n" inputmode="decimal" data-f="amt" value="${x.amt}" aria-label="Jumlah"><select class="in t" data-f="cat" aria-label="Kategori">${opts.replace('value="'+esc(x.cat)+'"','value="'+esc(x.cat)+'" selected')}</select></div>`).join('')+`<div class="rtot"><span>Dipilih</span><b class="num" id="rcpT"></b></div>`;
+    tot();
+  }
+  function tot(){const r=rcpData;if(!r)return;const t=sum(r.items.filter(x=>x.on),x=>x.amt);document.getElementById('rcpT').textContent=rm(t)+(r.total!=null?'  ·  resit '+rm(r.total):'');OK.disabled=!r.items.some(x=>x.on)}
+  L.addEventListener('input',e=>{const row=e.target.closest('.rr');if(e.target.id==='rcpD'){rcpData.date=e.target.value;return}if(!row)return;const x=rcpData.items[+row.dataset.i],f=e.target.dataset.f;
+    if(e.target.type==='checkbox'){x.on=e.target.checked;row.classList.toggle('off',!x.on)}else if(f==='amt')x.amt=num(e.target.value)||0;else if(f)x[f]=e.target.value;tot()});
+  OK.onclick=()=>{
+    const r=rcpData;if(!r)return;const d=/^\d{4}-\d{2}-\d{2}$/.test(r.date)?r.date:blSel;const add=[];
+    r.items.filter(x=>x.on&&x.amt>0).forEach(x=>{const c=cats().find(c=>c.n===x.cat),row={d,name:(c&&c.e?c.e+' ':'')+(x.name||x.cat||'Belanja'),amt:+x.amt};if(x.cat)row.cat=x.cat;add.push(row);state.belanja.rows.push(row)});
+    if(!add.length)return;blSel=d;blMonth=d.slice(0,7);touch('belanja');close();later();
+    setUndo(add.length+' belanja ditambah',()=>{add.forEach(a=>{const ix=state.belanja.rows.indexOf(a);if(ix>=0)state.belanja.rows.splice(ix,1)});touch('belanja');later()});
+  };
+  F.addEventListener('change',async()=>{
+    const f=F.files&&F.files[0];F.value='';if(!f)return;
+    rcpData=null;L.innerHTML='';OK.hidden=true;Bw.hidden=false;Bw.firstChild.style.width='0%';O.hidden=false;S.textContent='Menyediakan gambar...';
+    try{
+      const c=await prep(f);S.textContent='Memuat enjin bacaan (kali pertama perlu internet)...';
+      await loadTess();S.textContent='Membaca resit...';
+      const res=await Tesseract.recognize(c,'eng',{logger:m=>{if(m.status==='recognizing text')Bw.firstChild.style.width=Math.round(m.progress*100)+'%'}});
+      const p=rcpParse(res.data.text);Bw.hidden=true;
+      if(!p.items.length){S.textContent='Tak jumpa item dalam gambar tu. Cuba ambil gambar lebih terang dan lurus, atau tambah belanja guna butang kategori.';return}
+      rcpData={date:p.date||blSel,total:p.total,items:p.items.map(x=>({...x,on:true}))};
+      S.textContent='Semak dulu. Betulkan nama, jumlah atau kategori, nyahtanda yang tak perlu.';OK.hidden=false;draw();
+    }catch(e){Bw.hidden=true;S.textContent=(navigator.onLine===false?'Tiada internet. ':'')+'Bacaan gagal. Cuba lagi atau tambah belanja guna butang kategori.'}
+  });
+})();
 
 /* ---------- bulan semasa auto-muncul ---------- */
 let monthEnsured=false;
