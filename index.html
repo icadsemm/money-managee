@@ -211,8 +211,8 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
   .tabs a[aria-current="page"]{background:linear-gradient(160deg,var(--g-thumb),var(--g-bg2));box-shadow:inset 0 1px 0 var(--g-hi),0 4px 12px -3px var(--g-sh)}
   main{padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))}
 }
-.seg button[aria-pressed="true"]{animation:pop .45s cubic-bezier(.3,1.5,.5,1)}
-.tabs a[aria-current="page"] svg{animation:pop .5s cubic-bezier(.3,1.6,.5,1)}
+.tabs a[aria-current="page"] svg{animation:popS .4s cubic-bezier(.3,1.3,.5,1)}
+@keyframes popS{0%{transform:scale(.88)}100%{transform:scale(1)}}
 .tabs a,.seg button,.btn{transition:transform .15s ease,background .25s ease,color .25s ease}
 .tabs a:active,.seg button:active,.btn:active{transform:scale(.94)}
 @keyframes pop{0%{transform:scale(.88)}100%{transform:scale(1)}}
