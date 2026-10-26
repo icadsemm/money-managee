@@ -245,6 +245,8 @@ main.enter.fwd>*{animation-name:slideF}main.enter.back>*{animation-name:slideB}
 main{padding-bottom:calc(120px + env(safe-area-inset-bottom,0px))}
 :root{--nav1:var(--g-bg);--nav2:var(--g-bg2)}
 @keyframes navUp{from{opacity:0;transform:translateY(40px) scale(.96)}to{opacity:1;transform:none}}
+/* elak halaman terlebar semasa luncur */
+html,body{overflow-x:clip;max-width:100%}.wrap,main{overflow-x:clip}
 /* tajuk */
 .top h1 .ch{display:inline-block;opacity:0;animation:chIn .7s cubic-bezier(.2,.8,.2,1) forwards,chWave 6s ease-in-out 2s 2;animation-delay:calc(var(--i)*45ms + .9s),calc(var(--i)*70ms + 2.2s)}
 .top h1 .sp{display:inline-block;width:.28em}
