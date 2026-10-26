@@ -247,6 +247,39 @@ main{padding-bottom:calc(120px + env(safe-area-inset-bottom,0px))}
 @keyframes navUp{from{opacity:0;transform:translateY(40px) scale(.96)}to{opacity:1;transform:none}}
 /* elak halaman terlebar semasa luncur */
 html,body{overflow-x:clip;max-width:100%}.wrap,main{overflow-x:clip}
+
+/* ===== fungsi baru ===== */
+.seg.s3{grid-template-columns:repeat(3,1fr)}.seg.s3 button{padding:8px 2px;min-height:38px;font-size:12.5px}
+.dl{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:99px;background:color-mix(in srgb,var(--mute) 14%,transparent);color:var(--mute);white-space:nowrap}
+.dl.good{background:color-mix(in srgb,var(--good) 15%,transparent);color:var(--good)}.dl.bad{background:color-mix(in srgb,var(--bad) 15%,transparent);color:var(--bad)}
+.cmp{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:4px 10px;align-items:center;padding:9px 0;border-top:1px solid var(--line)}
+.cmp:first-of-type{border-top:0}.cmp .cl{font-size:12.5px;color:var(--mute);font-weight:600}.cmp .cv{font-family:var(--display);font-weight:700;font-size:15px;text-align:right}
+.gl{display:grid;grid-template-columns:76px minmax(0,1fr);gap:12px;align-items:center}
+.ring{width:76px;height:76px;transform:rotate(-90deg)}.ring circle{fill:none;stroke-width:7;stroke-linecap:round}
+.ring .rt{stroke:var(--track)}.ring .rp{stroke:var(--accent);transition:stroke-dasharray .9s cubic-bezier(.2,.8,.2,1)}
+.ring text{transform:rotate(90deg);transform-origin:32px 32px;font-family:var(--display);font-weight:700;font-size:13px;fill:var(--ink);stroke:none}
+.gr{display:flex;flex-direction:column;gap:6px;min-width:0}.gr small{color:var(--mute)}
+select.in{appearance:none;-webkit-appearance:none;background:transparent;font-size:14px;font-weight:600;letter-spacing:0;text-transform:none}
+.dvc{display:flex;align-items:flex-end;gap:6px;height:140px;padding-top:18px}
+.dvb{flex:1;min-width:0;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:3px;position:relative}
+.dvb i{display:block;width:100%;max-width:28px;border-radius:7px 7px 3px 3px;background:linear-gradient(180deg,var(--mint),var(--accent));min-height:4px;transform-origin:bottom;animation:grow .8s cubic-bezier(.2,.8,.2,1) both}
+.dvb i.neg{background:linear-gradient(180deg,#F87171,var(--bad))}
+.dvb span{font-size:9.5px;color:var(--mute);font-weight:700;white-space:nowrap}.dvb em{font-style:normal;font-size:9.5px;color:var(--mute)}
+@keyframes grow{from{transform:scaleY(.05);opacity:.4}to{transform:none;opacity:1}}
+#toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);z-index:40;display:flex;align-items:center;gap:12px;
+  background:rgba(15,23,42,.88);color:#fff;border-radius:99px;padding:8px 8px 8px 16px;font-size:13px;font-weight:600;box-shadow:0 10px 30px -6px rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:opacity .25s,transform .3s cubic-bezier(.2,.9,.3,1);max-width:calc(100vw - 28px)}
+#toast.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+#toast span{white-space:nowrap}#toast button{white-space:nowrap;font:inherit;font-weight:800;border:0;border-radius:99px;background:var(--mint);color:#04130C;padding:8px 14px;cursor:pointer}
+#lock[hidden]{display:none}
+#lock{position:fixed;inset:0;z-index:250;background:radial-gradient(circle at 50% 30%,#12342A 0,#07100D 65%);color:#fff;display:flex;align-items:center;justify-content:center;padding:24px}
+.lk{width:min(320px,100%);display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
+.lkt{font-family:var(--display);font-size:22px;font-weight:700}.lkm{min-height:18px;font-size:12.5px;color:#FBBF24}
+.dots{display:flex;gap:14px;height:16px}.dots i{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.55);transition:background .15s,transform .15s}.dots i.f{background:var(--mint);border-color:var(--mint);transform:scale(1.1)}
+.dots.shake{animation:shake .4s}@keyframes shake{20%,60%{transform:translateX(-10px)}40%,80%{transform:translateX(10px)}}
+.pad{display:grid;grid-template-columns:repeat(3,72px);gap:14px;margin-top:6px}
+.pad button{width:72px;height:72px;border-radius:50%;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.09);color:#fff;font:700 24px var(--display);cursor:pointer;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.pad button:active{background:rgba(255,255,255,.25);transform:scale(.94)}.pad button.ghost{background:transparent;border-color:transparent;font-size:14px}
+.lkb{display:flex;flex-direction:column;gap:8px;align-items:center}.lkb button{background:none;border:0;color:#9FB3AA;font:600 13px var(--body);text-decoration:underline;cursor:pointer}
 /* tajuk */
 .top h1 .ch{display:inline-block;opacity:0;animation:chIn .7s cubic-bezier(.2,.8,.2,1) forwards,chWave 6s ease-in-out 2s 2;animation-delay:calc(var(--i)*45ms + .9s),calc(var(--i)*70ms + 2.2s)}
 .top h1 .sp{display:inline-block;width:.28em}
@@ -262,6 +295,8 @@ html,body{overflow-x:clip;max-width:100%}.wrap,main{overflow-x:clip}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;transition:none!important}.top h1 .ch{opacity:1}}
 </style>
 
+<div id="lock" hidden role="dialog" aria-modal="true" aria-label="Kunci app"><div class="lk"><div class="lkt" id="lkT">Masukkan PIN</div><div class="dots" id="lkD"></div><div class="lkm" id="lkM" role="status"></div><div class="pad" id="lkP"></div><div class="lkb"><button id="lkBio" hidden>Guna cap jari</button><button id="lkX" hidden>Batal</button><button id="lkF" hidden>Lupa PIN? Log keluar</button></div></div></div>
+<div id="toast" role="status"><span id="toastT"></span><button id="toastB">Buat asal</button></div>
 <div id="splash" aria-hidden="true"><img src="kucing-192.png" alt="" onerror="this.style.display='none'"><b>Money Manage</b></div>
 <header class="top"><div class="wrap">
   <div><h1>Money Manage</h1><p id="sub"></p></div>
@@ -358,21 +393,22 @@ const num=v=>{v=String(v).replace(/[^\d.\-]/g,'');if(v===''||v==='-'||v==='.')re
 const uidx=()=>Math.random().toString(36).slice(2,8);
 
 const DEF={
-  saving:()=>({accounts:[],target:100000,goal:1000,
+  saving:()=>({accounts:[],goals:[],target:100000,goal:1000,
     levels:[{icon:'🌱',name:'Benih',pct:0},{icon:'🥉',name:'Perunggu',pct:.1},{icon:'🥈',name:'Perak',pct:.25},{icon:'🥇',name:'Emas',pct:.5},{icon:'💎',name:'Platinum',pct:.75},{icon:'👑',name:'Berlian',pct:1}],
     monthly:[],history:[],updated:todayISO()}),
   delivery:()=>({rows:[]}),
-  komitmen:()=>({label:ML[new Date().getMonth()]+' '+new Date().getFullYear(),income:[],items:[],notes:[]}),
+  komitmen:()=>({label:ML[new Date().getMonth()]+' '+new Date().getFullYear(),income:[],items:[],notes:[],history:[]}),
   spaylater:()=>({target:0,entries:[],ryt:'',spay:'',notes:[]}),
   advance:()=>({month:nowYm(),amount:0,items:[],notes:[]})
 };
 const state={};DOCS.forEach(n=>state[n]=DEF[n]());
 const last={},dirty=new Set(),writing={},again={},timers={};
-let db=null,loaded=false,dbErr='',bilTab='spay',localMode=false,nwRange='all';
+let db=null,loaded=false,dbErr='',bilTab='spay',localMode=false,nwRange='all',dvRange='d';
 const KEY='duit-icad-v1';
 const SEED=null;
 try{bilTab=localStorage.getItem('bilTab')||'spay'}catch(e){}
 try{nwRange=localStorage.getItem('nwRange')||'all'}catch(e){}
+try{dvRange=localStorage.getItem('dvRange')||'d'}catch(e){}
 
 /* ---------- calculations ---------- */
 function calc(){
@@ -511,6 +547,7 @@ function vRingkasan(C){
   <p class="quote">${QUOTES[serial%10]}</p>
   ${nwView(C)}
   ${empty&&loaded?`<p class="empty">Belum ada data lagi. Isi di tab Simpanan, Komitmen, Bil dan Delivery.</p>`:''}
+  ${vBulan(C)}
   <section class="panel"><div class="sec-h">${head('Perlu perhatian')}</div>
     ${att.length?`<ul class="att">${att.map(x=>`<li><a href="#${x.to}" data-s="${x.s}"><span class="dot"></span><span><b>${x.t}</b><small>${x.d||''}</small></span>${chev}</a></li>`).join('')}</ul>`:'<p class="empty">Tiada apa-apa lagi.</p>'}
   </section>
@@ -581,6 +618,8 @@ function vSimpanan(C){
     <div class="kvs k4">${kv('Modal',rm(C.modal))}${kv('Nilai',rm(C.nilai))}${kv('Profit',rm(C.profit),C.profit<0?'bad':'good')}${kv('ROI',pc(C.roi,2),C.profit<0?'bad':'good')}</div>
   </section>
 
+  ${goalsHtml(C)}
+
   <section class="panel">
     ${head('Pencapaian','Sasaran level ikut peratus dari target.')}
     <div class="ladder">${ladder}</div>
@@ -608,7 +647,8 @@ function vSimpanan(C){
     <div class="btns"><button class="btn" data-act="snap">Simpan snapshot ${ymLab(nowYm())}</button>${add('saving.history','Bulan')}</div>
     ${hist||'<p class="empty">Belum ada sejarah.</p>'}
   </section>
-  <section class="panel"><div class="sec-h">${head('Sandaran','Simpan salinan semua data sebagai fail.')}<button class="btn ghost" data-act="backup">Simpan fail</button></div>${localMode?'<label class="btn ghost" style="text-align:center;display:block;line-height:20px">Pulih dari fail sandaran<input id="imp" type="file" accept=".json,application/json" hidden></label>':''}</section>`;
+  <section class="panel"><div class="sec-h">${head('Sandaran','Simpan salinan semua data sebagai fail.')}<button class="btn ghost" data-act="backup">Simpan fail</button></div>${localMode?'<label class="btn ghost" style="text-align:center;display:block;line-height:20px">Pulih dari fail sandaran<input id="imp" type="file" accept=".json,application/json" hidden></label>':''}</section>
+  ${secPanel()}`;
 }
 
 function vKomitmen(C){
@@ -633,7 +673,8 @@ function vKomitmen(C){
     <div class="sec-h">${head('Komitmen','Tanda kotak bila dah bayar.')}${add('komitmen.items','Komitmen')}</div>
     <div class="list">${items||'<p class="empty">Belum ada komitmen. Tekan + Komitmen.</p>'}</div>
     <div class="total"><span>Jumlah komitmen</span><b class="num">${rm(C.k.commit)}</b></div>
-    <div class="btns"><button class="btn ghost" data-act="reset-paid">Reset tanda bayar</button></div>
+    <div class="btns"><button class="btn ghost" data-act="reset-paid">Reset tanda bayar</button><button class="btn ghost" data-act="newmonth">Mulakan bulan baru</button></div>
+    <p class="hint">Bulan baru: simpan ringkasan bulan ni, tukar nama bulan, kosongkan tanda bayar dan kekalkan senarai komitmen.</p>
   </section>
 
   <section class="panel">
@@ -736,11 +777,55 @@ function vDelivery(C){
       ${kv('Tertinggi sehari',rm(C.dMax))}
     </div>
   </section>
+  ${dvChart(C)}
   ${C.dMonths.length?`<section class="panel">${head('Ringkasan bulanan')}<div class="list">${C.dMonths.map(m=>{const n=m.inc+m.tip-m.sav;return `<div class="row" style="grid-template-columns:62px minmax(0,1fr) auto;padding:10px 0"><b>${ymLab(m.ym)}</b>${bar(n/maxN)}<span class="num" style="text-align:right;font-size:12.5px"><b>${rm(n)}</b><br><small style="color:var(--mute)">${m.days} hari · ${rm(m.inc,0)}</small></span></div>`}).join('')}</div></section>`:''}
   <section class="panel">
     <div class="sec-h">${head('Rekod harian')}${add('delivery.rows','Hari')}</div>
     ${rows||'<p class="empty">Belum ada rekod. Tekan + Hari.</p>'}
   </section>`;
+}
+
+
+/* ---------- fungsi baru: bulan, sasaran, graf delivery ---------- */
+function chip(v,p,dir){
+  if(v==null||p==null)return '<span class="dl">-</span>';
+  const d=v-p;if(Math.abs(d)<0.005)return '<span class="dl">Sama</span>';
+  const good=d*dir>0;return `<span class="dl ${good?'good':'bad'}">${d>0?'▲':'▼'} ${rm(Math.abs(d),0)}</span>`;
+}
+function vBulan(C){
+  const k=state.komitmen,s=state.saving,cur=nowYm(),pv=addYm(cur,-1),h=(k.history||[]).slice(-1)[0]||null;
+  const sm=ym=>{const m=s.monthly.find(x=>x.ym===ym);return m&&m.amt!=null?(+m.amt||0):null};
+  const dm=ym=>{const m=C.dMonths.find(x=>x.ym===ym);return m?m.inc+m.tip-m.sav:null};
+  const rows=[['Pendapatan gaji',C.k.income,h?h.income:null,1],['Komitmen',C.k.commit,h?h.commit:null,-1],['Simpanan',sm(cur),sm(pv),1],['Delivery bersih',dm(cur),dm(pv),1],['Baki lepas komitmen',C.k.baki,h?h.baki:null,1]];
+  if(rows.every(r=>r[1]==null||r[1]===0))return '';
+  return `<section class="panel"><div>${'<h2>'+ML[new Date().getMonth()]+'</h2>'}<p class="hint">Berbanding bulan lepas${h?' ('+esc(h.label)+')':''}.</p></div>
+  <div>${rows.map(r=>`<div class="cmp"><span class="cl">${r[0]}</span><span class="cv num">${r[1]==null?'-':rm(r[1],0)}</span>${chip(r[1],r[2],r[3])}</div>`).join('')}</div></section>`;
+}
+function goalsHtml(C){
+  const s=state.saving;
+  const items=(s.goals||[]).map((g,i)=>{
+    const cur=g.from?sum(s.accounts.filter(a=>a.name===g.from),a=>a.nilai):C.nilai;
+    const t=+g.target||0,p=t>0?clamp(cur/t):0,L=2*Math.PI*26;
+    const opts=['<option value="">Jumlah semua akaun</option>'].concat(s.accounts.filter(a=>a.name).map(a=>`<option value="${esc(a.name)}" ${g.from===a.name?'selected':''}>${esc(a.name)}</option>`)).join('');
+    return `<div class="acc"><div class="acc-h">${inT(`saving.goals.${i}.name`,g.name,'Nama sasaran','Nama sasaran')}${del('saving.goals',i,g.name||'sasaran')}</div>
+    <div class="gl"><svg class="ring" viewBox="0 0 64 64" role="img" aria-label="${pc(p)}"><circle cx="32" cy="32" r="26" class="rt"/><circle cx="32" cy="32" r="26" class="rp" style="stroke-dasharray:${(p*L).toFixed(1)} ${L.toFixed(1)}"/><text x="32" y="37" text-anchor="middle">${Math.round(p*100)}%</text></svg>
+    <div class="gr"><div class="num"><b>${rm(cur,0)}</b> <small>/ ${rm(t,0)}</small></div><small>${t>cur?'Baki '+rm(t-cur,0):(t>0?'Sasaran tercapai 🎉':'Isi jumlah sasaran')}</small></div></div>
+    <div class="acc-g"><label class="lab">Sasaran (RM)${inN(`saving.goals.${i}.target`,g.target,'Sasaran '+(g.name||''))}</label><label class="lab">Ambil dari<select class="in t" data-k="saving.goals.${i}.from" data-t="t" aria-label="Ambil dari">${opts}</select></label></div></div>`}).join('');
+  return `<section class="panel"><div class="sec-h">${head('Sasaran','Contoh: Dana kecemasan, Umrah. Pilih satu akaun atau jumlah semua.')}${add('saving.goals','Sasaran')}</div>${items||'<p class="empty">Belum ada sasaran. Tekan + Sasaran.</p>'}</section>`;
+}
+function dvChart(C){
+  const rows=state.delivery.rows.filter(r=>r.d),net=r=>(+r.inc||0)+(+r.tip||0)-(+r.sav||0);
+  let it=[];
+  if(dvRange==='d')it=[...rows].sort((a,b)=>a.d<b.d?-1:1).slice(-14).map(r=>({l:String(+r.d.slice(8,10)),v:net(r)}));
+  else if(dvRange==='w'){const g={};rows.forEach(r=>{const d=new Date(r.d+'T00:00:00');d.setDate(d.getDate()-((d.getDay()+6)%7));const k=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());g[k]=(g[k]||0)+net(r)});it=Object.keys(g).sort().slice(-8).map(k=>({l:(+k.slice(8,10))+' '+MS[+k.slice(5,7)-1],v:g[k]}))}
+  else it=C.dMonths.slice(-12).map(m=>({l:MS[+m.ym.slice(5,7)-1],v:m.inc+m.tip-m.sav}));
+  const seg=`<div class="seg s3" role="group" aria-label="Julat graf">${[['d','Harian'],['w','Mingguan'],['m','Bulanan']].map(([v,t])=>`<button data-act="dvr" data-v="${v}" aria-pressed="${dvRange===v}">${t}</button>`).join('')}</div>`;
+  if(!it.length)return '';
+  const mx=Math.max(...it.map(x=>Math.abs(x.v)),1),tot=sum(it,x=>x.v),avg=tot/it.length,top=Math.max(...it.map(x=>x.v));
+  const lab=it.length<=10;
+  return `<section class="panel">${head('Graf pendapatan bersih','Pendapatan + tip − saving.')}${seg}
+  <div class="dvc" role="img" aria-label="Graf bar pendapatan bersih">${it.map((x,j)=>`<div class="dvb">${lab?`<span>${Math.round(x.v)}</span>`:''}<i class="${x.v<0?'neg':''}" style="height:${Math.max(3,Math.abs(x.v)/mx*100*.78).toFixed(1)}%;animation-delay:${j*35}ms"></i><em>${esc(x.l)}</em></div>`).join('')}</div>
+  <div class="kvs">${kv('Purata',rm(avg,0))}${kv('Tertinggi',rm(top,0))}</div></section>`;
 }
 
 /* ---------- render ---------- */
@@ -804,6 +889,7 @@ function setK(path,val){const p=path.split('.');const doc=p.shift();let o=state[
 function getArr(path){const p=path.split('.');const doc=p.shift();let o=state[doc];p.forEach(x=>o=o[x]);return [doc,o]}
 const NEW={
   'saving.accounts':()=>({name:'',modal:null,nilai:null}),
+  'saving.goals':()=>({name:'',target:null,from:''}),
   'saving.monthly':()=>{const a=state.saving.monthly;const l=a.reduce((m,x)=>x.ym>m?x.ym:m,'');return {ym:l?addYm(l,1):nowYm(),amt:null}},
   'saving.history':()=>{const a=state.saving.history;const l=a.reduce((m,x)=>x.ym>m?x.ym:m,'');return {ym:l?addYm(l,1):nowYm(),modal:null,nilai:null}},
   'komitmen.income':()=>({name:'',amt:null}),
@@ -833,13 +919,25 @@ document.addEventListener('change',e=>{
 document.addEventListener('click',e=>{
   const b=e.target.closest('[data-act]');if(!b)return;
   const act=b.dataset.act;
+  if(act==='dvr'){dvRange=b.dataset.v;try{localStorage.setItem('dvRange',dvRange)}catch(x){}later();return}
+  if(act.indexOf('pin-')===0){pinAct(act);return}
+  if(act==='newmonth'){
+    if(!b.dataset.armed){b.dataset.armed='1';const o=b.textContent;b.textContent='Pasti?';setTimeout(()=>{if(b.isConnected){delete b.dataset.armed;b.textContent=o}},3000);return}
+    const k=state.komitmen,C=calc(),snap=JSON.parse(JSON.stringify(k));
+    k.history=(k.history||[]).concat([{label:k.label,income:C.k.income,commit:C.k.commit,paid:C.k.paid,baki:C.k.baki}]).slice(-24);
+    let m=-1,y=0;const mm=/([A-Za-z]+)\s+(\d{4})/.exec(k.label||'');
+    if(mm){m=ML.findIndex(x=>x.toLowerCase()===mm[1].toLowerCase());y=+mm[2]}
+    if(m<0){const n=new Date();m=n.getMonth();y=n.getFullYear()}else{m++;if(m>11){m=0;y++}}
+    k.label=ML[m]+' '+y;k.items.forEach(x=>x.paid=false);touch('komitmen');later();
+    setUndo('Bulan baru dimulakan',()=>{state.komitmen=Object.assign(DEF.komitmen(),snap);touch('komitmen');later()});return}
   if(act==='logo-clear'){const a=state.saving.accounts[+b.dataset.i];if(a){delete a.logo;touch('saving');later()}return}
   if(act==='nwr'){nwRange=b.dataset.v;try{localStorage.setItem('nwRange',nwRange)}catch(x){}later();return}
   if(act==='seg'){bilTab=b.dataset.v;try{localStorage.setItem('bilTab',bilTab)}catch(x){}later();return}
   if(act==='add'){const k=b.dataset.k;const [doc,arr]=getArr(k);arr.push(NEW[k]());touch(doc);pendingFocus=k+'.'+(arr.length-1);later();return}
   if(act==='del'){
     if(!b.dataset.armed){b.dataset.armed='1';b.textContent='Pasti?';setTimeout(()=>{if(b.isConnected){delete b.dataset.armed;b.innerHTML='&times;'}},3000);return}
-    const [doc,arr]=getArr(b.dataset.k);arr.splice(+b.dataset.i,1);touch(doc);later();return}
+    const [doc,arr]=getArr(b.dataset.k),ix=+b.dataset.i,item=arr[ix],kk=b.dataset.k;arr.splice(ix,1);touch(doc);later();
+    setUndo('Dipadam',()=>{const [d2,a2]=getArr(kk);a2.splice(Math.min(ix,a2.length),0,item);touch(d2);later()});return}
   if(act==='reset-paid'){state.komitmen.items.forEach(x=>x.paid=false);touch('komitmen');later();return}
   if(act==='snap'){const C=calc(),ym=nowYm();let h=state.saving.history.find(x=>x.ym===ym);if(!h){h={ym};state.saving.history.push(h)}h.modal=+C.modal.toFixed(2);h.nilai=+C.nilai.toFixed(2);touch('saving');later();return}
   if(act==='backup'){const fn='duit-icad-sandaran-'+todayISO()+'.json',txt=JSON.stringify(state,null,2);
@@ -860,6 +958,96 @@ function nwScrub(e){
 }
 document.addEventListener('pointerdown',nwScrub);
 document.addEventListener('pointermove',e=>{if(e.pointerType==='mouse'&&!e.buttons&&!(e.target.closest&&e.target.closest('.nwc')))return;nwScrub(e)});
+
+
+/* ---------- buat asal (toast) ---------- */
+let undoFn=null,undoT=0;
+function setUndo(msg,fn){
+  undoFn=fn;const t=document.getElementById('toast');document.getElementById('toastB').style.display=fn?'':'none';document.getElementById('toastT').textContent=msg;
+  t.classList.add('on');clearTimeout(undoT);undoT=setTimeout(()=>{t.classList.remove('on');undoFn=null},7000);
+}
+document.getElementById('toastB').addEventListener('click',()=>{
+  const f=undoFn;undoFn=null;clearTimeout(undoT);document.getElementById('toast').classList.remove('on');if(f)f();
+});
+
+/* ---------- kunci PIN + cap jari (pada peranti ni sahaja) ---------- */
+const PK={pin:'mm-pin',salt:'mm-salt',bio:'mm-bio'};
+const lsGet=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
+const lsSet=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+const lsDel=k=>{try{localStorage.removeItem(k)}catch(e){}};
+const hasPin=()=>!!lsGet(PK.pin);
+async function hashPin(pin,salt){
+  try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(salt+':'+pin));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+  catch(e){let h=5381;const t=salt+':'+pin;for(let i=0;i<t.length;i++)h=((h<<5)+h+t.charCodeAt(i))>>>0;return 'x'+h}
+}
+const b64=buf=>btoa(String.fromCharCode(...new Uint8Array(buf)));
+const unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+const bioOK=()=>!!(window.PublicKeyCredential&&navigator.credentials&&window.isSecureContext);
+async function bioReg(){
+  try{const c=await navigator.credentials.create({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),rp:{name:'Money Manage'},user:{id:crypto.getRandomValues(new Uint8Array(16)),name:'pengguna',displayName:'Pengguna'},pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required'},timeout:60000}});lsSet(PK.bio,b64(c.rawId));return true}catch(e){return false}
+}
+async function bioAuth(){
+  try{const raw=lsGet(PK.bio);if(!raw)return false;await navigator.credentials.get({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),allowCredentials:[{type:'public-key',id:unb64(raw),transports:['internal']}],userVerification:'required',timeout:60000}});return true}catch(e){return false}
+}
+const L={el:document.getElementById('lock'),mode:'unlock',buf:'',tmp:'',after:null};
+const LD=document.getElementById('lkD'),LM=document.getElementById('lkM'),LT=document.getElementById('lkT');
+(function(){
+  const P=document.getElementById('lkP');
+  ['1','2','3','4','5','6','7','8','9','','0','⌫'].forEach(k=>{const b=document.createElement('button');b.type='button';b.textContent=k;
+    if(!k){b.className='ghost';b.disabled=true}else if(k==='⌫'){b.className='ghost';b.setAttribute('aria-label','Padam digit');b.onclick=()=>{L.buf=L.buf.slice(0,-1);lkDraw()}}else b.onclick=()=>lkKey(k);P.appendChild(b)});
+  for(let i=0;i<4;i++)LD.appendChild(document.createElement('i'));
+})();
+function lkDraw(){[...LD.children].forEach((d,i)=>d.classList.toggle('f',i<L.buf.length))}
+const TITLES={unlock:'Masukkan PIN',verify:'Masukkan PIN semasa',set1:'Tetapkan PIN baru',set2:'Masukkan semula PIN'};
+function lkShow(mode,after){
+  L.mode=mode;L.buf='';L.after=after||null;LT.textContent=TITLES[mode];LM.textContent='';lkDraw();L.el.hidden=false;
+  document.getElementById('lkX').hidden=mode==='unlock';
+  document.getElementById('lkF').hidden=!(mode==='unlock'&&!localMode&&typeof firebase!=='undefined');
+  document.getElementById('lkBio').hidden=!(mode==='unlock'&&lsGet(PK.bio));
+  if(mode==='unlock'&&lsGet(PK.bio)&&document.visibilityState==='visible')bioAuth().then(ok=>{if(ok&&L.mode==='unlock')lkOpen()});
+}
+function lkOpen(){L.el.hidden=true;L.buf='';lkDraw()}
+function lkBad(msg){LM.textContent=msg;LD.classList.remove('shake');void LD.offsetWidth;LD.classList.add('shake');L.buf='';setTimeout(lkDraw,380);if(navigator.vibrate)navigator.vibrate(60)}
+async function lkKey(d){
+  if(L.buf.length>=4)return;L.buf+=d;lkDraw();if(L.buf.length<4)return;
+  const pin=L.buf;
+  if(L.mode==='unlock'||L.mode==='verify'){
+    const ok=(await hashPin(pin,lsGet(PK.salt)||''))===lsGet(PK.pin);
+    if(!ok){lkBad('PIN salah');return}
+    if(L.mode==='unlock'){lkOpen();return}
+    const f=L.after;lkOpen();if(f)f();return}
+  if(L.mode==='set1'){L.tmp=pin;L.mode='set2';L.buf='';LT.textContent=TITLES.set2;LM.textContent='';setTimeout(lkDraw,150);return}
+  if(L.mode==='set2'){
+    if(pin!==L.tmp){L.mode='set1';LT.textContent=TITLES.set1;lkBad('PIN tak sama, cuba lagi');return}
+    const salt=Math.random().toString(36).slice(2);lsSet(PK.salt,salt);lsSet(PK.pin,await hashPin(pin,salt));
+    lkOpen();later();setUndo('PIN ditetapkan',null);}
+}
+document.getElementById('lkX').onclick=()=>{lkOpen()};
+document.getElementById('lkBio').onclick=()=>{bioAuth().then(ok=>{if(ok)lkOpen();else{LM.textContent='Cap jari gagal, guna PIN'}})};
+document.getElementById('lkF').onclick=()=>{
+  if(!confirm('Log keluar akaun Google dan buang PIN? Anda perlu log masuk semula.'))return;
+  [PK.pin,PK.salt,PK.bio].forEach(lsDel);
+  try{firebase.auth().signOut().finally(()=>location.reload())}catch(e){location.reload()}
+};
+function pinAct(a){
+  if(a==='pin-set')lkShow('set1');
+  else if(a==='pin-change')lkShow('verify',()=>lkShow('set1'));
+  else if(a==='pin-off')lkShow('verify',()=>{[PK.pin,PK.salt,PK.bio].forEach(lsDel);later();setUndo('PIN dibuang',null)});
+  else if(a==='pin-bio-on')lkShow('verify',async()=>{const ok=await bioReg();later();setUndo(ok?'Cap jari diaktifkan':'Cap jari tak dapat diaktifkan',null)});
+  else if(a==='pin-bio-off'){lsDel(PK.bio);later()}
+}
+function secPanel(){
+  const p=hasPin(),bio=!!lsGet(PK.bio);
+  return `<section class="panel">${head('Keselamatan','Kunci app dengan PIN 4 digit. PIN disimpan pada fon ni sahaja, setiap fon ada PIN sendiri.')}
+  <div class="kvs">${kv('Kunci PIN',p?'Aktif':'Tak aktif',p?'good':'')}${kv('Cap jari',bio?'Aktif':'Tak aktif',bio?'good':'')}</div>
+  <div class="btns">${p?`<button class="btn ghost" data-act="pin-change">Tukar PIN</button><button class="btn ghost" data-act="pin-off">Buang PIN</button>${bioOK()?(bio?'<button class="btn ghost" data-act="pin-bio-off">Matikan cap jari</button>':'<button class="btn ghost" data-act="pin-bio-on">Aktifkan cap jari</button>'):''}`:'<button class="btn" data-act="pin-set">Tetapkan PIN</button>'}</div></section>`;
+}
+let hiddenAt=0;
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='hidden'){hiddenAt=Date.now();return}
+  if(hasPin()&&L.el.hidden&&hiddenAt&&Date.now()-hiddenAt>45000)lkShow('unlock');
+});
+if(hasPin())lkShow('unlock');
 
 /* ---------- bulan semasa auto-muncul ---------- */
 let monthEnsured=false;
