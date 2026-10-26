@@ -389,6 +389,7 @@ const pad=n=>String(n).padStart(2,'0');
 const todayISO=()=>{const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())};
 const nowYm=()=>todayISO().slice(0,7);
 const addYm=(ym,n)=>{let [y,m]=ym.split('-').map(Number);m+=n;y+=Math.floor((m-1)/12);m=((m-1)%12+12)%12+1;return y+'-'+pad(m)};
+const labYm=l=>{const m=/([A-Za-z]+)\s+(\d{4})/.exec(l||'');const i=m?ML.findIndex(x=>x.toLowerCase()===m[1].toLowerCase()):-1;return i<0?nowYm():m[2]+'-'+String(i+1).padStart(2,'0')};
 const ymLab=ym=>MS[+ym.slice(5,7)-1]+' '+ym.slice(2,4);
 const fmtDate=d=>d.getDate()+' '+MS[d.getMonth()]+' '+d.getFullYear();
 const addMonths=(d,n)=>{const x=new Date(d.getFullYear(),d.getMonth()+n,d.getDate());return x};
@@ -402,7 +403,7 @@ const DEF={
     monthly:[],history:[],updated:todayISO()}),
   delivery:()=>({rows:[]}),
   komitmen:()=>({label:ML[new Date().getMonth()]+' '+new Date().getFullYear(),income:[],items:[],notes:[],history:[]}),
-  spaylater:()=>({name:'',desc:'',emptyMsg:'',logTitle:'',target:0,entries:[],ryt:'',spay:'',notes:[]}),
+  spaylater:()=>({name:'',desc:'',emptyMsg:'',logTitle:'',month:nowYm(),target:0,entries:[],ryt:'',spay:'',notes:[]}),
   advance:()=>({name:'',desc:'',emptyMsg:'',boxTitle:'',month:nowYm(),amount:0,items:[],notes:[]})
 };
 const state={};DOCS.forEach(n=>state[n]=DEF[n]());
@@ -416,7 +417,7 @@ try{dvRange=localStorage.getItem('dvRange')||'d'}catch(e){}
 
 let edOpen=false;
 const sx=(o,k,d)=>String(o&&o[k]||'').trim()||d;
-const pn=()=>String(state.spaylater.name||'').trim()||'SPayLater',an=()=>String(state.advance.name||'').trim()||'Advance';
+const pn=()=>String(state.spaylater.name||'').trim()||'Tab anda 1',an=()=>String(state.advance.name||'').trim()||'Tab anda 2';
 /* ---------- calculations ---------- */
 function calc(){
   const s=state.saving,k=state.komitmen,p=state.spaylater,a=state.advance,d=state.delivery,now=new Date(),cur=nowYm();
@@ -666,7 +667,7 @@ function vKomitmen(C){
   const notes=k.notes.map((x,i)=>`<div class="row note">${inA(`komitmen.notes.${i}`,x,'Peringatan','Tulis peringatan')}${del('komitmen.notes',i,'peringatan')}</div>`).join('');
   return `
   <section class="panel">
-    <div class="sec-h">${head('Komitmen bulanan')}<label class="lab" style="width:150px"><span class="sr" style="position:absolute;left:-9999px">Bulan</span>${inT('komitmen.label',k.label,'Bulan','Bulan')}</label></div>
+    <div class="sec-h">${head('Komitmen bulanan')}<label class="lab" style="width:190px"><span class="sr" style="position:absolute;left:-9999px">Bulan</span><input class="in t" type="month" data-k="komitmen.label" data-t="m" value="${esc(labYm(k.label))}" aria-label="Bulan"></label></div>
     <div class="kvs k4">
       ${kv('Pendapatan',rm(C.k.income))}
       ${kv('Komitmen',rm(C.k.commit))}
@@ -709,32 +710,33 @@ function vBil(C){
   const p=state.spaylater,a=state.advance;
   const seg=`<div class="seg" role="group" aria-label="Pilih bil"><button data-act="seg" data-v="spay" aria-pressed="${bilTab==='spay'}">${esc(pn())}</button><button data-act="seg" data-v="adv" aria-pressed="${bilTab==='adv'}">${esc(an())}</button></div>`;
   if(bilTab==='spay'){
-    const ent=p.entries.map((x,i)=>`<div class="row">${inT(`spaylater.entries.${i}.name`,x.name,'Keterangan','Keterangan')}${inN(`spaylater.entries.${i}.amt`,x.amt,'Amaun '+(x.name||''))}${del('spaylater.entries',i,x.name||'catatan')}</div>`).join('');
+    const ent=p.entries.map((x,i)=>`<div class="row">${inT(`spaylater.entries.${i}.name`,x.name,'Nama kotak','Kotak')}${inN(`spaylater.entries.${i}.amt`,x.amt,'Jumlah '+(x.name||'kotak'))}${del('spaylater.entries',i,x.name||'kotak')}</div>`).join('');
     return seg+`
     <section class="panel">
-      ${head(esc(pn()),esc(sx(p,'desc','Kumpul duit sampai cukup untuk bayar bil.')))}
-      <label class="lab" style="max-width:240px">Nama tab${inT('spaylater.name',p.name,'Nama tab','SPayLater')}</label>
+      ${head(esc(pn()),esc(sx(p,'desc','Catat belanja ikut kotak supaya tak melebihi had.')))}
+      <label class="lab" style="max-width:240px">Nama tab${inT('spaylater.name',p.name,'Nama tab','Tab anda 1')}</label>
       <details class="edtx" ${edOpen?'open':''}><summary>Ubah suai tulisan</summary><p class="hint" style="margin:2px 0 0">Tukar ikut cara anda guna tab ni. Kosongkan kotak untuk guna tulisan asal.</p>
-        <label class="lab">Tulisan bawah tajuk${inT('spaylater.desc',p.desc,'Tulisan bawah tajuk','Kumpul duit sampai cukup untuk bayar bil.')}</label>
-        <label class="lab">Tulisan bila target belum diisi${inT('spaylater.emptyMsg',p.emptyMsg,'Tulisan bila target belum diisi','Isi target bil dulu')}</label>
-        <label class="lab">Tajuk senarai duit masuk${inT('spaylater.logTitle',p.logTitle,'Tajuk senarai duit masuk','Log duit masuk')}</label>
+        <label class="lab">Tulisan bawah tajuk${inT('spaylater.desc',p.desc,'Tulisan bawah tajuk','Catat belanja ikut kotak supaya tak melebihi had.')}</label>
+        <label class="lab">Tulisan bila jumlah belum diisi${inT('spaylater.emptyMsg',p.emptyMsg,'Tulisan bila jumlah belum diisi','Isi jumlah dulu')}</label>
+        <label class="lab">Tajuk senarai kotak belanja${inT('spaylater.logTitle',p.logTitle,'Tajuk senarai kotak belanja','Kotak belanja')}</label>
       </details>
+      <label class="lab" style="max-width:240px">Bulan<input class="in t" type="month" data-k="spaylater.month" data-t="d" value="${esc(p.month)}" aria-label="Bulan"></label>
       <div class="kvs">
-        <div class="kv"><span>Target (RM)</span>${inN('spaylater.target',p.target,'Target bil SPayLater')}</div>
-        ${kv('Terkumpul',rm(C.p.got))}
-        ${kv('Baki perlu kumpul',rm(C.p.baki),'hi')}
-        ${kv('Progress',pc(C.p.prog))}
+        <div class="kv"><span>Jumlah (RM)</span>${inN('spaylater.target',p.target,'Jumlah')}</div>
+        ${kv('Jumlah guna',rm(C.p.got))}
+        ${kv('Baki lagi',rm(C.p.baki),'hi')}
+        ${kv('Diguna',pc(C.p.prog))}
       </div>
       ${bar(C.p.prog)}
-      <p style="margin:0;font-weight:700" class="${C.p.got>=p.target&&p.target>0?'pos':''}">${p.target>0?(C.p.got>=p.target?'Dah cukup, boleh bayar bil':'Masih kurang, kumpul lagi'):esc(sx(p,'emptyMsg','Isi target bil dulu'))}</p>
+      <p style="margin:0;font-weight:700" class="pos">${p.target>0?(C.p.got>=p.target?'Dah habis diguna':'Masih ada baki'):esc(sx(p,'emptyMsg','Isi jumlah dulu'))}</p>
     </section>
     <section class="panel">
-      <div class="sec-h">${head(esc(sx(p,'logTitle','Log duit masuk')),'Tambah satu baris setiap kali ada duit masuk.')}${add('spaylater.entries','Duit masuk')}</div>
-      <div class="list">${ent||'<p class="empty">Belum ada duit masuk.</p>'}</div>
-      <div class="total"><span>Jumlah</span><b class="num">${rm(C.p.got)}</b></div>
+      <div class="sec-h">${head(esc(sx(p,'logTitle','Kotak belanja')))}${add('spaylater.entries','Kotak')}</div>
+      <div class="list">${ent||'<p class="empty">Belum ada kotak.</p>'}</div>
+      <div class="total"><span>Jumlah guna</span><b class="num">${rm(C.p.got)}</b></div>
     </section>
     <section class="panel">
-      <div class="sec-h">${head('Nota')}${add('spaylater.notes','Nota')}</div>
+      <div class="sec-h">${head('📝 Nota')}${add('spaylater.notes','Nota')}</div>
       <div class="list">${(p.notes||[]).map((x,i)=>`<div class="row note">${inA(`spaylater.notes.${i}`,x,'Nota','Tulis nota')}${del('spaylater.notes',i,'nota')}</div>`).join('')||'<p class="empty">Tiada nota.</p>'}</div>
     </section>`;
   }
@@ -742,22 +744,22 @@ function vBil(C){
   const nt=a.notes.map((x,i)=>`<div class="row note">${inA(`advance.notes.${i}`,x,'Nota','Tulis nota')}${del('advance.notes',i,'nota')}</div>`).join('');
   return seg+`
   <section class="panel">
-    ${head(esc(an()),esc(sx(a,'desc','Catat belanja ikut kotak supaya advance tak melebihi had.')))}
-    <label class="lab" style="max-width:240px">Nama tab${inT('advance.name',a.name,'Nama tab','Advance')}</label>
+    ${head(esc(an()),esc(sx(a,'desc','Catat belanja ikut kotak supaya tak melebihi had.')))}
+    <label class="lab" style="max-width:240px">Nama tab${inT('advance.name',a.name,'Nama tab','Tab anda 2')}</label>
     <details class="edtx" ${edOpen?'open':''}><summary>Ubah suai tulisan</summary><p class="hint" style="margin:2px 0 0">Tukar ikut cara anda guna tab ni. Kosongkan kotak untuk guna tulisan asal.</p>
-      <label class="lab">Tulisan bawah tajuk${inT('advance.desc',a.desc,'Tulisan bawah tajuk','Catat belanja ikut kotak supaya advance tak melebihi had.')}</label>
-      <label class="lab">Tulisan bila jumlah belum diisi${inT('advance.emptyMsg',a.emptyMsg,'Tulisan bila jumlah belum diisi','Isi jumlah advance dulu')}</label>
+      <label class="lab">Tulisan bawah tajuk${inT('advance.desc',a.desc,'Tulisan bawah tajuk','Catat belanja ikut kotak supaya tak melebihi had.')}</label>
+      <label class="lab">Tulisan bila jumlah belum diisi${inT('advance.emptyMsg',a.emptyMsg,'Tulisan bila jumlah belum diisi','Isi jumlah dulu')}</label>
       <label class="lab">Tajuk senarai kotak belanja${inT('advance.boxTitle',a.boxTitle,'Tajuk senarai kotak belanja','Kotak belanja')}</label>
     </details>
-    <label class="lab" style="max-width:240px">Bulan<input class="in t" type="month" data-k="advance.month" data-t="d" value="${esc(a.month)}" aria-label="Bulan advance"></label>
+    <label class="lab" style="max-width:240px">Bulan<input class="in t" type="month" data-k="advance.month" data-t="d" value="${esc(a.month)}" aria-label="Bulan"></label>
     <div class="kvs">
-      <div class="kv"><span>Jumlah (RM)</span>${inN('advance.amount',a.amount,'Jumlah advance')}</div>
+      <div class="kv"><span>Jumlah (RM)</span>${inN('advance.amount',a.amount,'Jumlah')}</div>
       ${kv('Jumlah guna',rm(C.a.used))}
       ${kv('Baki lagi',rm(C.a.baki),C.a.baki<0?'bad':'hi')}
       ${kv('Diguna',pc(C.a.prog))}
     </div>
     ${bar(C.a.prog,C.a.baki<0?'bad':'')}
-    <p style="margin:0;font-weight:700" class="${C.a.baki<0?'neg':'pos'}">${a.amount>0?(C.a.baki<0?'Melebihi advance, semak balik kotak':C.a.baki===0?'Advance dah habis diguna':'Masih ada baki'):esc(sx(a,'emptyMsg','Isi jumlah advance dulu'))}</p>
+    <p style="margin:0;font-weight:700" class="${C.a.baki<0?'neg':'pos'}">${a.amount>0?(C.a.baki<0?'Melebihi had, semak balik kotak':C.a.baki===0?'Dah habis diguna':'Masih ada baki'):esc(sx(a,'emptyMsg','Isi jumlah dulu'))}</p>
   </section>
   <section class="panel">
     <div class="sec-h">${head(esc(sx(a,'boxTitle','Kotak belanja')))}${add('advance.items','Kotak')}</div>
@@ -765,7 +767,7 @@ function vBil(C){
     <div class="total"><span>Jumlah guna</span><b class="num">${rm(C.a.used)}</b></div>
   </section>
   <section class="panel">
-    <div class="sec-h">${head('Nota')}${add('advance.notes','Nota')}</div>
+    <div class="sec-h">${head('📝 Nota')}${add('advance.notes','Nota')}</div>
     <div class="list">${nt||'<p class="empty">Tiada nota.</p>'}</div>
   </section>`;
 }
@@ -918,7 +920,7 @@ const NEW={
 document.addEventListener('change',e=>{
   const t=e.target;if(!t.dataset||!t.dataset.k)return;
   const ty=t.dataset.t;let v;
-  if(ty==='n')v=num(t.value);else if(ty==='b')v=t.checked;else v=t.value.trim();
+  if(ty==='n')v=num(t.value);else if(ty==='b')v=t.checked;else if(ty==='m'){if(!/^\d{4}-\d{2}$/.test(t.value))return;v=ML[+t.value.slice(5,7)-1]+' '+t.value.slice(0,4)}else v=t.value.trim();
   if(setK(t.dataset.k,v))later();
 });
 document.addEventListener('change',e=>{const t=e.target;if(t.id!=='imp'||!t.files||!t.files[0])return;
