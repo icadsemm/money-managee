@@ -260,6 +260,13 @@ html,body{overflow-x:clip;max-width:100%}.wrap,main{overflow-x:clip}
 .ring text{transform:rotate(90deg);transform-origin:32px 32px;font-family:var(--display);font-weight:700;font-size:13px;fill:var(--ink);stroke:none}
 .gr{display:flex;flex-direction:column;gap:6px;min-width:0}.gr small{color:var(--mute)}
 select.in{appearance:none;-webkit-appearance:none;background:transparent;font-size:14px;font-weight:600;letter-spacing:0;text-transform:none}
+.calh{display:flex;align-items:center;justify-content:space-between}.calh b{font-size:15px}.calh .btn{min-width:44px;font-size:18px;padding:6px 12px}
+.calt{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}.calt b{font-size:24px}.calt small{color:var(--mute)}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}.cal em{font-style:normal;font-size:10.5px;text-align:center;color:var(--mute);font-weight:700}
+.cd{font:inherit;font-weight:700;font-size:13px;aspect-ratio:1;border:0;border-radius:10px;cursor:pointer;background:var(--track);color:var(--mute);padding:0}
+.cd.g{background:var(--good);color:#fff}.cd.r{background:var(--bad);color:#fff}
+.cd.td{box-shadow:inset 0 0 0 2px var(--ink)}.cd.sel{outline:3px solid var(--accent);outline-offset:1px}
+.calb{display:flex;flex-direction:column;gap:8px}
 .dvc{display:flex;align-items:flex-end;gap:6px;height:140px;padding-top:18px}
 .dvb{flex:1;min-width:0;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:3px;position:relative}
 .dvb i{display:block;width:100%;max-width:28px;border-radius:7px 7px 3px 3px;background:linear-gradient(180deg,var(--mint),var(--accent));min-height:4px;transform-origin:bottom;animation:grow .8s cubic-bezier(.2,.8,.2,1) both}
@@ -312,7 +319,7 @@ select.in{appearance:none;-webkit-appearance:none;background:transparent;font-si
   <a href="#simpanan" data-tab="simpanan"><svg viewBox="0 0 24 24"><path d="M3 17l5-5 4 3 8-9"/><path d="M15 6h5v5"/></svg><span>Simpanan</span></a>
   <a href="#komitmen" data-tab="komitmen"><svg viewBox="0 0 24 24"><path d="M4 7l2 2 3-3.5"/><path d="M12 7.5h8"/><path d="M4 16l2 2 3-3.5"/><path d="M12 16.5h8"/></svg><span>Komitmen</span></a>
   <a href="#bil" data-tab="bil"><svg viewBox="0 0 24 24"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M3 10h18"/><path d="M7 15h4"/></svg><span>Bil</span></a>
-  <a href="#delivery" data-tab="delivery"><svg viewBox="0 0 24 24"><circle cx="6" cy="16.5" r="3"/><circle cx="18" cy="16.5" r="3"/><path d="M6 16.5l3.5-7h5l3.5 7"/><path d="M9.5 9.5h-2"/></svg><span>Delivery</span></a>
+  <a href="#delivery" data-tab="delivery"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M14.6 9.3c-.5-.8-1.5-1.3-2.6-1.3-1.5 0-2.6.8-2.6 1.9 0 2.7 5.3 1.3 5.3 4 0 1.2-1.2 2-2.7 2-1.2 0-2.2-.5-2.7-1.3"/><path d="M12 6.4V8M12 16v1.6"/></svg><span>Income</span></a>
 </div></nav>
 
 <div id="login" hidden style="position:fixed;inset:0;z-index:100;background:#0F172A;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center;font-family:system-ui,sans-serif">
@@ -398,16 +405,18 @@ const num=v=>{v=String(v).replace(/[^\d.\-]/g,'');if(v===''||v==='-'||v==='.')re
 const uidx=()=>Math.random().toString(36).slice(2,8);
 
 const DEF={
-  saving:()=>({accounts:[],goals:[],target:100000,goal:1000,
+  saving:()=>({usdRate:4.2,accounts:[],goals:[],target:100000,goal:1000,
     levels:[{icon:'🌱',name:'Benih',pct:0},{icon:'🥉',name:'Perunggu',pct:.1},{icon:'🥈',name:'Perak',pct:.25},{icon:'🥇',name:'Emas',pct:.5},{icon:'💎',name:'Platinum',pct:.75},{icon:'👑',name:'Berlian',pct:1}],
     monthly:[],history:[],updated:todayISO()}),
-  delivery:()=>({rows:[]}),
+  delivery:()=>({title:'',target:0,rows:[]}),
   komitmen:()=>({label:ML[new Date().getMonth()]+' '+new Date().getFullYear(),income:[],items:[],notes:[],history:[]}),
   spaylater:()=>({name:'',desc:'',emptyMsg:'',logTitle:'',month:nowYm(),target:0,entries:[],ryt:'',spay:'',notes:[]}),
   advance:()=>({name:'',desc:'',emptyMsg:'',boxTitle:'',month:nowYm(),amount:0,items:[],notes:[]})
 };
 const state={};DOCS.forEach(n=>state[n]=DEF[n]());
 const last={},dirty=new Set(),writing={},again={},timers={};
+let fxBusy=false,fxMsg='';
+let dvMonth=nowYm(),dvSel=todayISO();
 let db=null,loaded=false,dbErr='',bilTab='spay',localMode=false,nwRange='all',dvRange='d';
 const KEY='duit-icad-v1';
 const SEED=null;
@@ -417,12 +426,15 @@ try{dvRange=localStorage.getItem('dvRange')||'d'}catch(e){}
 
 let edOpen=false;
 const sx=(o,k,d)=>String(o&&o[k]||'').trim()||d;
+const fx=a=>a&&a.cur==='USD'?(+state.saving.usdRate>0?+state.saving.usdRate:4.2):1;
+const money=(n,cur,d=2)=>cur==='USD'?(Number(n)<0?'-':'')+'$'+Math.abs(Number(n)||0).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d}):rm(n,d);
+const fxBox=()=>{const s=state.saving;return `<div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap"><label class="lab" style="max-width:200px">Kadar 1 USD = RM${inN('saving.usdRate',s.usdRate,'Kadar USD ke RM','4.20')}</label><button class="btn ghost" data-act="fxup">${fxBusy?'Sekejap…':'Kemas kini kadar'}</button></div>${fxMsg?`<p class="hint" style="margin:4px 0 0">${esc(fxMsg)}</p>`:''}`};
 const pn=()=>String(state.spaylater.name||'').trim()||'Tab anda 1',an=()=>String(state.advance.name||'').trim()||'Tab anda 2';
 /* ---------- calculations ---------- */
 function calc(){
   const s=state.saving,k=state.komitmen,p=state.spaylater,a=state.advance,d=state.delivery,now=new Date(),cur=nowYm();
   const C={};
-  C.modal=sum(s.accounts,x=>x.modal);C.nilai=sum(s.accounts,x=>x.nilai);C.profit=C.nilai-C.modal;C.roi=C.modal>0?C.profit/C.modal:0;
+  C.modal=sum(s.accounts,x=>(+x.modal||0)*fx(x));C.nilai=sum(s.accounts,x=>(+x.nilai||0)*fx(x));C.profit=C.nilai-C.modal;C.roi=C.modal>0?C.profit/C.modal:0;
   const filled=s.monthly.filter(m=>m.amt>0);
   C.mTotal=sum(s.monthly,m=>m.amt);C.mAvg=filled.length?C.mTotal/filled.length:0;
   C.remain=Math.max(s.target-C.nilai,0);C.prog=s.target>0?clamp(C.nilai/s.target):0;
@@ -441,10 +453,10 @@ function calc(){
   let best=null;s.monthly.forEach(m=>{if(m.amt>0&&(!best||m.amt>best.amt))best=m});C.best=best;
   const tm=s.monthly.find(m=>m.ym===cur);C.thisMonth=tm&&tm.amt?tm.amt:0;C.thisGap=Math.max(s.goal-C.thisMonth,0);
   // delivery
-  const dr=d.rows;C.dInc=sum(dr,r=>r.inc);C.dTip=sum(dr,r=>r.tip);C.dSav=sum(dr,r=>r.sav);C.dNet=C.dInc+C.dTip-C.dSav;
-  C.dDays=dr.filter(r=>r.inc>0).length;C.dAvg=C.dDays?C.dInc/C.dDays:0;C.dMax=dr.reduce((m,r)=>Math.max(m,Number(r.inc)||0),0);
+  const dr=d.rows;C.dInc=sum(dr,r=>(+r.inc||0)*fx(r));C.dSav=sum(dr,r=>(+r.sav||0)*fx(r));C.dNet=C.dInc-C.dSav;
+  C.dDays=dr.filter(r=>r.inc>0).length;C.dAvg=C.dDays?C.dInc/C.dDays:0;C.dMax=dr.reduce((m,r)=>Math.max(m,(Number(r.inc)||0)*fx(r)),0);
   C.workDays=C.dAvg>0?Math.floor(C.nilai/C.dAvg):null;
-  const g={};dr.forEach(r=>{if(!r.d)return;const ym=r.d.slice(0,7);const o=g[ym]||(g[ym]={ym,days:0,inc:0,tip:0,sav:0});if(r.inc>0)o.days++;o.inc+=+r.inc||0;o.tip+=+r.tip||0;o.sav+=+r.sav||0});
+  const g={};dr.forEach(r=>{if(!r.d)return;const ym=r.d.slice(0,7);const o=g[ym]||(g[ym]={ym,days:0,inc:0,sav:0});if(r.inc>0)o.days++;o.inc+=(+r.inc||0)*fx(r);o.sav+=(+r.sav||0)*fx(r)});
   C.dMonths=Object.values(g).sort((x,y)=>x.ym<y.ym?-1:1);
   // komitmen
   C.k={};C.k.income=sum(k.income,x=>x.amt);C.k.commit=sum(k.items,x=>x.amt);C.k.baki=C.k.income-C.k.commit;
@@ -554,7 +566,7 @@ function vRingkasan(C){
   </section>
   <p class="quote">${QUOTES[serial%10]}</p>
   ${nwView(C)}
-  ${empty&&loaded?`<p class="empty">Belum ada data lagi. Isi di tab Simpanan, Komitmen, Bil dan Delivery.</p>`:''}
+  ${empty&&loaded?`<p class="empty">Belum ada data lagi. Isi di tab Simpanan, Komitmen, Bil dan Income.</p>`:''}
   ${vBulan(C)}
   <section class="panel"><div class="sec-h">${head('Perlu perhatian')}</div>
     ${att.length?`<ul class="att">${att.map(x=>`<li><a href="#${x.to}" data-s="${x.s}"><span class="dot"></span><span><b>${x.t}</b><small>${x.d||''}</small></span>${chev}</a></li>`).join('')}</ul>`:'<p class="empty">Tiada apa-apa lagi.</p>'}
@@ -564,7 +576,7 @@ function vRingkasan(C){
     <a class="mod ${C.k.baki<0?'neg':''}" href="#komitmen"><span class="eyebrow">Baki lepas komitmen</span><span class="v num">${rm(C.k.baki)}</span><small>${C.k.n-C.k.unpaidN} / ${C.k.n} dibayar</small>${bar(C.k.payProg)}</a>
     <a class="mod" href="#bil"><span class="eyebrow">${esc(pn())} kurang</span><span class="v num">${rm(C.p.baki)}</span><small>${pc(C.p.prog)} terkumpul</small>${bar(C.p.prog)}</a>
     <a class="mod ${C.a.baki<0?'neg':''}" href="#bil"><span class="eyebrow">Baki ${esc(an())}</span><span class="v num">${rm(C.a.baki)}</span><small>${pc(C.a.prog)} diguna</small>${bar(C.a.prog,C.a.baki<0?'bad':'')}</a>
-    <a class="mod" href="#delivery"><span class="eyebrow">Bersih delivery</span><span class="v num">${rm(C.dNet)}</span><small>${C.dDays} hari kerja</small></a>
+    <a class="mod" href="#delivery"><span class="eyebrow">Bersih income</span><span class="v num">${rm(C.dNet)}</span><small>${C.dDays} hari kerja</small></a>
     <a class="mod" href="#simpanan"><span class="eyebrow">Profit pelaburan</span><span class="v num ${C.profit<0?'neg':''}" style="${C.profit<0?'color:var(--bad)':''}">${rm(C.profit)}</span><small>ROI ${pc(C.roi,2)}</small></a>
   </section>`;
 }
@@ -581,11 +593,12 @@ async function toLogo(file){
 function vSimpanan(C){
   const s=state.saving;
   const accs=s.accounts.map((x,i)=>{
-    const pr=(+x.nilai||0)-(+x.modal||0),roi=x.modal>0?pr/x.modal:0,share=C.nilai>0?(+x.nilai||0)/C.nilai:0;
+    const pr=(+x.nilai||0)-(+x.modal||0),roi=x.modal>0?pr/x.modal:0,share=C.nilai>0?(+x.nilai||0)*fx(x)/C.nilai:0,usd=x.cur==='USD';
     return `<div class="acc">
       <div class="acc-h lg"><label class="logo ${okLogo(x.logo)?'has':''}" title="Letak logo"><input type="file" accept="image/*" hidden data-logo="${i}" aria-label="Letak logo ${esc(x.name)}">${okLogo(x.logo)?`<img src="${esc(x.logo)}" alt="Logo ${esc(x.name)}">`:'<span aria-hidden="true">+</span>'}</label>${inT(`saving.accounts.${i}.name`,x.name,'Nama akaun','Nama akaun')}${del('saving.accounts',i,x.name||'akaun')}</div>
-      <div class="acc-g"><label class="lab">Modal (RM)${inN(`saving.accounts.${i}.modal`,x.modal,'Modal '+(x.name||''))}</label><label class="lab">Nilai sekarang (RM)${inN(`saving.accounts.${i}.nilai`,x.nilai,'Nilai '+(x.name||''))}</label></div>
-      <div class="res"><span>Profit <b class="${pr<0?'neg':pr>0?'pos':''}">${rm(pr)}</b></span><span>ROI <b class="${pr<0?'neg':pr>0?'pos':''}">${pc(roi,2)}</b></span></div>
+      <div class="seg" role="group" aria-label="Matawang" style="max-width:200px">${[['MYR','MYR (RM)'],['USD','USD ($)']].map(([v,t])=>`<button data-act="cur" data-i="${i}" data-v="${v}" aria-pressed="${(x.cur||'MYR')===v}">${t}</button>`).join('')}</div>
+      <div class="acc-g"><label class="lab">Modal (${usd?'USD':'RM'})${inN(`saving.accounts.${i}.modal`,x.modal,'Modal '+(x.name||''))}</label><label class="lab">Nilai sekarang (${usd?'USD':'RM'})${inN(`saving.accounts.${i}.nilai`,x.nilai,'Nilai '+(x.name||''))}</label></div>
+      <div class="res"><span>Profit <b class="${pr<0?'neg':pr>0?'pos':''}">${money(pr,x.cur)}</b>${usd?` <small>(≈ ${rm(pr*fx(x))})</small>`:''}</span><span>ROI <b class="${pr<0?'neg':pr>0?'pos':''}">${pc(roi,2)}</b></span></div>
       <div class="share">${bar(share)}<span>${pc(share,1)} daripada jumlah</span>${okLogo(x.logo)?`<button class="lnk" data-act="logo-clear" data-i="${i}">Buang logo</button>`:''}</div>
     </div>`}).join('');
   const ladder=C.lv.slice(1).map((l,i)=>{const idx=i+1;const done=C.nilai>=l.amt,isNext=idx===C.li+1;
@@ -622,6 +635,7 @@ function vSimpanan(C){
 
   <section class="panel">
     <div class="sec-h">${head('Akaun','Modal = duit masuk sendiri, tak termasuk untung.')}${add('saving.accounts','Akaun')}</div>
+    ${s.accounts.some(a=>a.cur==='USD')?fxBox():''}
     ${accs||'<p class="empty">Belum ada akaun. Tekan + Akaun.</p>'}
     <div class="kvs k4">${kv('Modal',rm(C.modal))}${kv('Nilai',rm(C.nilai))}${kv('Profit',rm(C.profit),C.profit<0?'bad':'good')}${kv('ROI',pc(C.roi,2),C.profit<0?'bad':'good')}</div>
   </section>
@@ -772,28 +786,60 @@ function vBil(C){
   </section>`;
 }
 
+const dvNet=r=>((+r.inc||0)-(+r.sav||0))*fx(r);
+const dvTgt=r=>{const t=+r.tgt;return t>0?t:(+state.delivery.target||0)};
+const sgn=n=>(n>0?'+':'')+rm(n);
+const DAYN=['Ahad','Isnin','Selasa','Rabu','Khamis','Jumaat','Sabtu'];
+function dvRow(r,i,inBox){
+  const net=dvNet(r),t=dvTgt(r),df=net-t,d=state.delivery,usd=r.cur==='USD',u=usd?' (USD)':'';
+  return `<div class="acc"><div class="acc-h">${inBox?`<b>${fmtISO(r.d)}</b>`:`<input class="in t" type="date" data-k="delivery.rows.${i}.d" data-t="d" value="${esc(r.d)}" aria-label="Tarikh">`}${del('delivery.rows',i,fmtISO(r.d))}</div>
+    <div class="seg" role="group" aria-label="Matawang" style="max-width:200px">${[['MYR','MYR (RM)'],['USD','USD ($)']].map(([v,t])=>`<button data-act="dcur" data-i="${i}" data-v="${v}" aria-pressed="${(r.cur||'MYR')===v}">${t}</button>`).join('')}</div>
+    <div class="acc-g"><label class="lab">Keuntungan${u}${inN(`delivery.rows.${i}.inc`,r.inc,'Keuntungan '+fmtISO(r.d))}</label><label class="lab">Kerugian${u}${inN(`delivery.rows.${i}.sav`,r.sav,'Kerugian '+fmtISO(r.d),'0')}</label></div>
+    <div class="acc-g"><label class="lab">Target hari ni (RM)${inN(`delivery.rows.${i}.tgt`,r.tgt,'Target '+fmtISO(r.d),d.target>0?String(d.target):'0')}</label></div>
+    <div class="res"><span>Baki bersih</span><b class="${net<0?'neg':'pos'}">${usd?money(net/fx(r),'USD')+' <small>(≈ '+rm(net)+')</small>':rm(net)}</b></div>
+    ${t>0?`<div class="res"><span>${df>=0?'Untung':'Rugi'} berbanding target ${rm(t,0)}</span><b class="${df>=0?'pos':'neg'}">${sgn(df)}</b></div>`:''}</div>`;
+}
+function dvCal(){
+  const d=state.delivery,ym=dvMonth,[y,m]=ym.split('-').map(Number),off=(new Date(y,m-1,1).getDay()+6)%7,dim=new Date(y,m,0).getDate(),by={};
+  d.rows.forEach(r=>{if(!r.d||r.d.slice(0,7)!==ym)return;const o=by[r.d]||(by[r.d]={net:0,tgt:0});o.net+=dvNet(r);o.tgt=Math.max(o.tgt,dvTgt(r))});
+  let tot=0,g=0,rd=0,cells='';
+  for(let i=0;i<off;i++)cells+='<i></i>';
+  for(let n=1;n<=dim;n++){const iso=ym+'-'+pad(n),o=by[iso];let c='n';
+    if(o){tot+=o.net;const ok=o.tgt>0?o.net>=o.tgt:o.net>0;c=ok?'g':'r';if(ok)g++;else rd++}
+    cells+=`<button class="cd ${c}${iso===dvSel?' sel':''}${iso===todayISO()?' td':''}" data-act="dvd" data-d="${iso}" aria-pressed="${iso===dvSel}" aria-label="${n} ${ML[m-1]}${c==='g'?', untung':c==='r'?', rugi':', tiada rekod'}">${n}</button>`}
+  const rows=d.rows.map((r,i)=>({r,i})).filter(x=>x.r.d===dvSel);
+  const dn=DAYN[new Date(dvSel+'T00:00:00').getDay()];
+  const box=rows.length?rows.map(({r,i})=>dvRow(r,i,true)).join(''):`<p class="empty">Tiada rekod untuk hari ni.</p><button class="btn ghost" data-act="dvadd" data-d="${dvSel}">+ Tambah rekod hari ni</button>`;
+  return `<section class="panel">
+    <div class="sec-h">${head('Kalendar untung rugi','Hijau = capai target, merah = bawah target. Tekan hari untuk tengok.')}</div>
+    <div class="calh"><button class="btn ghost" data-act="dvm" data-n="-1" aria-label="Bulan lepas">‹</button><b>${ML[m-1]} ${y}</b><button class="btn ghost" data-act="dvm" data-n="1" aria-label="Bulan depan">›</button></div>
+    <div class="calt"><b class="num ${tot<0?'neg':'pos'}">${sgn(tot)}</b><small>bulan ni · ${g} untung · ${rd} rugi</small></div>
+    <div class="cal">${['Isn','Sel','Rab','Kha','Jum','Sab','Ahd'].map(x=>`<em>${x}</em>`).join('')}${cells}</div>
+    <div class="calb"><h2 style="font-size:15px;margin:2px 0 8px">${dn}, ${fmtISO(dvSel)}</h2>${box}</div>
+  </section>`;
+}
 function vDelivery(C){
   const d=state.delivery;
-  const rows=d.rows.map((r,i)=>({r,i})).sort((x,y)=>(x.r.d||'')<(y.r.d||'')?1:-1).map(({r,i})=>{const net=(+r.inc||0)+(+r.tip||0)-(+r.sav||0);
-    return `<div class="acc"><div class="acc-h"><input class="in t" type="date" data-k="delivery.rows.${i}.d" data-t="d" value="${esc(r.d)}" aria-label="Tarikh">${del('delivery.rows',i,fmtISO(r.d))}</div>
-    <div class="acc-g" style="grid-template-columns:repeat(3,minmax(0,1fr))"><label class="lab">Pendapatan${inN(`delivery.rows.${i}.inc`,r.inc,'Pendapatan '+fmtISO(r.d))}</label><label class="lab">Tip${inN(`delivery.rows.${i}.tip`,r.tip,'Tip '+fmtISO(r.d),'0')}</label><label class="lab">Saving${inN(`delivery.rows.${i}.sav`,r.sav,'Saving '+fmtISO(r.d),'0')}</label></div>
-    <div class="res"><span>Baki bersih</span><b class="${net<0?'neg':'pos'}">${rm(net)}</b></div></div>`}).join('');
-  const maxN=Math.max(...C.dMonths.map(m=>m.inc+m.tip-m.sav),1);
+  const rows=d.rows.map((r,i)=>({r,i})).sort((x,y)=>(x.r.d||'')<(y.r.d||'')?1:-1).map(({r,i})=>dvRow(r,i,false)).join('');
+  const maxN=Math.max(...C.dMonths.map(m=>m.inc-m.sav),1);
   return `
   <section class="panel">
-    ${head('Income delivery','Rekod pendapatan delivery harian. Bersih = pendapatan + tip − saving.')}
+    ${head(esc(sx(d,'title','Income')),'Rekod harian. Bersih = keuntungan − kerugian.')}
+    <details class="edtx" ${edOpen?'open':''}><summary>Ubah suai tulisan</summary><label class="lab" style="max-width:240px">Nama tajuk${inT('delivery.title',d.title,'Nama tajuk','Income')}</label></details>
     <div class="kvs">
-      ${kv('Jumlah pendapatan',rm(C.dInc))}
-      ${kv('Jumlah tip',rm(C.dTip))}
-      ${kv('Saving ditolak',rm(C.dSav))}
+      <div class="kv"><span>Target harian (RM)</span>${inN('delivery.target',d.target,'Target harian','0')}</div>
+      ${kv('Jumlah keuntungan',rm(C.dInc))}
+      ${kv('Jumlah kerugian',rm(C.dSav))}
       ${kv('Jumlah bersih (poket)',rm(C.dNet),'hi')}
       ${kv('Hari kerja',C.dDays)}
       ${kv('Purata / hari',rm(C.dAvg))}
       ${kv('Tertinggi sehari',rm(C.dMax))}
     </div>
   </section>
+  ${d.rows.some(r=>r.cur==='USD')?`<section class="panel">${fxBox()}</section>`:''}
+  ${dvCal()}
   ${dvChart(C)}
-  ${C.dMonths.length?`<section class="panel">${head('Ringkasan bulanan')}<div class="list">${C.dMonths.map(m=>{const n=m.inc+m.tip-m.sav;return `<div class="row" style="grid-template-columns:62px minmax(0,1fr) auto;padding:10px 0"><b>${ymLab(m.ym)}</b>${bar(n/maxN)}<span class="num" style="text-align:right;font-size:12.5px"><b>${rm(n)}</b><br><small style="color:var(--mute)">${m.days} hari · ${rm(m.inc,0)}</small></span></div>`}).join('')}</div></section>`:''}
+  ${C.dMonths.length?`<section class="panel">${head('Ringkasan bulanan')}<div class="list">${C.dMonths.map(m=>{const n=m.inc-m.sav;return `<div class="row" style="grid-template-columns:62px minmax(0,1fr) auto;padding:10px 0"><b>${ymLab(m.ym)}</b>${bar(n/maxN)}<span class="num" style="text-align:right;font-size:12.5px"><b>${rm(n)}</b><br><small style="color:var(--mute)">${m.days} hari · ${rm(m.inc,0)}</small></span></div>`}).join('')}</div></section>`:''}
   <section class="panel">
     <div class="sec-h">${head('Rekod harian')}${add('delivery.rows','Hari')}</div>
     ${rows||'<p class="empty">Belum ada rekod. Tekan + Hari.</p>'}
@@ -810,8 +856,8 @@ function chip(v,p,dir){
 function vBulan(C){
   const k=state.komitmen,s=state.saving,cur=nowYm(),pv=addYm(cur,-1),h=(k.history||[]).slice(-1)[0]||null;
   const sm=ym=>{const m=s.monthly.find(x=>x.ym===ym);return m&&m.amt!=null?(+m.amt||0):null};
-  const dm=ym=>{const m=C.dMonths.find(x=>x.ym===ym);return m?m.inc+m.tip-m.sav:null};
-  const rows=[['Pendapatan gaji',C.k.income,h?h.income:null,1],['Komitmen',C.k.commit,h?h.commit:null,-1],['Simpanan',sm(cur),sm(pv),1],['Delivery bersih',dm(cur),dm(pv),1],['Baki lepas komitmen',C.k.baki,h?h.baki:null,1]];
+  const dm=ym=>{const m=C.dMonths.find(x=>x.ym===ym);return m?m.inc-m.sav:null};
+  const rows=[['Pendapatan gaji',C.k.income,h?h.income:null,1],['Komitmen',C.k.commit,h?h.commit:null,-1],['Simpanan',sm(cur),sm(pv),1],['Income bersih',dm(cur),dm(pv),1],['Baki lepas komitmen',C.k.baki,h?h.baki:null,1]];
   if(rows.every(r=>r[1]==null||r[1]===0))return '';
   return `<section class="panel"><div>${'<h2>'+ML[new Date().getMonth()]+'</h2>'}<p class="hint">Berbanding bulan lepas${h?' ('+esc(h.label)+')':''}.</p></div>
   <div>${rows.map(r=>`<div class="cmp"><span class="cl">${r[0]}</span><span class="cv num">${r[1]==null?'-':rm(r[1],0)}</span>${chip(r[1],r[2],r[3])}</div>`).join('')}</div></section>`;
@@ -819,7 +865,7 @@ function vBulan(C){
 function goalsHtml(C){
   const s=state.saving;
   const items=(s.goals||[]).map((g,i)=>{
-    const cur=g.from?sum(s.accounts.filter(a=>a.name===g.from),a=>a.nilai):C.nilai;
+    const cur=g.from?sum(s.accounts.filter(a=>a.name===g.from),a=>(+a.nilai||0)*fx(a)):C.nilai;
     const t=+g.target||0,p=t>0?clamp(cur/t):0,L=2*Math.PI*26;
     const opts=['<option value="">Jumlah semua akaun</option>'].concat(s.accounts.filter(a=>a.name).map(a=>`<option value="${esc(a.name)}" ${g.from===a.name?'selected':''}>${esc(a.name)}</option>`)).join('');
     return `<div class="acc"><div class="acc-h">${inT(`saving.goals.${i}.name`,g.name,'Nama sasaran','Nama sasaran')}${del('saving.goals',i,g.name||'sasaran')}</div>
@@ -829,16 +875,16 @@ function goalsHtml(C){
   return `<section class="panel"><div class="sec-h">${head('Sasaran','Contoh: Dana kecemasan, Umrah. Pilih satu akaun atau jumlah semua.')}${add('saving.goals','Sasaran')}</div>${items||'<p class="empty">Belum ada sasaran. Tekan + Sasaran.</p>'}</section>`;
 }
 function dvChart(C){
-  const rows=state.delivery.rows.filter(r=>r.d),net=r=>(+r.inc||0)+(+r.tip||0)-(+r.sav||0);
+  const rows=state.delivery.rows.filter(r=>r.d),net=dvNet;
   let it=[];
   if(dvRange==='d')it=[...rows].sort((a,b)=>a.d<b.d?-1:1).slice(-14).map(r=>({l:String(+r.d.slice(8,10)),v:net(r)}));
   else if(dvRange==='w'){const g={};rows.forEach(r=>{const d=new Date(r.d+'T00:00:00');d.setDate(d.getDate()-((d.getDay()+6)%7));const k=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());g[k]=(g[k]||0)+net(r)});it=Object.keys(g).sort().slice(-8).map(k=>({l:(+k.slice(8,10))+' '+MS[+k.slice(5,7)-1],v:g[k]}))}
-  else it=C.dMonths.slice(-12).map(m=>({l:MS[+m.ym.slice(5,7)-1],v:m.inc+m.tip-m.sav}));
+  else it=C.dMonths.slice(-12).map(m=>({l:MS[+m.ym.slice(5,7)-1],v:m.inc-m.sav}));
   const seg=`<div class="seg s3" role="group" aria-label="Julat graf">${[['d','Harian'],['w','Mingguan'],['m','Bulanan']].map(([v,t])=>`<button data-act="dvr" data-v="${v}" aria-pressed="${dvRange===v}">${t}</button>`).join('')}</div>`;
   if(!it.length)return '';
   const mx=Math.max(...it.map(x=>Math.abs(x.v)),1),tot=sum(it,x=>x.v),avg=tot/it.length,top=Math.max(...it.map(x=>x.v));
   const lab=it.length<=10;
-  return `<section class="panel">${head('Graf pendapatan bersih','Pendapatan + tip − saving.')}${seg}
+  return `<section class="panel">${head('Graf pendapatan bersih','Keuntungan − kerugian.')}${seg}
   <div class="dvc" role="img" aria-label="Graf bar pendapatan bersih">${it.map((x,j)=>`<div class="dvb">${lab?`<span>${Math.round(x.v)}</span>`:''}<i class="${x.v<0?'neg':''}" style="height:${Math.max(3,Math.abs(x.v)/mx*100*.78).toFixed(1)}%;animation-delay:${j*35}ms"></i><em>${esc(x.l)}</em></div>`).join('')}</div>
   <div class="kvs">${kv('Purata',rm(avg,0))}${kv('Tertinggi',rm(top,0))}</div></section>`;
 }
@@ -903,7 +949,7 @@ async function flush(name){
 function setK(path,val){const p=path.split('.');const doc=p.shift();let o=state[doc];for(let i=0;i<p.length-1;i++)o=o[p[i]];const lk=p[p.length-1];if(o[lk]===val)return false;o[lk]=val;touch(doc);return true}
 function getArr(path){const p=path.split('.');const doc=p.shift();let o=state[doc];p.forEach(x=>o=o[x]);return [doc,o]}
 const NEW={
-  'saving.accounts':()=>({name:'',modal:null,nilai:null}),
+  'saving.accounts':()=>({name:'',cur:'MYR',modal:null,nilai:null}),
   'saving.goals':()=>({name:'',target:null,from:''}),
   'saving.monthly':()=>{const a=state.saving.monthly;const l=a.reduce((m,x)=>x.ym>m?x.ym:m,'');return {ym:l?addYm(l,1):nowYm(),amt:null}},
   'saving.history':()=>{const a=state.saving.history;const l=a.reduce((m,x)=>x.ym>m?x.ym:m,'');return {ym:l?addYm(l,1):nowYm(),modal:null,nilai:null}},
@@ -914,7 +960,7 @@ const NEW={
   'spaylater.notes':()=>'',
   'advance.items':()=>({name:'',amt:null}),
   'advance.notes':()=>'',
-  'delivery.rows':()=>({d:todayISO(),inc:null,tip:null,sav:null})
+  'delivery.rows':()=>({d:todayISO(),cur:'MYR',inc:null,sav:null,tgt:null})
 };
 
 document.addEventListener('change',e=>{
@@ -934,6 +980,18 @@ document.addEventListener('change',e=>{
 document.addEventListener('click',e=>{
   const b=e.target.closest('[data-act]');if(!b)return;
   const act=b.dataset.act;
+  if(act==='fxup'){if(fxBusy)return;fxBusy=true;fxMsg='';later();
+    const tryU=[['https://open.er-api.com/v6/latest/USD',j=>j&&j.rates&&j.rates.MYR],['https://api.frankfurter.app/latest?from=USD&to=MYR',j=>j&&j.rates&&j.rates.MYR]];
+    (async()=>{let r=null,er=[];for(const [u,g] of tryU){try{const c=new AbortController(),t=setTimeout(()=>c.abort(),8000);const res=await fetch(u,{signal:c.signal});clearTimeout(t);if(!res.ok){er.push(new URL(u).hostname+': HTTP '+res.status);continue}const v=+g(await res.json());if(v>0){r=v;break}er.push(new URL(u).hostname+': data tak sah')}catch(x){er.push(new URL(u).hostname+': '+(x&&x.name==='AbortError'?'timeout':'disekat/tiada internet'))}}
+      fxBusy=false;
+      if(r){state.saving.usdRate=+r.toFixed(4);touch('saving');fxMsg='Kadar dikemas kini: 1 USD = RM'+r.toFixed(4)+' ('+fmtDate(new Date())+')'}
+      else fxMsg='Tak dapat ambil kadar (tiada internet atau disekat). Kadar lama masih dipakai, boleh isi manual. ['+er.join(' | ')+']';
+      later()})();return}
+  if(act==='dvd'){dvSel=b.dataset.d;later();return}
+  if(act==='dvm'){dvMonth=addYm(dvMonth,+b.dataset.n);later();return}
+  if(act==='dvadd'){const r=NEW['delivery.rows']();r.d=b.dataset.d;state.delivery.rows.push(r);touch('delivery');pendingFocus='delivery.rows.'+(state.delivery.rows.length-1);later();return}
+  if(act==='dcur'){const r=state.delivery.rows[+b.dataset.i];if(r&&(r.cur||'MYR')!==b.dataset.v){r.cur=b.dataset.v;touch('delivery');later()}return}
+  if(act==='cur'){const a=state.saving.accounts[+b.dataset.i];if(a&&(a.cur||'MYR')!==b.dataset.v){a.cur=b.dataset.v;touch('saving');later()}return}
   if(act==='dvr'){dvRange=b.dataset.v;try{localStorage.setItem('dvRange',dvRange)}catch(x){}later();return}
   if(act.indexOf('pin-')===0){pinAct(act);return}
   if(act==='newmonth'){
