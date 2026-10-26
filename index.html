@@ -280,6 +280,9 @@ select.in{appearance:none;-webkit-appearance:none;background:transparent;font-si
 .pad button{width:72px;height:72px;border-radius:50%;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.09);color:#fff;font:700 24px var(--display);cursor:pointer;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 .pad button:active{background:rgba(255,255,255,.25);transform:scale(.94)}.pad button.ghost{background:transparent;border-color:transparent;font-size:14px}
 .lkb{display:flex;flex-direction:column;gap:8px;align-items:center}.lkb button{background:none;border:0;color:#9FB3AA;font:600 13px var(--body);text-decoration:underline;cursor:pointer}
+.kv{display:flex;flex-direction:column;justify-content:flex-start;min-height:84px}
+.kv>.in.n{text-align:left;font-family:var(--display);font-size:18px;font-weight:700;letter-spacing:-.01em;padding:2px 0 4px;margin-top:2px;min-height:0}
+.kv>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* tajuk */
 .top h1 .ch{display:inline-block;opacity:0;animation:chIn .7s cubic-bezier(.2,.8,.2,1) forwards,chWave 6s ease-in-out 2s 2;animation-delay:calc(var(--i)*45ms + .9s),calc(var(--i)*70ms + 2.2s)}
 .top h1 .sp{display:inline-block;width:.28em}
@@ -398,8 +401,8 @@ const DEF={
     monthly:[],history:[],updated:todayISO()}),
   delivery:()=>({rows:[]}),
   komitmen:()=>({label:ML[new Date().getMonth()]+' '+new Date().getFullYear(),income:[],items:[],notes:[],history:[]}),
-  spaylater:()=>({target:0,entries:[],ryt:'',spay:'',notes:[]}),
-  advance:()=>({month:nowYm(),amount:0,items:[],notes:[]})
+  spaylater:()=>({name:'',target:0,entries:[],ryt:'',spay:'',notes:[]}),
+  advance:()=>({name:'',month:nowYm(),amount:0,items:[],notes:[]})
 };
 const state={};DOCS.forEach(n=>state[n]=DEF[n]());
 const last={},dirty=new Set(),writing={},again={},timers={};
@@ -410,6 +413,7 @@ try{bilTab=localStorage.getItem('bilTab')||'spay'}catch(e){}
 try{nwRange=localStorage.getItem('nwRange')||'all'}catch(e){}
 try{dvRange=localStorage.getItem('dvRange')||'d'}catch(e){}
 
+const pn=()=>String(state.spaylater.name||'').trim()||'SPayLater',an=()=>String(state.advance.name||'').trim()||'Advance';
 /* ---------- calculations ---------- */
 function calc(){
   const s=state.saving,k=state.komitmen,p=state.spaylater,a=state.advance,d=state.delivery,now=new Date(),cur=nowYm();
@@ -523,12 +527,12 @@ function vRingkasan(C){
   if(C.k.income>0&&C.k.ratio>.9)att.push({s:'bad',t:`Komitmen ${pc(C.k.ratio,1)} daripada pendapatan`,d:'Tahap bahaya',to:'komitmen'});
   else if(C.k.income>0&&C.k.ratio>.7)att.push({s:'warn',t:`Komitmen ${pc(C.k.ratio,1)} daripada pendapatan`,d:'Berhati-hati',to:'komitmen'});
   if(p.target>0){
-    if(C.p.baki>0)att.push({s:'warn',t:`SPayLater kurang ${rm(C.p.baki)}`,d:p.spay?`Ansuran ${esc(p.spay)}`:'Masih kumpul duit',to:'bil'});
-    else att.push({s:'good',t:'SPayLater dah cukup, boleh bayar bil',d:p.spay?`Ansuran ${esc(p.spay)}`:'',to:'bil'});
+    if(C.p.baki>0)att.push({s:'warn',t:`${esc(pn())} kurang ${rm(C.p.baki)}`,d:'Masih kumpul duit',to:'bil'});
+    else att.push({s:'good',t:`${esc(pn())} dah cukup, boleh bayar bil`,d:'',to:'bil'});
   }
   if(a.amount>0){
-    if(C.a.baki<0)att.push({s:'bad',t:`Advance melebihi ${rm(-C.a.baki)}`,d:'Semak balik kotak belanja',to:'bil'});
-    else att.push({s:'good',t:`Advance berbaki ${rm(C.a.baki)}`,d:`${pc(C.a.prog)} dah diguna`,to:'bil'});
+    if(C.a.baki<0)att.push({s:'bad',t:`${esc(an())} melebihi ${rm(-C.a.baki)}`,d:'Semak balik kotak belanja',to:'bil'});
+    else att.push({s:'good',t:`${esc(an())} berbaki ${rm(C.a.baki)}`,d:`${pc(C.a.prog)} dah diguna`,to:'bil'});
   }
   if(s.goal>0&&s.monthly.length){
     if(C.thisGap>0)att.push({s:'warn',t:`Simpanan ${MS[new Date().getMonth()]}: lagi ${rm(C.thisGap,0)} nak cecah sasaran`,d:`${rm(C.thisMonth,0)} daripada ${rm(s.goal,0)}`,to:'simpanan'});
@@ -554,8 +558,8 @@ function vRingkasan(C){
   <section class="mods" aria-label="Ringkasan modul">
     <a class="mod hi" href="#simpanan"><span class="eyebrow">Simpanan bulan ni</span><span class="v num">${rm(C.thisMonth,0)}</span><small>Sasaran ${rm(s.goal,0)} · streak ${C.streak} bulan</small>${bar(s.goal>0?C.thisMonth/s.goal:0)}</a>
     <a class="mod ${C.k.baki<0?'neg':''}" href="#komitmen"><span class="eyebrow">Baki lepas komitmen</span><span class="v num">${rm(C.k.baki)}</span><small>${C.k.n-C.k.unpaidN} / ${C.k.n} dibayar</small>${bar(C.k.payProg)}</a>
-    <a class="mod" href="#bil"><span class="eyebrow">SPayLater kurang</span><span class="v num">${rm(C.p.baki)}</span><small>${pc(C.p.prog)} terkumpul</small>${bar(C.p.prog)}</a>
-    <a class="mod ${C.a.baki<0?'neg':''}" href="#bil"><span class="eyebrow">Baki advance</span><span class="v num">${rm(C.a.baki)}</span><small>${pc(C.a.prog)} diguna</small>${bar(C.a.prog,C.a.baki<0?'bad':'')}</a>
+    <a class="mod" href="#bil"><span class="eyebrow">${esc(pn())} kurang</span><span class="v num">${rm(C.p.baki)}</span><small>${pc(C.p.prog)} terkumpul</small>${bar(C.p.prog)}</a>
+    <a class="mod ${C.a.baki<0?'neg':''}" href="#bil"><span class="eyebrow">Baki ${esc(an())}</span><span class="v num">${rm(C.a.baki)}</span><small>${pc(C.a.prog)} diguna</small>${bar(C.a.prog,C.a.baki<0?'bad':'')}</a>
     <a class="mod" href="#delivery"><span class="eyebrow">Bersih delivery</span><span class="v num">${rm(C.dNet)}</span><small>${C.dDays} hari kerja</small></a>
     <a class="mod" href="#simpanan"><span class="eyebrow">Profit pelaburan</span><span class="v num ${C.profit<0?'neg':''}" style="${C.profit<0?'color:var(--bad)':''}">${rm(C.profit)}</span><small>ROI ${pc(C.roi,2)}</small></a>
   </section>`;
@@ -700,14 +704,15 @@ function vKomitmen(C){
 
 function vBil(C){
   const p=state.spaylater,a=state.advance;
-  const seg=`<div class="seg" role="group" aria-label="Pilih bil"><button data-act="seg" data-v="spay" aria-pressed="${bilTab==='spay'}">SPayLater</button><button data-act="seg" data-v="adv" aria-pressed="${bilTab==='adv'}">Advance</button></div>`;
+  const seg=`<div class="seg" role="group" aria-label="Pilih bil"><button data-act="seg" data-v="spay" aria-pressed="${bilTab==='spay'}">${esc(pn())}</button><button data-act="seg" data-v="adv" aria-pressed="${bilTab==='adv'}">${esc(an())}</button></div>`;
   if(bilTab==='spay'){
     const ent=p.entries.map((x,i)=>`<div class="row">${inT(`spaylater.entries.${i}.name`,x.name,'Keterangan','Keterangan')}${inN(`spaylater.entries.${i}.amt`,x.amt,'Amaun '+(x.name||''))}${del('spaylater.entries',i,x.name||'catatan')}</div>`).join('');
     return seg+`
     <section class="panel">
-      ${head('SPayLater','Kumpul duit dalam RYTBANK sampai cukup untuk bayar bil.')}
+      ${head(esc(pn()),'Kumpul duit dalam RYTBANK sampai cukup untuk bayar bil.')}
+      <label class="lab" style="max-width:240px">Nama tab${inT('spaylater.name',p.name,'Nama tab','SPayLater')}</label>
       <div class="kvs">
-        <div class="kv"><span>Target bil (RM)</span>${inN('spaylater.target',p.target,'Target bil SPayLater')}</div>
+        <div class="kv"><span>Target (RM)</span>${inN('spaylater.target',p.target,'Target bil SPayLater')}</div>
         ${kv('Terkumpul',rm(C.p.got))}
         ${kv('Baki perlu kumpul',rm(C.p.baki),'hi')}
         ${kv('Progress',pc(C.p.prog))}
@@ -721,13 +726,6 @@ function vBil(C){
       <div class="total"><span>Jumlah</span><b class="num">${rm(C.p.got)}</b></div>
     </section>
     <section class="panel">
-      ${head('Tarikh ansuran bulan hadapan')}
-      <div class="kvs">
-        <label class="kv"><span>RYT PayLater</span>${inT('spaylater.ryt',p.ryt,'Tarikh ansuran RYT PayLater','cth 20 Haribulan')}</label>
-        <label class="kv"><span>SPayLater</span>${inT('spaylater.spay',p.spay,'Tarikh ansuran SPayLater','cth 21 Haribulan')}</label>
-      </div>
-    </section>
-    <section class="panel">
       <div class="sec-h">${head('Nota')}${add('spaylater.notes','Nota')}</div>
       <div class="list">${(p.notes||[]).map((x,i)=>`<div class="row note">${inA(`spaylater.notes.${i}`,x,'Nota','Tulis nota')}${del('spaylater.notes',i,'nota')}</div>`).join('')||'<p class="empty">Tiada nota.</p>'}</div>
     </section>`;
@@ -736,9 +734,10 @@ function vBil(C){
   const nt=a.notes.map((x,i)=>`<div class="row note">${inA(`advance.notes.${i}`,x,'Nota','Tulis nota')}${del('advance.notes',i,'nota')}</div>`).join('');
   return seg+`
   <section class="panel">
-    <div class="sec-h">${head('Advance')}<label class="lab" style="width:150px">Bulan<input class="in t" type="month" data-k="advance.month" data-t="d" value="${esc(a.month)}" aria-label="Bulan advance"></label></div>
+    <label class="lab" style="max-width:240px">Nama tab${inT('advance.name',a.name,'Nama tab','Advance')}</label>
+    <div class="sec-h">${head(esc(an()))}<label class="lab" style="width:150px">Bulan<input class="in t" type="month" data-k="advance.month" data-t="d" value="${esc(a.month)}" aria-label="Bulan advance"></label></div>
     <div class="kvs">
-      <div class="kv"><span>Jumlah advance (RM)</span>${inN('advance.amount',a.amount,'Jumlah advance')}</div>
+      <div class="kv"><span>Jumlah (RM)</span>${inN('advance.amount',a.amount,'Jumlah advance')}</div>
       ${kv('Jumlah guna',rm(C.a.used))}
       ${kv('Baki lagi',rm(C.a.baki),C.a.baki<0?'bad':'hi')}
       ${kv('Diguna',pc(C.a.prog))}
