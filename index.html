@@ -1038,7 +1038,7 @@ function blInsight(rows,tot,bud){
   const bars=it.map((x,j)=>`<div class="dvb"><span>${x.v>0?Math.round(x.v):''}</span><i class="${x.lim>0&&x.v>x.lim?'neg':''}" style="height:${x.v>0?Math.max(4,x.v/mx2*78):2}%;animation-delay:${j*50}ms;${x.v<=0?'opacity:.25':''}"></i><em>${esc(x.l)}</em></div>`).join('');
   const rseg=`<div class="seg" role="group" aria-label="Julat graf">${[['h','7 hari'],['m','Ikut minggu']].map(([v,t])=>`<button data-act="blr" data-v="${v}" aria-pressed="${blRange===v}">${t}</button>`).join('')}</div>`;
   const g={};rows.forEach(x=>{const k=catOf(x.r);g[k]=(g[k]||0)+(+x.r.amt||0)});
-  const cats=state.belanja.cats||DEFCATS,icon=n=>{const c=cats.find(c=>c.n===n);return c?c.e:'🏷️'};
+  const cats=state.belanja.cats||DEFCATS,icon=n=>{const c=cats.find(c=>c.n===n);return c?c.e:(foodEmoji(n)||'🏷️')};
   const list=Object.entries(g).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).slice(0,8);
   const wk=(()=>{const t=new Date();t.setHours(0,0,0,0);t.setDate(t.getDate()-((t.getDay()+6)%7));const a=t.getFullYear()+'-'+pad(t.getMonth()+1)+'-'+pad(t.getDate());return sum(state.belanja.rows.filter(r=>r.d>=a&&r.d<=todayISO()),r=>r.amt)})();
   const proj=el>0?tot/el*dim:0;
@@ -1406,13 +1406,13 @@ function vNorm(s){return String(s).toLowerCase()
   .replace(/[^a-z0-9.\s]/g,' ').replace(/\.(?!\d)/g,' ').replace(/(\d)\.(?!\d)/g,'$1 ')
   .split(/\s+/).filter(Boolean)}
 function vNums(ws){
-  const out=[],isN=w=>(w in V_UNI)||V_SPC.test(w)||V_MUL.test(w);let i=0;
+  const out=[],isN=(w,k)=>w==='kosong'?/^(koma|point|perpuluhan)$/.test(ws[k-1]||''):(w in V_UNI)||V_SPC.test(w)||V_MUL.test(w);let i=0;
   while(i<ws.length){
     const w=ws[i];
     if(/^\d+(\.\d+)?$/.test(w)){out.push({n:parseFloat(w)});i++;continue}
-    if(isN(w)&&!V_MUL.test(w)){
+    if(isN(w,i)&&!V_MUL.test(w)){
       let total=0,cur=0;
-      while(i<ws.length&&isN(ws[i])){
+      while(i<ws.length&&isN(ws[i],i)){
         const x=ws[i],nx=ws[i+1];
         if(x==='sepuluh'){cur+=10;i++}
         else if(x==='sebelas'){cur+=11;i++}
@@ -1469,6 +1469,17 @@ function vCat(words){
   for(const w of words)for(const c of cats)if(keys(c).includes(w))return c;
   for(const w of words)for(const c of cats){const k=keys(c)[0];if(k&&(V_SYN[k]||'').split(' ').includes(w))return c}
   return null}
+/* emoji ikut makanan: guna emoji makanan tu kalau ada, kalau takde baru guna emoji kategori */
+const FOOD_E={nasi:'🍚',bubur:'🍚',ayam:'🍗',chicken:'🍗',kfc:'🍗',nugget:'🍗',telur:'🥚',egg:'🥚',roti:'🍞',bread:'🍞',mee:'🍜',mi:'🍜',maggi:'🍜',laksa:'🍜',bihun:'🍜',kuetiau:'🍜',soto:'🍜',sup:'🍜',ramen:'🍜',pasta:'🍝',spaghetti:'🍝',burger:'🍔',pizza:'🍕',kentang:'🍟',fries:'🍟',sandwich:'🥪',sandwic:'🥪',kari:'🍛',curry:'🍛',ikan:'🐟',fish:'🐟',sushi:'🍣',daging:'🥩',steak:'🥩',beef:'🥩',sate:'🍢',satay:'🍢',sayur:'🥗',salad:'🥗',hotdog:'🌭',taco:'🌮',kebab:'🌯',kopi:'☕',coffee:'☕',latte:'☕',teh:'🧃',tea:'🧃',milo:'🧃',susu:'🧃',milk:'🧃',air:'🧃',mineral:'🧃',water:'🧃',jus:'🧃',juice:'🧃',sirap:'🧃',soda:'🧃',cola:'🧃',pepsi:'🧃',boba:'🧃',bubble:'🧃',bir:'🧃',beer:'🧃',epal:'🍎',apple:'🍎',pisang:'🍌',anggur:'🍇',tembikai:'🍉',oren:'🍊',mangga:'🥭',strawberi:'🍓',nanas:'🍍',kek:'🍰',cake:'🍰',aiskrim:'🍦',coklat:'🍫',chocolate:'🍫',donut:'🍩',biskut:'🍪',cookies:'🍪',popcorn:'🍿',kuih:'🍡',kueh:'🍡',karipap:'🥟',oden:'🍢',kelapa:'🧃',ais:'🧃',cendol:'🧃',bandung:'🧃',tebu:'🧃',plus:'🧃','100plus':'🧃',isotonik:'🧃',nescafe:'☕',horlicks:'☕',pau:'🥟',popia:'🥟',wantan:'🥟',dim:'🥟',keropok:'🍘',jagung:'🌽',ubi:'🍠',kacang:'🥜',keju:'🧀',kandar:'🍛',tomyam:'🍛',lempeng:'🥞',pancake:'🥞',murtabak:'🌯',capati:'🌯',durian:'🍈',buah:'🍉'};
+const FOOD_CAT=/^(makan|minum|kopi|air)\b/i;
+function foodEmoji(s){
+  const t=(Array.isArray(s)?s.join(' '):String(s||'')).toLowerCase().replace(/[^a-z0-9\s]/g,' ').split(/\s+/).filter(Boolean);
+  if(/\bnasi (kandar|kari)\b/.test(t.join(' ')))return '🍛';
+  if(/\b(mata kerbau|mata lembu|telur goreng|telur dadar|dadar|omelet|omelette|fried egg)\b/.test(t.join(' ')))return '🍳';
+  for(let i=0;i<t.length;i++){
+    if((t[i]==='ais'&&t[i+1]==='krim')||(t[i]==='ice'&&t[i+1]==='cream'))return '🍦';
+    if(Object.prototype.hasOwnProperty.call(FOOD_E,t[i]))return FOOD_E[t[i]]}
+  return ''}
 function vAdd(items){
   const cap=t=>t?t.charAt(0).toUpperCase()+t.slice(1):t,added=[],dd=items.off!=null?dayISO(items.off):blSel;
   items.forEach(it=>{
@@ -1476,8 +1487,9 @@ function vAdd(items){
     if(!words.length&&it.amt==null)return;
     const c=vCat(words),txt=words.join(' '),r=NEW['belanja.rows']();
     r.d=dd;r.amt=it.amt;r.vid=Date.now().toString(36)+Math.random().toString(36).slice(2,6);
-    if(c){r.cat=c.n;r.name=(c.e?c.e+' ':'')+(txt&&txt!==String(c.n).toLowerCase()?cap(txt):c.n)}
-    else r.name=cap(txt)||'Belanja';
+    const fe=foodEmoji(txt);
+    if(c){r.cat=c.n;const em=((FOOD_CAT.test(c.n)||!c.e)&&fe)?fe:c.e;r.name=(em?em+' ':'')+(txt&&txt!==String(c.n).toLowerCase()?cap(txt):c.n)}
+    else r.name=(fe?fe+' ':'')+(cap(txt)||'Belanja');
     state.belanja.rows.push(r);added.push(r)});
   if(!added.length)return false;
   if(items.off!=null)blSel=dd;
@@ -1790,7 +1802,7 @@ let rcpData=null;
     if(e.target.type==='checkbox'){x.on=e.target.checked;row.classList.toggle('off',!x.on)}else if(f==='amt'){x.amt=num(e.target.value)||0;x.unit=x.amt/(x.qty||1)}else if(f==='qty'){x.qty=Math.max(1,Math.min(99,Math.round(num(e.target.value)||1)));if(!(x.unit>0))x.unit=x.amt/Math.max(1,x.qty);x.amt=Math.round(x.unit*x.qty*100)/100;const ai=row.querySelector('[data-f=amt]');if(ai)ai.value=x.amt}else if(f)x[f]=e.target.value;tot()});
   OK.onclick=()=>{
     const r=rcpData;if(!r)return;const d=/^\d{4}-\d{2}-\d{2}$/.test(r.date)?r.date:blSel;const add=[];
-    r.items.filter(x=>x.on&&x.amt>0).forEach(x=>{const c=cats().find(c=>c.n===x.cat),row={d,name:(c&&c.e?c.e+' ':'')+(x.name||x.cat||'Belanja')+((x.qty||1)>1?' x'+x.qty:''),amt:+x.amt};if(x.cat)row.cat=x.cat;add.push(row);state.belanja.rows.push(row)});
+    r.items.filter(x=>x.on&&x.amt>0).forEach(x=>{const c=cats().find(c=>c.n===x.cat),fe=foodEmoji(x.name||x.cat),em=((!c||!c.e||FOOD_CAT.test(c.n))&&fe)?fe:(c&&c.e),row={d,name:(em?em+' ':'')+(x.name||x.cat||'Belanja')+((x.qty||1)>1?' x'+x.qty:''),amt:+x.amt};if(x.cat)row.cat=x.cat;add.push(row);state.belanja.rows.push(row)});
     if(!add.length)return;blSel=d;blMonth=d.slice(0,7);touch('belanja');close();later();
     setUndo(add.length+' belanja ditambah',()=>{add.forEach(a=>{const ix=state.belanja.rows.indexOf(a);if(ix>=0)state.belanja.rows.splice(ix,1)});touch('belanja');later()});
   };
@@ -1824,7 +1836,20 @@ let rcpData=null;
 
 /* ---------- bulan semasa auto-muncul ---------- */
 let monthEnsured=false;
+let foodFixed=false;
+function foodFix(){
+  if(foodFixed)return;foodFixed=true;
+  if(dirty.has('belanja')||writing.belanja)return;
+  const cats=state.belanja.cats||DEFCATS,strip=e=>String(e||'').replace(/\uFE0F/g,'');let ch=false;
+  state.belanja.rows.forEach(r=>{
+    const nm=String(r.name||''),m=nm.match(/^(\p{Extended_Pictographic}\uFE0F?)\s+(.+)$/u);
+    if(!m){if(!r.cat&&nm){const fe=foodEmoji(nm);if(fe){r.name=fe+' '+nm;ch=true}}return}
+    const c=cats.find(c=>c.n===r.cat);
+    if(!c||!c.e||!FOOD_CAT.test(c.n)||strip(m[1])!==strip(c.e))return;
+    const fe=foodEmoji(m[2]);if(fe&&strip(fe)!==strip(m[1])){r.name=fe+' '+m[2];ch=true}});
+  if(ch)touch('belanja')}
 function ensureMonth(){
+  foodFix();
   if(monthEnsured)return;monthEnsured=true;
   const a=state.saving.monthly;if(!a.length)return;
   if(dirty.has('saving')||writing.saving)return;
