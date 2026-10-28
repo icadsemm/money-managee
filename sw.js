@@ -1,7 +1,33 @@
-const C='money-manage-v3';
-self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>c.addAll(['./','index.html','manifest.json','kucing-192.png?v=2','kucing-512.png?v=2'])))});
-self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C).map(x=>caches.delete(x)))).then(()=>self.clients.claim()))});
+const CACHE='mm-v3';
+const CORE=['./','index.html','manifest.json','kucing-192.png','kucing-512.png'];
+self.addEventListener('install',e=>{
+  self.skipWaiting();
+  e.waitUntil(caches.open(CACHE).then(c=>Promise.all(CORE.map(u=>c.add(new Request(u,{cache:'reload'})).catch(()=>{})))));
+});
+self.addEventListener('activate',e=>{
+  e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));
+});
 self.addEventListener('fetch',e=>{
-  if(e.request.method!=='GET')return;
-  e.respondWith(fetch(e.request).then(r=>{const cp=r.clone();caches.open(C).then(c=>c.put(e.request,cp)).catch(()=>{});return r}).catch(()=>caches.match(e.request).then(m=>m||caches.match('index.html'))));
+  const r=e.request;
+  if(r.method!=='GET')return;
+  const u=new URL(r.url);
+  if(u.origin!==location.origin)return;
+  const isPage=r.mode==='navigate'||u.pathname.endsWith('.html')||u.pathname.endsWith('/');
+  if(isPage){
+    // page: network first (always latest), cache only as offline fallback
+    e.respondWith(
+      fetch(r,{cache:'no-cache'}).then(res=>{
+        const copy=res.clone();caches.open(CACHE).then(c=>c.put('index.html',copy)).catch(()=>{});
+        return res;
+      }).catch(()=>caches.match('index.html').then(m=>m||caches.match('./')))
+    );
+    return;
+  }
+  // other files: cache first, refresh in background
+  e.respondWith(
+    caches.match(r).then(m=>{
+      const net=fetch(r).then(res=>{if(res&&res.ok){const copy=res.clone();caches.open(CACHE).then(c=>c.put(r,copy)).catch(()=>{})}return res}).catch(()=>m);
+      return m||net;
+    })
+  );
 });
