@@ -641,6 +641,8 @@ select.in{appearance:none;-webkit-appearance:none;background:transparent;font-si
 .rr.off{--o:.45}.still .rr{animation:none}#rcpW.neg{color:var(--bad);font-weight:700}#rcpW.pos{color:var(--good);font-weight:700}
 .r2{grid-column:2/4;display:flex;gap:8px;align-items:center}.r2 select.in{flex:1;min-width:0}
 .qt{display:flex;align-items:center;gap:4px;font-weight:700;color:var(--mute)}.qt input.in{width:50px;text-align:center;border:1px solid var(--line);border-radius:10px;padding:6px 2px}
+/* imbas: buang bulatan kamera, imej lebih jelas */
+.scn .cam{display:none}.scn img{filter:blur(.6px) brightness(.88) saturate(1.05)}
 @media (prefers-reduced-motion:reduce){.scn .ln,.scn .cn,.scn .shn,.cam,.cam::before,.cam .orb,.cam .halo,.cam .rg,.cam .lens,#rcpB i,.rr{animation:none}}
 .rr.off{opacity:.45}.rtot{display:flex;justify-content:space-between;font-weight:700;padding:4px 2px}
 /* tajuk */
@@ -2296,7 +2298,10 @@ let rcpData=null;
   const F=document.getElementById('rcpF'),O=document.getElementById('rcp'),S=document.getElementById('rcpS'),Bw=document.getElementById('rcpB'),P=document.getElementById('rcpP'),PI=document.getElementById('rcpImg'),ST=document.getElementById('rcpSt'),L=document.getElementById('rcpL'),OK=document.getElementById('rcpOk');
   let pUrl='';
   const stage=n=>[...ST.children].forEach((c,i)=>c.classList.toggle('on',i<n));
-  const close=()=>{O.hidden=true;rcpData=null;P.hidden=true;if(pUrl){URL.revokeObjectURL(pUrl);pUrl=''}};
+  let hMark=false;
+  const close=()=>{const was=!O.hidden;O.hidden=true;rcpData=null;P.hidden=true;if(pUrl){URL.revokeObjectURL(pUrl);pUrl=''}if(hMark){hMark=false;if(was)try{history.back()}catch(e){}}};
+  window.addEventListener('popstate',()=>{if(!O.hidden&&hMark){hMark=false;close()}});
+  const markOpen=()=>{if(!hMark){hMark=true;try{history.pushState({rcp:1},'')}catch(e){hMark=false}}};
   document.getElementById('rcpNo').onclick=close;O.addEventListener('click',e=>{if(e.target===O)close()});
   const loadTess=()=>window.Tesseract?Promise.resolve():new Promise((ok,no)=>{const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';sc.onload=ok;sc.onerror=()=>no(new Error('load'));document.head.appendChild(sc)});
   const bmpOf=async f=>{try{return await createImageBitmap(f)}catch(e){const u=URL.createObjectURL(f);return await new Promise((ok,no)=>{const im=new Image();im.onload=()=>ok(im);im.onerror=no;im.src=u})}};
@@ -2368,7 +2373,7 @@ let rcpData=null;
   };
   F.addEventListener('change',async()=>{
     const f=F.files&&F.files[0];F.value='';if(!f)return;
-    const t0=Date.now();rcpData=null;L.innerHTML='';OK.hidden=true;Bw.hidden=false;Bw.firstChild.style.width='0%';O.hidden=false;S.textContent='Menyediakan gambar...';
+    const t0=Date.now();rcpData=null;L.innerHTML='';OK.hidden=true;Bw.hidden=false;Bw.firstChild.style.width='0%';O.hidden=false;markOpen();S.textContent='Menyediakan gambar...';
     if(pUrl)URL.revokeObjectURL(pUrl);pUrl=URL.createObjectURL(f);PI.src=pUrl;P.classList.remove('done','fail');P.hidden=false;stage(1);
     try{
       const c=await prep(f);S.textContent='Memuat enjin bacaan (kali pertama perlu internet)...';
