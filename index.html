@@ -653,7 +653,7 @@ select.in{appearance:none;-webkit-appearance:none;background:transparent;font-si
 .row.paid .in.t{text-decoration-color:currentColor;opacity:.7}
 .row.paid .in.n{opacity:.6;transition:opacity .35s}
 @media (prefers-reduced-motion:reduce){.tick,.tick:checked,.tick:checked::after{animation:none;transition:none}}
-body.ro main :is(input,textarea,select,button,.tick){pointer-events:none;opacity:.75}
+body.ro main :is(input,textarea,select,button,label,.tick,[data-act]){pointer-events:none;opacity:.75}
 /* imbas: buang bulatan kamera, imej lebih jelas */
 .scn .cam{display:none}.scn img{filter:blur(.6px) brightness(.88) saturate(1.05)}
 @media (prefers-reduced-motion:reduce){.scn .ln,.scn .cn,.scn .shn,.cam,.cam::before,.cam .orb,.cam .halo,.cam .rg,.cam .lens,#rcpB i,.rr{animation:none}}
@@ -1710,9 +1710,16 @@ let rq=0;const later=()=>{cancelAnimationFrame(rq);rq=requestAnimationFrame(()=>
 window.addEventListener('hashchange',()=>{later();window.scrollTo(0,0)});
 
 /* ---------- state mutation + saving ---------- */
-function setSync(s,t){const e=document.getElementById('sync');e.dataset.s=s;document.getElementById('syncT').textContent=t}
+const OFFMSG='Luar talian: data dipaparkan sahaja, tak boleh ubah apa-apa. Sambung internet dan buka semula app untuk ubah.';
+const isRO=()=>offlineCache||navigator.onLine===false;
+function applyRO(){const ro=isRO();document.body.classList.toggle('ro',ro);
+  if(ro)dbErr=OFFMSG;else if(dbErr===OFFMSG)dbErr='';
+  setSync(ro?'err':'ok',ro?'Luar talian':(localMode?'Mod peranti':'Tersimpan'));later()}
+window.addEventListener('offline',applyRO);window.addEventListener('online',()=>{if(!offlineCache)applyRO()});
+function setSync(s,t){if(isRO()){s='err';t='Luar talian'}const e=document.getElementById('sync');e.dataset.s=s;document.getElementById('syncT').textContent=t}
 function touch(name){dirty.add(name);clearTimeout(timers[name]);setSync('saving','Menyimpan');timers[name]=setTimeout(()=>flush(name),600)}
 async function flush(name){
+  if(isRO()){dirty.delete(name);return}
   if(!db){
     if(localMode){if(offlineCache){dirty.delete(name);return}try{localStorage.setItem(KEY,JSON.stringify(state));dirty.delete(name);if(!dirty.size)setSync('ok','Tersimpan di peranti')}catch(e){setSync('err','Tak boleh simpan');dbErr='Browser ni tak benarkan simpan data. Guna Simpan fail untuk sandaran.';later()}return}
     setSync('err','Tak disimpan');return}
@@ -2476,6 +2483,7 @@ render();
     try{const cr=localStorage.getItem('mm-cloud-cache-v1');offlineCache=!!cr;const raw=cr||localStorage.getItem(KEY);const src=raw?JSON.parse(raw):SEED;if(src)DOCS.forEach(n=>{if(src[n])state[n]=Object.assign(DEF[n](),src[n])});dbErr=offlineCache?'Luar talian: data dipaparkan sahaja, tak boleh ubah apa-apa. Sambung internet dan buka semula app untuk ubah.':'Mod peranti: data disimpan dalam browser ni sahaja dan tak sync dengan peranti lain. Guna Simpan fail untuk sandaran.'}
     catch(e){if(SEED)DOCS.forEach(n=>{if(SEED[n])state[n]=Object.assign(DEF[n](),SEED[n])});dbErr='Browser ni tak benarkan simpan data, jadi ubahan hilang bila ditutup. Guna Simpan fail untuk sandaran.'}
     ensureMonth();if(offlineCache)document.body.classList.add('ro');setSync(offlineCache?'err':'ok',offlineCache?'Luar talian':'Mod peranti');later();return}
+  applyRO();
   db.collection('m').onSnapshot(snap=>{
     snap.docs.forEach(doc=>{
       const n=doc.id;if(!DOCS.includes(n))return;
