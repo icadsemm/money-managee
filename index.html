@@ -1763,8 +1763,7 @@ function vDelivery(C){
   const maxN=Math.max(...C.dMonths.map(m=>m.inc-m.sav),1);
   return `
   <section class="panel">
-    ${head(esc(sx(d,'title','Income')),'Rekod harian. Bersih = keuntungan − kerugian.')}
-    <details class="edtx" ${edOpen?'open':''}><summary>Ubah suai tulisan</summary><label class="lab" style="max-width:240px">Nama tajuk${inT('delivery.title',d.title,'Nama tajuk','Income')}</label></details>
+    ${tabTitle('delivery.title',d.title,'Income','Rekod harian. Bersih = keuntungan − kerugian.')}
     <div class="kvs">
       <div class="kv"><span>Target harian (RM)</span>${inN('delivery.target',d.target,'Target harian','0')}</div>
       ${kv('Jumlah keuntungan',rm(C.dInc))}
