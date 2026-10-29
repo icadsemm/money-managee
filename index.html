@@ -2082,7 +2082,28 @@ function vCat(words){
   for(const w of words)for(const c of cats){const k=keys(c)[0];if(k&&(V_SYN[k]||'').split(' ').includes(w))return c}
   return null}
 /* emoji ikut makanan: guna emoji makanan tu kalau ada, kalau takde baru guna emoji kategori */
-const FOOD_E={nasi:'🍚',bubur:'🍚',ayam:'🍗',chicken:'🍗',kfc:'🍗',nugget:'🍗',telur:'🥚',egg:'🥚',roti:'🍞',bread:'🍞',mee:'🍜',mi:'🍜',maggi:'🍜',laksa:'🍜',bihun:'🍜',kuetiau:'🍜',soto:'🍜',sup:'🍜',ramen:'🍜',pasta:'🍝',spaghetti:'🍝',burger:'🍔',pizza:'🍕',kentang:'🍟',fries:'🍟',sandwich:'🥪',sandwic:'🥪',kari:'🍛',curry:'🍛',ikan:'🐟',fish:'🐟',sushi:'🍣',daging:'🥩',steak:'🥩',beef:'🥩',sate:'🍢',satay:'🍢',sayur:'🥗',salad:'🥗',hotdog:'🌭',taco:'🌮',kebab:'🌯',kopi:'☕',coffee:'☕',latte:'☕',teh:'🧃',tea:'🧃',milo:'🧃',susu:'🧃',milk:'🧃',air:'🧃',mineral:'🧃',water:'🧃',jus:'🧃',juice:'🧃',sirap:'🧃',soda:'🧃',cola:'🧃',pepsi:'🧃',boba:'🧃',bubble:'🧃',bir:'🧃',beer:'🧃',epal:'🍎',apple:'🍎',pisang:'🍌',anggur:'🍇',tembikai:'🍉',oren:'🍊',mangga:'🥭',strawberi:'🍓',nanas:'🍍',kek:'🍰',cake:'🍰',aiskrim:'🍦',coklat:'🍫',chocolate:'🍫',donut:'🍩',biskut:'🍪',cookies:'🍪',popcorn:'🍿',kuih:'🍡',kueh:'🍡',karipap:'🥟',oden:'🍢',kelapa:'🥥',ais:'🧃',cendol:'🧃',bandung:'🧃',tebu:'🧃',plus:'🧃','100plus':'🧃',isotonik:'🧃',nescafe:'☕',horlicks:'☕',pau:'🥟',popia:'🥟',wantan:'🥟',dim:'🥟',keropok:'🍘',jagung:'🌽',ubi:'🍠',kacang:'🥜',keju:'🧀',kandar:'🍛',tomyam:'🍛',lempeng:'🥞',pancake:'🥞',murtabak:'🌯',capati:'🌯',durian:'🍈',buah:'🍉',cucur:'🍤',udang:'🦐',prawn:'🦐',sotong:'🦑',siput:'🐚',ketam:'🦀',kupang:'🦪',kerang:'🦪',pengat:'🥣',kasturi:'🍋',limau:'🍋',lemon:'🍋',senja:'🍽️',pulut:'🍚',lemang:'🍚',ketupat:'🍙',rendang:'🍛',gulai:'🍛',tempe:'🍘',tauhu:'🍘',tahu:'🍘',terung:'🍆',kobis:'🥬',bayam:'🥬',kangkung:'🥬',puding:'🍮',pudding:'🍮',jeli:'🍮',nangka:'🍈',rambutan:'🍒',timun:'🥒',betik:'🍈',sambal:'🌶️',cili:'🌶️',lokching:'🍢',lokcing:'🍢',jambu:'🍐',pear:'🍐',pir:'🍐',pic:'🍑',peach:'🍑',ceri:'🍒',cherry:'🍒',kiwi:'🥝',avocado:'🥑',alpukat:'🥑',melon:'🍈',langsat:'🍈',duku:'🍈',ciku:'🍈',manggis:'🍇',epal:'🍎',delima:'🍎',tembikai:'🍉',mandarin:'🍊',tangerin:'🍊',blueberi:'🫐',blueberry:'🫐',berry:'🍓',markisa:'🍈',tomato:'🍅',lobak:'🥕',carrot:'🥕',brokoli:'🥦',bawang:'🧅'};
+const FOOD_E={nasi:'🍚',bubur:'🍚',ayam:'🍗',chicken:'🍗',kfc:'🍗',nugget:'🍗',telur:'🥚',egg:'🥚',roti:'🍞',bread:'🍞',mee:'🍜',mi:'🍜',maggi:'🍜',laksa:'🍜',bihun:'🍜',kuetiau:'🍜',soto:'🍜',sup:'🍜',ramen:'🍜',pasta:'🍝',spaghetti:'🍝',burger:'🍔',pizza:'🍕',kentang:'🍟',fries:'🍟',sandwich:'🥪',sandwic:'🥪',kari:'🍛',curry:'🍛',ikan:'🐟',fish:'🐟',sushi:'🍣',daging:'🥩',steak:'🥩',beef:'🥩',sate:'🍢',satay:'🍢',sayur:'🥗',salad:'🥗',hotdog:'🌭',taco:'🌮',kebab:'🌯',kopi:'☕',coffee:'☕',latte:'☕',teh:'🧃',tea:'🧃',milo:'🧃',susu:'🧃',milk:'🧃',air:'🧃',mineral:'🧃',water:'🧃',jus:'🧃',juice:'🧃',sirap:'🧃',soda:'🧃',cola:'🧃',pepsi:'🧃',boba:'🧃',bubble:'🧃',bir:'🧃',beer:'🧃',epal:'🍎',apple:'🍎',pisang:'🍌',anggur:'🍇',tembikai:'🍉',oren:'🍊',mangga:'🥭',strawberi:'🍓',nanas:'🍍',kek:'🍰',cake:'🍰',aiskrim:'🍦',coklat:'🍫',chocolate:'🍫',donut:'🍩',biskut:'🍪',cookies:'🍪',popcorn:'🍿',kuih:'🍡',kueh:'🍡',karipap:'🥟',oden:'🍢',kelapa:'🥥',ais:'🧃',cendol:'🧃',bandung:'🧃',tebu:'🧃',plus:'🧃','100plus':'🧃',isotonik:'🧃',nescafe:'☕',horlicks:'☕',pau:'🥟',popia:'🥟',wantan:'🥟',dim:'🥟',keropok:'🍘',jagung:'🌽',ubi:'🍠',kacang:'🥜',keju:'🧀',kandar:'🍛',tomyam:'🍛',lempeng:'🥞',pancake:'🥞',murtabak:'🌯',capati:'🌯',durian:'🍈',buah:'🍉',cucur:'🍤',udang:'🦐',prawn:'🦐',sotong:'🦑',siput:'🐚',ketam:'🦀',kupang:'🦪',kerang:'🦪',pengat:'🥣',kasturi:'🍋',limau:'🍋',lemon:'🍋',senja:'🍽️',pulut:'🍚',lemang:'🍚',ketupat:'🍙',rendang:'🍛',gulai:'🍛',tempe:'🍘',tauhu:'🍘',tahu:'🍘',terung:'🍆',kobis:'🥬',bayam:'🥬',kangkung:'🥬',puding:'🍮',pudding:'🍮',jeli:'🍮',nangka:'🍈',rambutan:'🍒',timun:'🥒',betik:'🍈',sambal:'🌶️',cili:'🌶️',lokching:'🍢',lokcing:'🍢',penyet:'🍗',wings:'🍗',drumstick:'🍗',kerabu:'🍚',dagang:'🍚',lauk:'🍛',siakap:'🐟',kerapu:'🐟',tilapia:'🐟',keli:'🐟',patin:'🐟',selar:'🐟',kembung:'🐟',bilis:'🐟',sawi:'🥬',taugeh:'🥬',jambu:'🍐',pear:'🍐',pir:'🍐',pic:'🍑',peach:'🍑',ceri:'🍒',cherry:'🍒',kiwi:'🥝',avocado:'🥑',alpukat:'🥑',melon:'🍈',langsat:'🍈',duku:'🍈',ciku:'🍈',manggis:'🍇',epal:'🍎',delima:'🍎',tembikai:'🍉',mandarin:'🍊',tangerin:'🍊',blueberi:'🫐',blueberry:'🫐',berry:'🍓',markisa:'🍈',tomato:'🍅',lobak:'🥕',carrot:'🥕',brokoli:'🥦',bawang:'🧅'};
+/* frasa makanan Malaysia: semua jenis mee = 🍜 satu emoji je */
+const FOOD_R=[
+[/\bnasi/,'🍚'],
+[/\b(?:mee|mie|mi|bihun|mihun|meehoon|laksa|ramen|udon|soba|maggi|bakmi|kolok|(?:ku[a-z]*|kway|koay|koey|kwey) ?(?:teow|tiau|teo))\b/,'🍜'],
+[/\b(?:sup|soup|soto|tomyam|tomyum|tom ?yam|tom ?yum|bak ?kut ?teh|bkt|asam ?pedas|masak ?lemak|lontong|bakso|claypot|steamboat|hotpot|yong ?tau ?f[ou]+)\b/,'🍲'],
+[/\b(?:briyani|biryani|beriani|mandy|mandi|kabsa)\b/,'🍛'],
+[/\b(?:canai|prata|tosai|thosai|dosai|dosa|capati|chapati|naan|tisu)\b/,'🫓'],
+[/\broti ?john\b/,'🥪'],
+[/\b(?:roti ?jala|apam|lempeng|serabai|pancake)\b/,'🥞'],
+[/\b(?:cendol|chendol|ais ?kacang|abc|air ?batu ?campur|bingsu)\b/,'🍧'],
+[/\b(?:bubble ?tea|boba|tealive|chatime|mixue|gongcha|koi)\b/,'🧋'],
+[/\b(?:teh|tea)\b/,'🍵'],
+[/\b(?:otak ?otak|fish ?ball|fishcake|lekor)\b/,'🍥'],
+[/\b(?:siew ?mai|siomai|har ?gow|dim ?sum|bao|dumpling|samosa|spring ?roll|gyoza|wantan|wonton)\b/,'🥟'],
+[/\b(?:onde ?onde|seri ?muka|kuih|kueh|bahulu|dodol|kaswi|tepung ?pelita|talam|ketayap|putu|wajik|pulut ?inti|pulut ?panggang)\b/,'🍡'],
+[/\b(?:char ?siu|siew ?yuk|siu ?yuk|roast ?duck|itik|bebek|kambing|lamb|ribs|rusuk|tulang)\b/,'🍖'],
+[/\b(?:ulam|rojak|pasembor|pecel|gado ?gado)\b/,'🥗'],
+[/\b(?:mcd|mcdonald|mcdonalds|big ?mac|burger ?king|bk)\b/,'🍔'],
+[/\b(?:subway)\b/,'🥪'],[/\b(?:domino|dominos|pizza ?hut)\b/,'🍕'],
+[/\b(?:starbucks|zus|kopitiam|old ?town)\b/,'☕']
+];
 const FOOD_CAT=/^(makan|minum|kopi)\b/i;
 /* emoji satu item: ikut nama makanan dulu; kalau kategori Makan tapi tak kenal, guna 🍽️ (bukan burger) */
 function itemEmoji(name,catName,cats){
@@ -2097,6 +2118,7 @@ function foodEmoji(s){
    if(/\b(skin ?care|skincare|serum|sunscreen|moisturi[sz]er|cleanser)\b/.test(j))return '🧴'}
   if(/\b(caj|charge|servis|service|sst|cukai|tax|rounding|diskaun|discount|tip)\b/.test(t.join(' ')))return '🧾';
   if(/\b(?:lo|lok|lock|log|loke|luk) ?(?:ching|chin|cing|cin|chen)\b/.test(t.join(' ')))return '🍢';
+  {const j=t.join(' ');if(!/\basam boi\b/.test(j))for(const r of FOOD_R)if(r[0].test(j))return r[1]}
   if(/\basam boi\b/.test(t.join(' ')))return '🍹';
   if(/\b(jus|juice)\b/.test(t.join(' '))){const fr=t.find(w=>['tembikai','oren','epal','apple','mangga','anggur','nanas','strawberi','pisang','kelapa','lemon','limau','betik'].includes(w));if(fr)return FOOD_E[fr]}
   if(/\bnasi (kandar|kari)\b/.test(t.join(' ')))return '🍛';
