@@ -1415,10 +1415,10 @@ function vSimpanan(C){
       ${kv('🎯 Capai sasaran',`${C.hits} / ${C.counted}`)}
       ${kv('🏆 Rekod terbaik',C.best?`${rm(C.best.amt,0)} · ${ymLab(C.best.ym)}`:'-')}
       ${kv('📅 Bulan ni',C.thisGap>0&&s.goal>0?`${rm(C.thisMonth,0)} (lagi ${rm(C.thisGap,0)})`:rm(C.thisMonth,0))}
-      ${kv('🛵 Aset setara',C.workDays!=null?`${C.workDays} hari delivery`:'-')}
+      ${kv('🚀 Sampai '+(C.next?esc(C.next.name):'level'),C.nextDate?fmtDate(C.nextDate):'-')}
       ${kv('☕ Purata simpan sehari',rm(C.mAvg/30))}
     </div>
-    <p class="hint">Bulan semasa tak putuskan streak selagi belum tamat.${C.nextDate?` Level seterusnya anggaran ${fmtDate(C.nextDate)}.`:''}</p>
+    <p class="hint">Bulan semasa tak putuskan streak selagi belum tamat. Tarikh anggaran ikut purata simpanan awak.</p>
   </section>`;
 }
 
