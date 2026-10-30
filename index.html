@@ -2114,48 +2114,82 @@ function laporanBoxes(d){
     d.est!=null?['Anggaran sebulan',rm(d.est,0),'']:['Hari tanpa belanja',d.idle+' hari','']
   ];
 }
+function laporanTiles(d){
+  return laporanBoxes(d).map(([l,v,c],i)=>{const pp=String(v).split(' · ');
+    if(i===0)return {l,m:pp[0]==='-'?'–':pp[0],s:pp[0]==='-'?'Belum ada data bulan lepas':'berbanding bulan lepas',st:c,h:c==='bad'?'b':c==='good'?'g':'n',w:1};
+    if(i===1)return {l,m:pp[1]||'–',s:pp[0]!=='-'?pp[0]:'',h:'a'};
+    if(i===2)return {l,m:pp[0],s:pp[1]||'',h:'p'};
+    return {l,m:pp[0],s:l==='Anggaran sebulan'?'jika kadar sama diteruskan':'',h:'i',w:1}});
+}
 async function lpImage(){
   try{
     const EN=window.mmLang&&window.mmLang()==='en',T=x=>window.mmTr?window.mmTr(x):x;
     const d=laporanData(blMonth),t=new Date(),cs=getComputedStyle(document.documentElement);
     if(!d.tot)return;
     const V=n=>cs.getPropertyValue(n).trim(),disp=V('--display')||'sans-serif',body=V('--body')||'sans-serif';
-    const col={bg:V('--surface')||'#fff',s2:V('--surface2')||'#f5f5f5',ink:V('--ink')||'#111',mute:V('--mute')||'#667',acc:V('--accent')||'#059669',ai:V('--accent-ink')||'#fff',bad:V('--bad')||'#DC2626',good:V('--good')||'#15803D'};
+    const col={bg:V('--surface')||'#fff',ink:V('--ink')||'#111',mute:V('--mute')||'#667',bad:V('--bad')||'#DC2626',good:V('--good')||'#15803D'};
     if(document.fonts&&document.fonts.ready)await document.fonts.ready;
-    const top=d.cats.slice(0,3),W=1080,P=64,HDR=110,HERO=250,GAP=36,CATS=top.length?top.length*112+24:0,GRID=2*140+20,FOOT=110;
-    const H=P+HDR+HERO+GAP+CATS+GRID+FOOT,cv=document.createElement('canvas');cv.width=W;cv.height=H;
+    const top=d.cats.slice(0,3),tiles=laporanTiles(d),W=1080,P=64,HDR=124,HERO=210,GAP=30,ROW=118,CATS=top.length?20+18+top.length*ROW+16:0,TH=128,TG=18,TROWS=(()=>{let r=0,k=0;tiles.forEach(q=>{if(q.w){if(k){r++;k=0}r++}else{k++;if(k===2){r++;k=0}}});return r+(k?1:0)})(),GRID=TROWS*TH+(TROWS-1)*TG,FOOT=124;
+    const H=P+HDR+HERO+GAP+(CATS?CATS+GAP:0)+GRID+FOOT,cv=document.createElement('canvas');cv.width=W;cv.height=H;
     const x=cv.getContext('2d');
     const rr=(a,b,w,h,r)=>{x.beginPath();x.moveTo(a+r,b);x.arcTo(a+w,b,a+w,b+h,r);x.arcTo(a+w,b+h,a,b+h,r);x.arcTo(a,b+h,a,b,r);x.arcTo(a,b,a+w,b,r);x.closePath()};
     const ls=v=>{try{x.letterSpacing=v}catch(e){}};
+    x.fillStyle=col.bg;const nb=x.fillStyle;let rgb=[255,255,255];
+    if(/^#/.test(nb)){const h=nb.length===4?nb.slice(1).replace(/./g,'$&$&'):nb.slice(1);rgb=[0,2,4].map(i=>parseInt(h.substr(i,2),16))}else{const m=nb.match(/[\d.]+/g);if(m)rgb=m.slice(0,3).map(Number)}
+    const dark=(rgb[0]*.299+rgb[1]*.587+rgb[2]*.114)<140;
+    const G=dark?{a:'rgba(44,68,58,.66)',b:'rgba(24,38,32,.55)',brd:'rgba(255,255,255,.15)',hi:'rgba(255,255,255,.22)',sh:'rgba(0,0,0,.38)',sheen:.10,div:'rgba(255,255,255,.09)'}:{a:'rgba(255,255,255,.96)',b:'rgba(255,255,255,.66)',brd:'rgba(15,23,42,.13)',hi:'rgba(255,255,255,1)',sh:'rgba(15,23,42,.16)',sheen:.5,div:'rgba(15,23,42,.08)'};
     x.fillStyle=col.bg;x.fillRect(0,0,W,H);
+    [[.08,.02,760,'rgba(52,211,153,'+(dark?.24:.20)+')'],[1,.36,700,'rgba(96,165,250,'+(dark?.20:.18)+')'],[.2,.98,760,'rgba(167,139,250,'+(dark?.16:.15)+')']].forEach(([fx,fy,r,c])=>{const g=x.createRadialGradient(W*fx,H*fy,0,W*fx,H*fy,r);g.addColorStop(0,c);g.addColorStop(1,c.replace(/[\d.]+\)$/,'0)'));x.fillStyle=g;x.fillRect(0,0,W,H)});
+    const glass=(a,b,w,h,r)=>{
+      x.save();x.shadowColor=G.sh;x.shadowBlur=34;x.shadowOffsetY=14;rr(a,b,w,h,r);const g=x.createLinearGradient(a,b,a+w*.7,b+h);g.addColorStop(0,G.a);g.addColorStop(1,G.b);x.fillStyle=g;x.fill();x.restore();
+      x.save();rr(a,b,w,h,r);x.clip();const sg=x.createLinearGradient(a,b,a+w*.55,b+h*1.1);sg.addColorStop(0,'rgba(255,255,255,'+G.sheen+')');sg.addColorStop(.4,'rgba(255,255,255,0)');sg.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=sg;x.fillRect(a,b,w,h);x.restore();
+      rr(a+1,b+1,w-2,h-2,r);x.lineWidth=2;x.strokeStyle=G.brd;x.stroke();
+      x.beginPath();x.moveTo(a+r,b+2);x.lineTo(a+w-r,b+2);x.lineWidth=2;x.strokeStyle=G.hi;x.stroke();
+    };
     let y=P;
     x.fillStyle=col.ink;x.font='800 56px '+disp;x.fillText(T('Laporan belanja '+ML[d.m-1]+' '+d.y),P,y+52);
     x.fillStyle=col.mute;x.font='600 28px '+body;x.fillText('Money Manage',P,y+94);
     y+=HDR;
-    rr(P,y,W-2*P,HERO,36);x.fillStyle=col.acc;x.fill();
-    const g=x.createLinearGradient(P,y,W-P,y+HERO);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.30)');rr(P,y,W-2*P,HERO,36);x.fillStyle=g;x.fill();
-    x.fillStyle=col.ai;x.globalAlpha=.85;x.font='700 26px '+body;ls('3px');x.fillText((EN?'TOTAL SPENDING':'JUMLAH BELANJA'),P+40,y+64);ls('0px');
-    x.globalAlpha=1;x.font='800 96px '+disp;x.fillText(rm(d.tot),P+40,y+160);
-    x.globalAlpha=.85;x.font='600 28px '+body;x.fillText(EN?d.days+(d.days===1?' day':' days')+' · avg '+rm(d.avg)+' / day · '+d.rows.length+(d.rows.length===1?' purchase':' purchases'):d.days+' hari · purata '+rm(d.avg)+' / hari · '+d.rows.length+' belanja',P+40,y+212);x.globalAlpha=1;
+    glass(P,y,W-2*P,HERO,34);
+    x.fillStyle=col.mute;x.font='700 23px '+body;ls('3px');x.fillText(EN?'TOTAL SPENDING':'JUMLAH BELANJA',P+40,y+58);ls('0px');
+    x.fillStyle=col.ink;x.font='800 86px '+disp;x.fillText(rm(d.tot),P+40,y+142);
+    x.fillStyle=col.mute;x.font='600 27px '+body;x.fillText(EN?d.days+(d.days===1?' day':' days')+' · avg '+rm(d.avg)+' / day · '+d.rows.length+(d.rows.length===1?' purchase':' purchases'):d.days+' hari · purata '+rm(d.avg)+' / hari · '+d.rows.length+' belanja',P+40,y+186);
     y+=HERO+GAP;
-    top.forEach(([n,v],i)=>{
-      const y0=y+i*112,bw=W-2*P,pct=d.tot>0?v/d.tot:0;
-      x.fillStyle=col.ink;x.font='700 36px '+body;const nm=catIcon(n)+' '+n;x.fillText(T(nm),P,y0+40);
-      const w=x.measureText(nm).width;x.fillStyle=col.mute;x.font='600 28px '+body;x.fillText(Math.round(pct*100)+'%',P+w+18,y0+40);
-      x.fillStyle=col.ink;x.font='800 36px '+disp;x.textAlign='right';x.fillText(rm(v),W-P,y0+40);x.textAlign='left';
-      rr(P,y0+60,bw,16,8);x.fillStyle=col.s2;x.fill();
-      if(pct>0){rr(P,y0+60,Math.max(16,bw*pct),16,8);x.fillStyle=col.acc;x.fill()}
+    if(top.length){
+      const bw=W-2*P,T0=d.tot>0?d.tot:1,sm=top.reduce((q,z)=>q+(+z[1]||0),0),rest=T0-sm,parts=top.map(([n,v],i)=>({v,c:CATPAL[i%CATPAL.length]}));
+      if(rest>T0*.004)parts.push({v:rest,c:dark?'rgba(255,255,255,.18)':'rgba(15,23,42,.14)'});
+      const gap=6,tw=parts.reduce((q,z)=>q+Math.max(z.v,T0*.02),0),avail=bw-gap*(parts.length-1);let sx=P;
+      parts.forEach(z=>{const w=Math.max(14,avail*Math.max(z.v,T0*.02)/tw);rr(sx,y,w,20,10);x.fillStyle=z.c;x.globalAlpha=.92;x.fill();x.globalAlpha=1;sx+=w+gap});
+      y+=20+18;
+      glass(P,y,bw,top.length*ROW+16,30);
+      top.forEach(([n,v],i)=>{
+        const y0=y+8+i*ROW,c=CATPAL[i%CATPAL.length],pct=d.tot>0?v/d.tot:0,cx=P+34+34,cy=y0+ROW/2,rx=P+bw-34;
+        if(i){x.beginPath();x.moveTo(P+34,y0);x.lineTo(P+bw-34,y0);x.lineWidth=2;x.strokeStyle=G.div;x.stroke()}
+        x.beginPath();x.arc(cx,cy,34,0,Math.PI*2);x.globalAlpha=.2;x.fillStyle=c;x.fill();x.globalAlpha=.45;x.lineWidth=2;x.strokeStyle=c;x.stroke();x.globalAlpha=1;
+        x.fillStyle=col.ink;x.font='34px '+body;x.textAlign='center';x.fillText(catIcon(n),cx,cy+12);x.textAlign='left';
+        const nx=P+34+68+26;
+        x.fillStyle=col.ink;x.font='700 34px '+body;x.fillText(T(n),nx,y0+50);
+        x.font='800 34px '+disp;x.textAlign='right';x.fillText(rm(v),rx,y0+50);
+        x.fillStyle=col.mute;x.font='600 25px '+body;x.fillText(Math.round(pct*100)+'%',rx,y0+92);x.textAlign='left';
+        const trw=rx-110-nx;rr(nx,y0+76,trw,12,6);x.fillStyle=dark?'rgba(255,255,255,.10)':'rgba(15,23,42,.08)';x.fill();
+        if(pct>0){rr(nx,y0+76,Math.max(12,trw*pct),12,6);x.fillStyle=c;x.fill()}
+      });
+      y+=top.length*ROW+16+GAP;
+    }
+    const cw=(W-2*P-TG)/2;let ty=y,k=0;
+    const drawTile=(q,bx,by,w)=>{
+      glass(bx,by,w,TH,28);
+      x.fillStyle=col.mute;x.font='700 22px '+body;ls('2px');x.fillText(T(q.l).toUpperCase(),bx+30,by+46);ls('0px');
+      const sub=q.s?T(q.s):'';x.font='600 24px '+body;const sw=sub?x.measureText(sub).width:0;
+      const mv=T(q.m);let fs=46;x.fillStyle=q.st==='bad'?col.bad:q.st==='good'?col.good:col.ink;do{x.font='800 '+fs+'px '+disp;fs-=2}while(x.measureText(mv).width>w-60-sw-(sw?16:0)&&fs>22);
+      x.fillText(mv,bx+30,by+102);
+      if(sub){x.fillStyle=col.mute;x.font='600 24px '+body;x.textAlign='right';x.fillText(sub,bx+w-30,by+102);x.textAlign='left'}
+    };
+    tiles.forEach(q=>{
+      if(q.w){if(k){ty+=TH+TG;k=0}drawTile(q,P,ty,W-2*P);ty+=TH+TG}
+      else{drawTile(q,P+k*(cw+TG),ty,cw);k++;if(k===2){k=0;ty+=TH+TG}}
     });
-    y+=CATS;
-    const bw=(W-2*P-24)/2;
-    laporanBoxes(d).forEach(([l,v,c],i)=>{
-      const bx=P+(i%2)*(bw+24),by=y+Math.floor(i/2)*160;
-      rr(bx,by,bw,140,28);x.fillStyle=col.s2;x.fill();
-      x.fillStyle=col.mute;x.font='700 24px '+body;x.fillText(T(l).toUpperCase(),bx+28,by+48);
-      let fs=44;x.fillStyle=c?col[c]:col.ink;do{x.font='800 '+fs+'px '+disp;fs-=2}while(x.measureText(v).width>bw-56&&fs>22);
-      x.fillText(T(v),bx+28,by+108);
-    });
-    x.fillStyle=col.mute;x.font='600 24px '+body;x.textAlign='center';x.fillText(T('Money Manage · '+t.getDate()+' '+ML[t.getMonth()]+' '+t.getFullYear()),W/2,H-P-10);x.textAlign='left';
+    x.fillStyle=col.mute;x.font='600 24px '+body;x.textAlign='center';x.fillText(T('Money Manage · '+t.getDate()+' '+ML[t.getMonth()]+' '+t.getFullYear()),W/2,H-P-6);x.textAlign='left';
     const blob=await new Promise(ok=>cv.toBlob(ok,'image/png'));if(!blob)throw new Error('blob');
     const fname='laporan-belanja-'+d.ym+'.png',f=new File([blob],fname,{type:'image/png'});
     if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:T('Laporan belanja '+ML[d.m-1])})}catch(e){}return}
@@ -2171,11 +2205,7 @@ function vLaporan(C,ym){
     <div class="sec-h">${head('Laporan belanja '+ML[d.m-1]+' '+d.y,'Ikut bulan yang dipilih, boleh kongsi sebagai gambar.')}<button class="btn ghost" data-act="lpshare">Kongsi gambar</button></div>
     <div class="rpt-hero"><span class="eyebrow">Jumlah belanja</span><b class="num">${rm(d.tot)}</b><small>${d.days} hari · purata ${rm(d.avg)} / hari · ${d.rows.length} belanja</small></div>
     ${top.length?catBlock(top,mx,catIcon):''}
-    <div class="bt">${laporanBoxes(d).map(([l,v,c],i)=>{const pp=String(v).split(' · ');
-      if(i===0)return btT(l,esc(pp[0]==='-'?'–':pp[0]),pp[0]==='-'?'Belum ada data bulan lepas':'berbanding bulan lepas',c==='bad'?'b':c==='good'?'g':'n',1);
-      if(i===1)return btT(l,esc(pp[1]||'–'),esc(pp[0]!=='-'?pp[0]:''),'a');
-      if(i===2)return btT(l,esc(pp[0]),esc(pp[1]||''),'p');
-      return btT(l,esc(pp[0]),l==='Anggaran sebulan'?'jika kadar sama diteruskan':'',  'i',1)}).join('')}</div>
+    <div class="bt">${laporanTiles(d).map(q=>btT(q.l,esc(q.m),esc(q.s),q.h,q.w)).join('')}</div>
   </section>`;
 }
 function vBelanja(C){
