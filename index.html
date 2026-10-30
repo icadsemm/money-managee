@@ -390,16 +390,6 @@ html{touch-action:manipulation;-webkit-overflow-scrolling:touch}
 @media (prefers-reduced-motion:no-preference){.gtrack i,.hbars i{transition:width .8s cubic-bezier(.2,.8,.2,1)}}
 </style>
 <style id="achcalm">
-/* nada tenang: satu warna accent, tiada cahaya */
-.ach-hero{background:color-mix(in srgb,var(--mint) 9%,transparent);border:1px solid color-mix(in srgb,var(--mint) 22%,transparent);box-shadow:none}
-.ach-hero .achring{filter:none}
-.ladder .lv{background:color-mix(in srgb,#fff 3%,transparent)}
-.ladder .lv.done{border-color:color-mix(in srgb,var(--mint) 30%,transparent);background:color-mix(in srgb,var(--mint) 7%,transparent)}
-.ladder .lv.done .ic{background:color-mix(in srgb,var(--mint) 18%,transparent);box-shadow:none}
-.ladder .lv.done .bar i,.ladder .lv.next .bar i{background:var(--mint)}
-.ladder .lv.next{border:1px solid color-mix(in srgb,var(--mint) 55%,transparent);background:color-mix(in srgb,var(--mint) 9%,transparent);box-shadow:none}
-.ladder .lv.next .ic{background:color-mix(in srgb,var(--mint) 20%,transparent);box-shadow:none;animation:none}
-.kvs.ach .kv.hi{box-shadow:none}
 .acc.goalc,.acc.histc{border-radius:16px;padding:14px}
 .acc.goalc{background:linear-gradient(145deg,var(--g-in1),var(--g-in2))}
 .acc.goalc::after{display:none}
@@ -424,6 +414,19 @@ html{touch-action:manipulation;-webkit-overflow-scrolling:touch}
 .hbars .v{background:var(--mint);box-shadow:none}
 .hbars i{height:6px}
 .hres .hc{background:color-mix(in srgb,#fff 4%,transparent);border-radius:12px}
+
+/* cincin premium */
+.ach-hero{gap:18px;padding:16px 18px}
+.ach-hero .achring{width:88px;height:88px;
+ background:conic-gradient(from 0deg,#34D399 0,#2DD4BF calc(var(--p)*.45%),#818CF8 calc(var(--p)*1%),color-mix(in srgb,var(--track) 75%,transparent) 0);
+ filter:drop-shadow(0 0 10px color-mix(in srgb,var(--mint) 55%,transparent)) drop-shadow(0 0 26px color-mix(in srgb,#818CF8 32%,transparent))}
+.ach-hero .achring::before{inset:9px;background:radial-gradient(circle at 32% 24%,color-mix(in srgb,var(--surface) 82%,#fff 14%),var(--surface) 70%);
+ box-shadow:inset 0 3px 8px rgba(0,0,0,.45),inset 0 -1px 0 rgba(255,255,255,.07),0 0 0 1px rgba(255,255,255,.07)}
+.ach-hero .achring::after{content:"";position:absolute;left:50%;top:0;width:10px;height:10px;margin-left:-5px;border-radius:50%;
+ background:#fff;box-shadow:0 0 0 2px color-mix(in srgb,#818CF8 70%,transparent),0 0 12px 3px #818CF8;
+ transform-origin:5px 44px;transform:rotate(calc(var(--p)*3.6deg))}
+.ach-hero .achring b{font-size:23px;letter-spacing:-.02em;text-shadow:0 1px 10px color-mix(in srgb,var(--mint) 35%,transparent)}
+.ach-hero .achring b small{font-size:12px;opacity:.8}
 </style>
 <style id="achpro">
 .goalc .gl{background:color-mix(in srgb,var(--mint) 8%,transparent);border:1px solid color-mix(in srgb,var(--mint) 20%,transparent);border-radius:16px;padding:16px;margin-top:12px;grid-template-columns:92px minmax(0,1fr);gap:16px}
