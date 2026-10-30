@@ -2341,7 +2341,7 @@ document.addEventListener('click',e=>{
     if(m<0){const n=new Date();m=n.getMonth();y=n.getFullYear()}else{m++;if(m>11){m=0;y++}}
     k.label=ML[m]+' '+y;k.items.forEach(x=>x.paid=false);touch('komitmen');later();
     setUndo('Bulan baru dimulakan',()=>{state.komitmen=Object.assign(DEF.komitmen(),snap);touch('komitmen');later()});return}
-  if(act==='logo-clear'){const a=state.saving.accounts[+b.dataset.i];if(a){delete a.logo;touch('saving');later()}return}
+  if(act==='logo-clear'){const a=state.saving.accounts[+b.dataset.i];if(a){const old=a.logo;delete a.logo;touch('saving');later();setUndo('Logo dibuang',()=>{if(state.saving.accounts.includes(a)){a.logo=old;touch('saving');later()}})}return}
   if(act==='nwr'){nwRange=b.dataset.v;try{localStorage.setItem('nwRange',nwRange)}catch(x){}later();return}
   if(act==='seg'){bilTab=b.dataset.v;try{localStorage.setItem('bilTab',bilTab)}catch(x){}later();return}
   if(act==='add'){const k=b.dataset.k;const [doc,arr]=getArr(k);arr.push((NEW[k]||NEW[k.replace(/\.\d+\./g,'.#.')])());touch(doc);if(k==='saving.accounts'){accOpen[arr.length-1]=true}pendingFocus=k+'.'+(arr.length-1);later();return}
