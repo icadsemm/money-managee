@@ -613,7 +613,7 @@ html{touch-action:manipulation;-webkit-overflow-scrolling:touch}
 .bx-chips>div{display:flex;flex-direction:column;gap:3px;padding:9px 10px;border-radius:14px;background:color-mix(in srgb,var(--ink) 5%,transparent);border:1px solid color-mix(in srgb,var(--line) 70%,transparent);min-width:0}
 .bx-chips small{font-size:9.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--mute);white-space:nowrap}
 .bx-chips b{font-family:var(--display);font-size:14px;overflow-wrap:anywhere}
-.bx-chips .bx-in .in{padding:2px 0;min-height:0;border:0;background:transparent;font-family:var(--display);font-weight:700;font-size:14px;width:100%}
+.bx-chips .bx-in .in{color:var(--accent);padding:2px 0;min-height:0;border:0;background:transparent;font-family:var(--display);font-weight:700;font-size:14px;width:100%}
 .bx-msg{margin:0;font-size:12.5px;font-weight:700;text-align:right}
 :root{--bt-a:color-mix(in srgb,var(--accent) 7%,rgba(255,255,255,.92));--bt-b:color-mix(in srgb,var(--accent) 3%,rgba(255,255,255,.62));--bt-brd:rgba(15,23,42,.13);--bt-hi:rgba(255,255,255,1);--bt-lo:rgba(15,23,42,.05);--bt-sh:rgba(15,23,42,.22)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bt-a:var(--g-bg);--bt-b:var(--g-bg2);--bt-brd:var(--g-brd);--bt-hi:var(--g-hi);--bt-lo:var(--g-lo);--bt-sh:var(--g-sh)}}
@@ -2109,7 +2109,7 @@ function blInsight(rows,tot,bud){
   <div class="bch">${rseg}${chart}${bud>0?'<p class="hint" style="margin:6px 0 0">Merah = lebih bajet.</p>':''}</div>
   <div><p class="eyebrow" style="margin-bottom:8px">Ikut kategori</p>${catBlock(list,tot,icon)}</div></section>`;
 }
-const CATPAL=[78,50,37,28,22,17,13,10].map(n=>`color-mix(in srgb,var(--ink) ${n}%,transparent)`);
+const CATPAL=[100,80,64,50,40,32,25,18].map(n=>`color-mix(in srgb,var(--accent) ${n}%,transparent)`);
 function catBlock(list,tot,icon){
   const T=tot>0?tot:1,sm=list.reduce((a,x)=>a+(+x[1]||0),0),rest=T-sm;
   const seg=list.map(([n,v],i)=>`<i style="flex:${Math.max(v,T*.012)};--c:${CATPAL[i%CATPAL.length]}"></i>`).join('')+(rest>T*.004?`<i style="flex:${rest};--c:var(--line)"></i>`:'');
@@ -2163,7 +2163,7 @@ async function lpImage(){
     const V=n=>cs.getPropertyValue(n).trim(),disp=V('--display')||'sans-serif',body=V('--body')||'sans-serif';
     const col={bg:V('--surface')||'#fff',ink:V('--ink')||'#111',mute:V('--mute')||'#667',bad:V('--bad')||'#DC2626',good:V('--good')||'#15803D'};
     if(document.fonts&&document.fonts.ready)await document.fonts.ready;
-    const MINT=V('--mint')||'#34D399',CATA=[.78,.5,.37,.28,.22,.17,.13,.10],top=d.cats.slice(0,3),tiles=laporanTiles(d),W=1080,P=64,HDR=124,HERO=210,GAP=30,ROW=118,CATS=top.length?20+18+top.length*ROW+16:0,TH=128,TG=18,TROWS=(()=>{let r=0,k=0;tiles.forEach(q=>{if(q.w){if(k){r++;k=0}r++}else{k++;if(k===2){r++;k=0}}});return r+(k?1:0)})(),GRID=TROWS*TH+(TROWS-1)*TG,FOOT=124;
+    const MINT=V('--mint')||'#34D399',CATA=[1,.8,.64,.5,.4,.32,.25,.18],ACC=V('--accent')||MINT,top=d.cats.slice(0,3),tiles=laporanTiles(d),W=1080,P=64,HDR=124,HERO=210,GAP=30,ROW=118,CATS=top.length?20+18+top.length*ROW+16:0,TH=128,TG=18,TROWS=(()=>{let r=0,k=0;tiles.forEach(q=>{if(q.w){if(k){r++;k=0}r++}else{k++;if(k===2){r++;k=0}}});return r+(k?1:0)})(),GRID=TROWS*TH+(TROWS-1)*TG,FOOT=124;
     const H=P+HDR+HERO+GAP+(CATS?CATS+GAP:0)+GRID+FOOT,cv=document.createElement('canvas');cv.width=W;cv.height=H;
     const x=cv.getContext('2d');
     const rr=(a,b,w,h,r)=>{x.beginPath();x.moveTo(a+r,b);x.arcTo(a+w,b,a+w,b+h,r);x.arcTo(a+w,b+h,a,b+h,r);x.arcTo(a,b+h,a,b,r);x.arcTo(a,b,a+w,b,r);x.closePath()};
@@ -2190,14 +2190,14 @@ async function lpImage(){
     x.fillStyle=col.mute;x.font='600 27px '+body;x.fillText(EN?d.days+(d.days===1?' day':' days')+' · avg '+rm(d.avg)+' / day · '+d.rows.length+(d.rows.length===1?' purchase':' purchases'):d.days+' hari · purata '+rm(d.avg)+' / hari · '+d.rows.length+' belanja',P+40,y+186);
     y+=HERO+GAP;
     if(top.length){
-      const bw=W-2*P,T0=d.tot>0?d.tot:1,sm=top.reduce((q,z)=>q+(+z[1]||0),0),rest=T0-sm,parts=top.map(([n,v],i)=>({v,c:col.ink,a:CATA[Math.min(i,CATA.length-1)]}));
+      const bw=W-2*P,T0=d.tot>0?d.tot:1,sm=top.reduce((q,z)=>q+(+z[1]||0),0),rest=T0-sm,parts=top.map(([n,v],i)=>({v,c:ACC,a:CATA[Math.min(i,CATA.length-1)]}));
       if(rest>T0*.004)parts.push({v:rest,c:dark?'rgba(255,255,255,.18)':'rgba(15,23,42,.14)',a:1});
       const gap=6,tw=parts.reduce((q,z)=>q+Math.max(z.v,T0*.02),0),avail=bw-gap*(parts.length-1);let sx=P;
       parts.forEach(z=>{const w=Math.max(14,avail*Math.max(z.v,T0*.02)/tw);rr(sx,y,w,20,10);x.fillStyle=z.c;x.globalAlpha=z.a;x.fill();x.globalAlpha=1;sx+=w+gap});
       y+=20+18;
       glass(P,y,bw,top.length*ROW+16,30);
       top.forEach(([n,v],i)=>{
-        const y0=y+8+i*ROW,c=col.ink,al=CATA[Math.min(i,CATA.length-1)],pct=d.tot>0?v/d.tot:0,cx=P+34+34,cy=y0+ROW/2,rx=P+bw-34;
+        const y0=y+8+i*ROW,c=ACC,al=CATA[Math.min(i,CATA.length-1)],pct=d.tot>0?v/d.tot:0,cx=P+34+34,cy=y0+ROW/2,rx=P+bw-34;
         if(i){x.beginPath();x.moveTo(P+34,y0);x.lineTo(P+bw-34,y0);x.lineWidth=2;x.strokeStyle=G.div;x.stroke()}
         x.beginPath();x.arc(cx,cy,34,0,Math.PI*2);x.fillStyle=dark?'rgba(255,255,255,.08)':'rgba(15,23,42,.06)';x.fill();x.lineWidth=2;x.strokeStyle=G.brd;x.stroke();
         x.fillStyle=col.ink;x.font='34px '+body;x.textAlign='center';x.fillText(catIcon(n),cx,cy+12);x.textAlign='left';
