@@ -321,6 +321,43 @@ html{touch-action:manipulation;-webkit-overflow-scrolling:touch}
 @media (prefers-color-scheme:dark){:root:root:root:root:not([data-theme="light"]) .nwseg button[aria-pressed="true"]{text-shadow:0 1px 0 rgba(255,255,255,.28)}}
 :root:root:root:root[data-theme="dark"] .nwseg button[aria-pressed="true"]{text-shadow:0 1px 0 rgba(255,255,255,.28)}
 </style>
+<style id="achfx">
+.ach-hero{display:flex;align-items:center;gap:16px;padding:14px 16px;margin:4px 0 14px;border-radius:20px;position:relative;overflow:hidden;
+ background:linear-gradient(135deg,color-mix(in srgb,var(--mint) 22%,transparent),color-mix(in srgb,#6366F1 14%,transparent));
+ border:1px solid color-mix(in srgb,var(--mint) 35%,transparent);box-shadow:0 14px 30px -18px color-mix(in srgb,var(--mint) 80%,transparent)}
+.ach-hero .achring{flex:none;width:76px;height:76px;border-radius:50%;display:grid;place-items:center;
+ background:conic-gradient(var(--mint) calc(var(--p)*1%),color-mix(in srgb,var(--track) 80%,transparent) 0);
+ -webkit-mask:radial-gradient(circle 100% at 50% 50%,#000 99%,#000 0);filter:drop-shadow(0 0 10px color-mix(in srgb,var(--mint) 55%,transparent));position:relative}
+.ach-hero .achring::before{content:"";position:absolute;inset:8px;border-radius:50%;background:var(--surface)}
+.ach-hero .achring b{position:relative;font-family:var(--display);font-size:20px;color:var(--ink)}
+.ach-hero .achring b small{font-size:11px;margin-left:1px;color:var(--mute)}
+.ach-hero .ht{display:flex;flex-direction:column;gap:2px;min-width:0}
+.ach-hero .eyebrow{font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--mute)}
+.ach-hero strong{font-family:var(--display);font-size:20px;color:var(--ink)}
+.ach-hero em{font-style:normal;font-size:13px;color:var(--mute)}.ach-hero em b{color:var(--accent)}
+.ladder{position:relative;gap:10px!important}
+.ladder .lv{padding:10px 12px;border-radius:16px;gap:6px 12px;position:relative;
+ background:linear-gradient(145deg,color-mix(in srgb,#fff 6%,transparent),color-mix(in srgb,#fff 1%,transparent));border:1px solid color-mix(in srgb,var(--line) 80%,transparent);
+ grid-template-columns:42px minmax(0,1fr) auto}
+.ladder .lv .ic{width:42px;height:42px;display:grid;place-items:center;font-size:22px;border-radius:50%;background:color-mix(in srgb,var(--track) 70%,transparent);grid-row:1/3}
+.ladder .lv .bar{height:8px;position:relative}
+.ladder .lv.done{border-color:color-mix(in srgb,var(--good) 45%,transparent);background:linear-gradient(145deg,color-mix(in srgb,var(--good) 16%,transparent),transparent 70%)}
+.ladder .lv.done .ic{background:radial-gradient(circle at 30% 25%,#FDE68A,#F59E0B);box-shadow:0 0 0 3px color-mix(in srgb,#F59E0B 25%,transparent),0 6px 16px -4px rgba(245,158,11,.7)}
+.ladder .lv.done .bar i{background:linear-gradient(90deg,#34D399,#4ADE80)}
+.ladder .lv.next{opacity:1;border:1.5px solid var(--mint);background:linear-gradient(145deg,color-mix(in srgb,var(--mint) 20%,transparent),transparent 75%);box-shadow:0 10px 26px -14px var(--mint)}
+.ladder .lv.next .ic{background:linear-gradient(145deg,var(--mint),#6366F1);box-shadow:0 0 0 3px color-mix(in srgb,var(--mint) 25%,transparent);animation:achpulse 2s ease-in-out infinite}
+.ladder .lv.next .st{background:var(--mint);color:#04130C;padding:2px 9px;border-radius:99px}
+.ladder .lv.next .bar i{background:linear-gradient(90deg,#34D399,#818CF8)}
+.ladder .lv.lock{opacity:.7}
+.ladder .lv.lock .ic{filter:grayscale(.7)}
+@keyframes achpulse{0%,100%{box-shadow:0 0 0 3px color-mix(in srgb,var(--mint) 25%,transparent)}50%{box-shadow:0 0 0 8px color-mix(in srgb,var(--mint) 8%,transparent)}}
+.kvs.ach{margin-top:14px}
+.kvs.ach .kv{border-radius:18px;position:relative;overflow:hidden}
+.kvs.ach .kv span{white-space:normal;letter-spacing:.05em}
+.kvs.ach .kv.hi{box-shadow:0 14px 28px -14px var(--mint)}
+.kvs.ach .kv.hi b{font-size:26px}
+@media (prefers-reduced-motion:reduce){.ladder .lv.next .ic{animation:none}}
+</style>
 </head><body>
 <title>Money Manage</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -1314,8 +1351,10 @@ function vSimpanan(C){
       <div class="res"><span>Profit <b class="${pr<0?'neg':pr>0?'pos':''}">${money(pr,x.cur)}</b>${usd?` <small>(≈ ${rm(pr*fx(x))})</small>`:''}</span><span>ROI <b class="${pr<0?'neg':pr>0?'pos':''}">${pc(roi,2)}</b></span></div>
       <div class="share">${bar(share)}<span>${pc(share,1)} daripada jumlah</span>${okLogo(x.logo)?`<button class="lnk" data-act="logo-clear" data-i="${i}">Buang logo</button>`:''}</div>
     </div>`}).join('');
-  const ladder=C.lv.slice(1).map((l,i)=>{const idx=i+1;const done=C.nilai>=l.amt,isNext=idx===C.li+1;
-    return `<div class="lv ${done?'done':isNext?'next':'lock'}"><span class="ic" aria-hidden="true">${esc(l.icon)}</span><span class="nm">${esc(l.name)}<small>${rm(l.amt,0)}</small></span><span class="st">${done?'Capai':isNext?'Seterusnya':'Terkunci'}</span>${bar(l.amt>0?C.nilai/l.amt:0)}</div>`}).join('');
+  const ladder=C.lv.slice(1).map((l,i)=>{const idx=i+1;const done=C.nilai>=l.amt,isNext=idx===C.li+1;const p=l.amt>0?clamp(C.nilai/l.amt):0;
+    return `<div class="lv ${done?'done':isNext?'next':'lock'}" style="--p:${(p*100).toFixed(1)}%"><span class="ic" aria-hidden="true">${esc(l.icon)}</span><span class="nm">${esc(l.name)}<small>${rm(l.amt,0)}</small></span><span class="st">${done?'✓ Capai':isNext?'Seterusnya':'🔒 '+(p*100).toFixed(0)+'%'}</span>${bar(p)}</div>`}).join('');
+  const nx=C.next,nxP=nx&&nx.amt>0?clamp(C.nilai/nx.amt):1;
+  const hero=`<div class="ach-hero" style="--p:${(nxP*100).toFixed(1)}"><div class="achring"><b>${(nxP*100).toFixed(0)}<small>%</small></b></div><div class="ht"><span class="eyebrow">${nx?'Level seterusnya':'Tahniah'}</span><strong>${nx?esc(nx.icon)+' '+esc(nx.name):'Semua level dicapai 🎉'}</strong><em>${nx?'Lagi <b>'+rm(Math.max(nx.amt-C.nilai,0),0)+'</b> untuk sampai':'Terus kekalkan momentum'}</em></div></div>`;
   const mon=[...s.monthly].map((m,i)=>({m,i})).sort((x,y)=>x.m.ym<y.m.ym?-1:1);
   const shown=mon.slice(-12);
   const maxv=Math.max(s.goal*1.15,...shown.map(x=>+x.m.amt||0),1);
@@ -1369,14 +1408,15 @@ function vSimpanan(C){
   </section>
   <section class="panel">
     ${head('Pencapaian','Sasaran level ikut peratus dari target.')}
+    ${hero}
     <div class="ladder">${ladder}</div>
-    <div class="kvs">
-      ${kv('Streak',`${C.streak} bulan`,'hi')}
-      ${kv('Capai sasaran',`${C.hits} / ${C.counted}`)}
-      ${kv('Rekod terbaik',C.best?`${rm(C.best.amt,0)} · ${ymLab(C.best.ym)}`:'-')}
-      ${kv('Bulan ni',C.thisGap>0&&s.goal>0?`${rm(C.thisMonth,0)} (lagi ${rm(C.thisGap,0)})`:rm(C.thisMonth,0))}
-      ${kv('Aset setara',C.workDays!=null?`${C.workDays} hari delivery`:'-')}
-      ${kv('Purata simpan sehari',rm(C.mAvg/30))}
+    <div class="kvs ach">
+      ${kv('🔥 Streak',`${C.streak} bulan`,'hi')}
+      ${kv('🎯 Capai sasaran',`${C.hits} / ${C.counted}`)}
+      ${kv('🏆 Rekod terbaik',C.best?`${rm(C.best.amt,0)} · ${ymLab(C.best.ym)}`:'-')}
+      ${kv('📅 Bulan ni',C.thisGap>0&&s.goal>0?`${rm(C.thisMonth,0)} (lagi ${rm(C.thisGap,0)})`:rm(C.thisMonth,0))}
+      ${kv('🛵 Aset setara',C.workDays!=null?`${C.workDays} hari delivery`:'-')}
+      ${kv('☕ Purata simpan sehari',rm(C.mAvg/30))}
     </div>
     <p class="hint">Bulan semasa tak putuskan streak selagi belum tamat.${C.nextDate?` Level seterusnya anggaran ${fmtDate(C.nextDate)}.`:''}</p>
   </section>`;
