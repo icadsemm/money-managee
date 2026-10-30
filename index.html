@@ -3749,4 +3749,25 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   if(document.body)start();else document.addEventListener('DOMContentLoaded',start);
 })();
 </script>
+<style id="perfpause">
+/* jeda animasi bila butang tak kelihatan / app di latar; rupa sama bila nampak */
+.mm-off,.mm-off::before,.mm-off::after,.mm-off *,.mm-off *::before,.mm-off *::after,
+html.mm-bg .hstars *,html.mm-bg .voicebtn,html.mm-bg .voicebtn::after,html.mm-bg .voicebtn *,html.mm-bg .scanbtn,html.mm-bg .scanbtn *{animation-play-state:paused!important}
+/* blur dalam kandungan scroll dibuang (latar gradien kekal) */
+.bch,.cat2-list{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+</style>
+<script>
+(function(){
+  var raf=0,H=document.documentElement;
+  function chk(){raf=0;var vh=innerHeight;
+    document.querySelectorAll('.voicebtn,.scanbtn').forEach(function(el){
+      var r=el.getBoundingClientRect(),off=r.bottom<-40||r.top>vh+40;
+      el.classList.toggle('mm-off',off)})}
+  function q(){if(!raf)raf=requestAnimationFrame(chk)}
+  addEventListener('scroll',q,{passive:true,capture:true});
+  addEventListener('resize',q);
+  document.addEventListener('visibilitychange',function(){H.classList.toggle('mm-bg',document.hidden);if(!document.hidden)q()});
+  q();setInterval(q,1500);
+})();
+</script>
 </body></html>
