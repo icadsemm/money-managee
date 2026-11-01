@@ -79,7 +79,7 @@ jobs:
           async function main(){
             const admin=(await import('firebase-admin')).default;
             const sa=JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT||'');
-            admin.initializeApp({credential:admin.credential.cert(sa)});
+            admin.initializeApp({credential:admin.credential.cert(sa)});console.log('project_id kunci penghantar:',sa.project_id);
             const db=admin.firestore(),fcm=admin.messaging(),test=process.env.TEST==='1';
             const snap=await db.collectionGroup('m').get(),users={};
             snap.forEach(d=>{if(d.id!=='custom'&&d.id!=='push')return;const u=d.ref.parent.parent;if(!u)return;(users[u.path]??={})[d.id]={data:d.data(),ref:d.ref}});
@@ -93,7 +93,7 @@ jobs:
                 try{await fcm.send({token,data:{title:m.title,body:m.body,tag:m.tag,url:'./'},android:{priority:'high'},webpush:{headers:{Urgency:'high',TTL:'7200'}}});sent++}
                 catch(e){const c=e&&e.code||'';
                   if(/registration-token-not-registered|invalid-registration-token|invalid-argument/.test(c)){dead++;await u.push.ref.update({tokens:admin.firestore.FieldValue.arrayRemove(token)}).catch(()=>{})}
-                  else console.error('hantar gagal',path,c)}
+                  else console.error('hantar gagal',path,c,String((e&&e.message)||e).slice(0,300))}
               }}
               if(!test&&list.length)await u.push.ref.set({sent:mark},{merge:true}).catch(()=>{});
             }
