@@ -1891,7 +1891,7 @@ const CALIC='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke=
 const RM_UNDO='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h11a5 5 0 010 10H9"/><path d="M8 5L4 9l4 4"/></svg>';
 const RM_CHECK='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 const RM_REP={'':'Sekali','m':'Tiap bulan','m3':'Tiap 3 bulan','m6':'Tiap 6 bulan','y':'Tiap tahun'};
-const PUSH_VAPID='BGn7e2tS4OuE4qYx4kF90VEZJ80hQ96o6XGfoTeKD-o3-BEubd8cwXJ4fIUaW54kLe6eK3ebyfOPE6j-eBAaaEI';
+const PUSH_VAPID='BGn7e2tS4OuE4qYx4kF90VEZJ80hQ96o6XGfoTeKD-o3-BEubd8cwXJ4flUaW54kLe6eK3ebyfOPE6j-eBAaaEI';
 let pushSt='';
 const pushKey=()=>/^B[\w-]{60,}$/.test(PUSH_VAPID);
 const pushSup=()=>pushKey()&&('Notification' in window)&&('serviceWorker' in navigator)&&('PushManager' in window)&&typeof firebase!=='undefined'&&!!firebase.messaging;
