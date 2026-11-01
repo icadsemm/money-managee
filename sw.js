@@ -1,4 +1,4 @@
-const CACHE='mm-v4';
+const CACHE='mm-v5';
 const CORE=['./','index.html','manifest.json','kucing-192.png','kucing-512.png'];
 self.addEventListener('install',e=>{
   self.skipWaiting();
@@ -25,4 +25,20 @@ self.addEventListener('fetch',e=>{
       return net;
     })
   );
+});
+
+// ---- notifikasi push (FCM, data-only) ----
+self.addEventListener('push',e=>{
+  let d={};try{d=e.data?e.data.json():{}}catch(x){}
+  const x=d.data||d.notification||d||{};
+  const title=x.title||'Money Manage',body=x.body||'';
+  e.waitUntil(self.registration.showNotification(title,{body,icon:'kucing-192.png',badge:'kucing-192.png',tag:x.tag||'mm',data:{url:x.url||'./'}}));
+});
+self.addEventListener('notificationclick',e=>{
+  e.notification.close();
+  const url=(e.notification.data&&e.notification.data.url)||'./';
+  e.waitUntil(self.clients.matchAll({type:'window',includeUncontrolled:true}).then(l=>{
+    for(const c of l){if('focus' in c)return c.focus()}
+    return self.clients.openWindow(url);
+  }));
 });
