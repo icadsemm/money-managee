@@ -884,7 +884,108 @@ h2{font-family:var(--display);font-size:17px;margin:0;font-weight:700;letter-spa
 .att [data-s="good"] .dot{background:var(--good)}.att [data-s="warn"] .dot{background:var(--warn)}.att [data-s="bad"] .dot{background:var(--bad)}
 .att b{display:block;font-weight:600}.att small{color:var(--mute);font-size:12px}
 .att svg{width:16px;height:16px;stroke:var(--mute)}
+/* peringatan */
+.rml{display:flex;flex-direction:column}
+.rmr{display:grid;grid-template-columns:42px minmax(0,1fr) 30px;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.rmr:first-child{border-top:0;padding-top:2px}
+.rmi{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;font-size:21px;background:var(--tint);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 18%,transparent)}
+.rmr.done .rmi{filter:grayscale(1);opacity:.55}
+.rmc{width:28px;height:28px;border-radius:50%;border:2px solid color-mix(in srgb,var(--mute) 55%,transparent);background:transparent;padding:0;cursor:pointer;display:grid;place-items:center;color:transparent;transition:background .2s,border-color .2s}
+.rmc svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.rmr.done .rmc{background:var(--good);border-color:var(--good);color:#fff}
+.rmm{display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0;width:100%;text-align:left;font:inherit;color:inherit;background:none;border:0;padding:4px 0;cursor:pointer}
+.rmm>span:first-child{min-width:0;display:flex;flex-direction:column;gap:2px}
+.rmm b{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rmm small{color:var(--mute);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rmr.done .rmm b{text-decoration:line-through;color:var(--mute)}
+.rmm .pill{flex:none}.pill.mute{background:var(--surface2);color:var(--mute);border:1px solid var(--line)}
+.rm-hint{color:var(--mute);font-size:12.5px;margin:0 0 4px}
+.rm-ex{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+#rmsheet[hidden]{display:none}
+#rmsheet{position:fixed;inset:0;z-index:61;background:rgba(7,16,13,.5);display:flex;align-items:flex-end;justify-content:center;animation:fade .25s both;touch-action:none;overscroll-behavior:contain}
+#rmsheet.out{animation:rmFadeOut .24s both}
+@keyframes rmFadeOut{to{opacity:0}}
+@keyframes rmDown{to{transform:translateY(100%)}}
+#rmsheet .shc{max-height:92vh;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;gap:16px;padding-top:10px;will-change:transform}
+#rmsheet.out .shc{animation:rmDown .24s ease-in both}
+html.rmlock,html.rmlock body{overflow:hidden!important;overscroll-behavior:none}
+.rmdrag{touch-action:none;cursor:grab;display:flex;flex-direction:column;gap:12px;margin:-10px -18px 0;padding:10px 18px 0;user-select:none;-webkit-user-select:none;flex:none}
+.rmx{position:absolute;right:10px;top:10px;z-index:3;width:34px;height:34px;border-radius:50%;border:0;background:rgba(0,0,0,.28);color:#fff;font-size:22px;line-height:1;display:grid;place-items:center;cursor:pointer;padding:0;touch-action:manipulation}
+.rmgrab{align-self:center;padding:0;width:42px;height:5px;border-radius:99px;background:color-mix(in srgb,var(--mute) 45%,transparent);margin-bottom:2px;flex:none}
+.rmh{position:relative;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;padding:18px;border-radius:20px;color:#fff;background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 70%,#04130C),var(--accent));overflow:hidden;flex:none}
+.rmh::after{content:"";position:absolute;right:-30px;top:-40px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.12)}
+.rmh.warn{background:linear-gradient(135deg,#047857,#34D399)}.rmh.bad{background:linear-gradient(135deg,#9f1239,#f43f5e)}
+.rmh-e{width:58px;height:58px;border-radius:18px;background:rgba(255,255,255,.2);display:grid;place-items:center;font-size:30px;z-index:1}
+.rmh-t{z-index:1;min-width:0}
+.rmh-n{font-family:var(--display);font-size:38px;font-weight:800;line-height:1;letter-spacing:-.02em}
+.rmh-n small{font-size:14px;font-weight:700;margin-left:6px;opacity:.9;letter-spacing:0}
+.rmh-d{font-size:13px;opacity:.92;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#rmT{font-family:var(--display);font-size:18px;font-weight:700;padding:13px 14px}
+.rms{display:flex;gap:8px;overflow-x:auto;margin:0 -18px;padding:2px 18px 4px;scrollbar-width:none;overscroll-behavior-x:contain;touch-action:pan-x}
+.rms::-webkit-scrollbar{display:none}.rms>*{flex:none}
+.chq{font:inherit;font-size:13px;font-weight:600;padding:9px 14px;border-radius:99px;border:1px solid var(--line);background:var(--surface2);color:var(--ink);cursor:pointer;white-space:nowrap}
+.chq[aria-pressed="true"]{border-color:var(--accent);background:var(--tint);color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.rme{width:44px;height:44px;border-radius:14px;padding:0;font-size:22px;display:grid;place-items:center;border:1px solid var(--line);background:var(--surface2);cursor:pointer}
+.rme[aria-pressed="true"]{border-color:var(--accent);background:var(--tint);box-shadow:0 0 0 2px var(--accent) inset}
+.rmg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#rmsheet input.in[type=date],#rmsheet input.in[type=time]{min-height:48px;font-size:15px;font-weight:700;border:1px solid var(--line);border-radius:12px;background:var(--surface2);padding:10px 12px;touch-action:manipulation}
+.rmseg{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:4px;border-radius:14px;background:var(--surface2);border:1px solid var(--line)}
+.rmseg button{font:inherit;font-size:12.5px;font-weight:700;padding:10px 2px;border:0;border-radius:10px;background:transparent;color:var(--mute);cursor:pointer}
+.rmseg button[aria-pressed="true"]{background:var(--accent);color:#fff;box-shadow:0 2px 8px color-mix(in srgb,var(--accent) 45%,transparent)}
+.rmb{display:flex;flex-direction:column;gap:8px;margin-top:2px}
+.rmb .btn{width:100%;justify-content:center;padding:14px;font-size:15px}
+.rmb .btn.danger{background:var(--bad);border-color:var(--bad);color:#fff;box-shadow:0 0 0 3px color-mix(in srgb,var(--bad) 30%,transparent);animation:rmShake .35s}
+@keyframes rmShake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.rmb .row2{display:flex;gap:8px}.rmb .row2 .btn{flex:1}
+.rmb .row2 .btn{padding:11px;font-size:13.5px}
+.rmb .row2 .btn:only-child{grid-column:1/-1}
 
+/* peringatan: HUD */
+.rmpanel{position:relative;overflow:hidden;border-color:color-mix(in srgb,var(--accent) 30%,var(--line))!important}
+.rmpanel::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(color-mix(in srgb,var(--accent) 9%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--accent) 9%,transparent) 1px,transparent 1px);background-size:22px 22px;-webkit-mask-image:radial-gradient(120% 90% at 100% 0,#000,transparent 65%);mask-image:radial-gradient(120% 90% at 100% 0,#000,transparent 65%)}
+.rmpanel::after{content:"";position:absolute;right:-70px;top:-70px;width:200px;height:200px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,color-mix(in srgb,var(--accent) 28%,transparent),transparent 68%)}
+.rmpanel>*{position:relative;z-index:1}
+.rmt{display:flex;align-items:center;gap:8px}
+.rmt h2{margin:0}
+.rmcnt{font:800 11px var(--display);letter-spacing:.06em;padding:3px 8px;border-radius:99px;color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent);border:1px solid color-mix(in srgb,var(--accent) 35%,transparent)}
+.rmf,.rmq{--c:var(--accent)}
+.u0{--c:var(--bad)}.u1{--c:var(--mint)}.u3{--c:var(--mute)}
+.rmf.u1{box-shadow:0 0 30px color-mix(in srgb,var(--mint) 32%,transparent),inset 0 1px 0 rgba(255,255,255,.14);border-color:color-mix(in srgb,var(--mint) 70%,transparent)}
+.rmf.u1 .rmr2 .pg{filter:drop-shadow(0 0 8px var(--mint))}
+.rmf{position:relative;border-radius:20px;padding:16px;margin-bottom:10px;background:linear-gradient(135deg,color-mix(in srgb,var(--c) 18%,transparent),color-mix(in srgb,var(--c) 4%,transparent) 70%);border:1px solid color-mix(in srgb,var(--c) 45%,transparent);box-shadow:0 0 22px color-mix(in srgb,var(--c) 18%,transparent),inset 0 1px 0 rgba(255,255,255,.12)}
+.rmf-b{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:center;width:100%;text-align:left;font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+.rmr2{position:relative;width:92px;height:92px;flex:none;color:var(--c)}
+.rmr2 svg{width:100%;height:100%;transform:rotate(-90deg);overflow:visible}
+.rmr2 .tr{fill:none;stroke:color-mix(in srgb,var(--c) 20%,transparent);stroke-width:7}
+.rmr2 .pg{fill:none;stroke:currentColor;stroke-width:7;stroke-linecap:round;filter:drop-shadow(0 0 5px currentColor);transition:stroke-dasharray .8s cubic-bezier(.2,.9,.3,1)}
+.rmr2 .nm{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--ink);line-height:1}
+.rmr2 .nm b{font:800 28px var(--display);letter-spacing:-.02em;text-shadow:0 0 14px color-mix(in srgb,var(--c) 70%,transparent)}
+.rmr2 .nm small{font:700 9px var(--display);letter-spacing:.14em;color:var(--c);margin-top:3px}
+.rmf-t{display:flex;flex-direction:column;gap:4px;min-width:0;padding-right:34px}
+.rmf-t em{font:800 10px var(--display);letter-spacing:.2em;font-style:normal;color:var(--c)}
+.rmf-t b{font-size:18px;font-weight:700;line-height:1.2;overflow-wrap:anywhere}
+.rmf-t small{color:var(--mute);font-size:12.5px}
+.rmf .rmc{position:absolute;right:12px;top:12px}
+.rmf-l{display:flex;flex-direction:column;gap:8px}
+.rmq{display:grid;grid-template-columns:minmax(0,1fr) 30px;gap:10px;align-items:center;padding:8px 12px 8px 8px;border-radius:16px;background:color-mix(in srgb,var(--ink) 4%,transparent);border:1px solid color-mix(in srgb,var(--c) 26%,transparent);box-shadow:inset 3px 0 0 color-mix(in srgb,var(--c) 70%,transparent)}
+.rmq-b{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:center;text-align:left;font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;min-width:0}
+.rmq .rmr2{width:46px;height:46px}.rmq .rmr2 .tr,.rmq .rmr2 .pg{stroke-width:9}.rmq .rmr2 .nm b{font-size:15px;text-shadow:none}.rmq .rmr2 .nm small{display:none}
+.rmq-t{display:flex;flex-direction:column;gap:2px;min-width:0}
+.rmq-t b{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rmq-t small{color:var(--mute);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rmq.done{opacity:.5;box-shadow:none}.rmq.done .rmq-t b{text-decoration:line-through}
+.rmr2.ok .nm{color:var(--good)}.rmr2.ok svg{opacity:.4}
+.rmpanel .rmc{background:color-mix(in srgb,var(--c,var(--accent)) 10%,transparent);color:color-mix(in srgb,var(--c,var(--accent)) 75%,transparent);border-color:color-mix(in srgb,var(--c,var(--accent)) 65%,transparent)}
+.rmpanel .rmc:active{background:var(--c,var(--accent));color:#fff}
+.rmq.done .rmc{background:transparent;color:var(--mute);border-color:var(--line);border-style:dashed}
+.rmq.done .rmc svg{width:14px;height:14px;stroke-width:2.4}
+
+.rmpush{display:flex;align-items:center;gap:10px;width:100%;margin:0 0 12px;padding:11px 14px;border-radius:14px;font:inherit;text-align:left;color:var(--ink);background:color-mix(in srgb,var(--accent) 8%,transparent);border:1px dashed color-mix(in srgb,var(--accent) 50%,transparent);cursor:pointer}
+.rmpush b{display:block;font-size:13.5px}.rmpush small{display:block;color:var(--mute);font-size:12px;margin-top:1px}
+.rmpush .ic{font-size:20px;flex:none}
+.rmpush.on{border-style:solid;cursor:default;background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.rmpush.on b{color:var(--accent)}.rmpush.err small{color:var(--bad)}
+.rmpush.hint{cursor:default;border-style:solid;border-color:var(--line);background:transparent}
 /* module cards */
 .mods{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .mod{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:6px;color:inherit;text-decoration:none;min-width:0}
@@ -1521,6 +1622,7 @@ button:focus:not(:focus-visible),[role=button]:focus:not(:focus-visible){outline
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
 <script>
 (function(){
 var cfg={apiKey:"AIzaSyBLIav5hacsI-gV6zz5SQN5ar0LidFw7Og",authDomain:"money-manage-38a74.firebaseapp.com",projectId:"money-manage-38a74",messagingSenderId:"183837622600",appId:"1:183837622600:web:384a65afc27d8454e7f37d"};
@@ -1549,6 +1651,8 @@ window.claude={use:function(k){
       box.hidden=true;
       if(done)return;done=true;
       var base='users/'+u.uid+'/';
+      window.mmFb={fs:fs,base:base,uid:u.uid};
+      setTimeout(function(){try{if(localStorage.getItem('mm-push')==='1'&&window.pushEnable)window.pushEnable(true)}catch(e){}},3500);
       res({
         doc:function(p){return{set:function(b){return fs.doc(base+p).set(b)}}},
         collection:function(p){return{onSnapshot:function(cb,eb){
@@ -1606,7 +1710,7 @@ const DEF={
   spaylater:()=>({name:'',desc:'',emptyMsg:'',logTitle:'',month:nowYm(),target:0,entries:[],ryt:'',spay:'',notes:[]}),
   advance:()=>({name:'',desc:'',emptyMsg:'',boxTitle:'',month:nowYm(),amount:0,items:[],notes:[],extra:[]}),
   belanja:()=>({budget:0,rows:[]}),
-  custom:()=>({tabs:[]})
+  custom:()=>({tabs:[],reminders:[]})
 };
 const state={};DOCS.forEach(n=>state[n]=DEF[n]());
 const last={},dirty=new Set(),writing={},again={},timers={};
@@ -1745,6 +1849,182 @@ function nwView(C){
     <div class="kvs">${cmp(mm,'Bulan ke bulan')}${cmp(yy,'Tahun ke tahun')}</div></section>`;
 }
 function nwRead(p){const pr=p.n-p.m,pp=p.m>0?pr/p.m:null;return `<span class="nwr-d">${p.l}</span><b class="nwr-v num">${rm(p.n)}</b>${p.m>0?`<span class="nwr-p"><span class="nwr-c">Modal <b>${rm(p.m)}</b></span><span class="nwr-c ${pr<0?'bad':'good'}">${pr<0?'▼':'▲'} Untung <b>${pr>0?'+':''}${rm(pr)}</b>${pp==null?'':` <em>${pr>0?'+':''}${(pp*100).toFixed(2)}%</em>`}</span></span>`:''}`}
+
+/* ---------- peringatan ---------- */
+const RM_ISO=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const RM_D=s=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||'');return m?new Date(+m[1],+m[2]-1,+m[3]):null};
+function rmOcc(r){
+  const b=RM_D(r.d);if(!b)return null;
+  if(!r.rep)return r.done?null:b;
+  const after=RM_D(r.doneOn);let i=0,d=b;
+  const st=r.rep==='y'?12:r.rep==='m6'?6:r.rep==='m3'?3:1;
+  const at=n=>{const x=new Date(b.getFullYear(),b.getMonth()+n*st,1);
+    const dim=new Date(x.getFullYear(),x.getMonth()+1,0).getDate();return new Date(x.getFullYear(),x.getMonth(),Math.min(b.getDate(),dim))};
+  while(i<2400){d=at(i);if(!after||d>after)return d;i++}
+  return d;
+}
+function rmInfo(r){
+  const o=rmOcc(r);if(!o)return {d:null,days:null,txt:r.done?'Siap':'Tarikh tak sah',cls:''};
+  const n=new Date(),t0=new Date(n.getFullYear(),n.getMonth(),n.getDate()),days=Math.round((o-t0)/864e5);
+  const lbl=o.getDate()+' '+MS[o.getMonth()]+' '+o.getFullYear()+(r.tm?', '+r.tm:'');
+  const txt=days<0?'Lewat '+(-days)+' hari ('+lbl+')':days===0?'Hari ni'+(r.tm?', '+r.tm:''):days===1?'Esok ('+lbl+')':days+' hari lagi ('+lbl+')';
+  return {d:o,days,txt,cls:days<=0?'bad':days<=3?'warn':''};
+}
+function rmICS(r){
+  const o=rmOcc(r)||RM_D(r.d);if(!o)return;
+  const y=o.getFullYear()+pad(o.getMonth()+1)+pad(o.getDate());
+  const esc2=x=>String(x).replace(/\\/g,'\\\\').replace(/[,;]/g,m=>'\\'+m).replace(/\n/g,'\\n');
+  const hm=/^(\d{1,2}):(\d{2})$/.exec(r.tm||'');
+  const L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Money Manage//Peringatan//MS','CALSCALE:GREGORIAN','BEGIN:VEVENT','UID:'+(r.id||uidx())+'-'+y+'@money-manage','DTSTAMP:'+new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d+/,'')];
+  if(hm){const st=y+'T'+pad(+hm[1])+hm[2]+'00';L.push('DTSTART:'+st,'DTEND:'+st)}
+  else{const e=new Date(o.getFullYear(),o.getMonth(),o.getDate()+1);L.push('DTSTART;VALUE=DATE:'+y,'DTEND;VALUE=DATE:'+e.getFullYear()+pad(e.getMonth()+1)+pad(e.getDate()))}
+  L.push('SUMMARY:'+esc2('⏰ '+(r.t||'Peringatan')));
+  if(r.rep==='m')L.push('RRULE:FREQ=MONTHLY');else if(r.rep==='m3')L.push('RRULE:FREQ=MONTHLY;INTERVAL=3');else if(r.rep==='m6')L.push('RRULE:FREQ=MONTHLY;INTERVAL=6');else if(r.rep==='y')L.push('RRULE:FREQ=YEARLY');
+  L.push('BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+esc2(r.t||'Peringatan'),hm?'TRIGGER:PT0M':'TRIGGER;RELATED=START:PT9H','END:VALARM');
+  if(!hm)L.push('BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+esc2('Esok: '+(r.t||'Peringatan')),'TRIGGER:-PT15H','END:VALARM');
+  L.push('END:VEVENT','END:VCALENDAR');
+  const txt=L.join('\r\n')+'\r\n',fn='peringatan-'+(String(r.t||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'baru')+'.ics';
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'text/calendar;charset=utf-8'}));a.download=fn;document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500);
+}
+const CALIC='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>';
+const RM_UNDO='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h11a5 5 0 010 10H9"/><path d="M8 5L4 9l4 4"/></svg>';
+const RM_CHECK='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+const RM_REP={'':'Sekali','m':'Tiap bulan','m3':'Tiap 3 bulan','m6':'Tiap 6 bulan','y':'Tiap tahun'};
+const PUSH_VAPID='BGn7e2tS4OuE4qYx4kF90VEZJ80hQ96o6XGfoTeKD-o3-BEubd8cwXJ4fIUaW54kLe6eK3ebyfOPE6j-eBAaaEI';
+let pushSt='';
+const pushKey=()=>/^B[\w-]{60,}$/.test(PUSH_VAPID);
+const pushSup=()=>pushKey()&&('Notification' in window)&&('serviceWorker' in navigator)&&('PushManager' in window)&&typeof firebase!=='undefined'&&!!firebase.messaging;
+async function pushEnable(silent){
+  try{
+    if(!pushSup())throw new Error('Browser ni tak sokong notifikasi');
+    if(Notification.permission==='default'&&!silent)await Notification.requestPermission();
+    if(Notification.permission!=='granted'){pushSt=Notification.permission==='denied'?'err:Notifikasi disekat. Benarkan di tetapan browser/app.':'';later();return}
+    const F=window.mmFb;if(!F)throw new Error('Log masuk Google dahulu');
+    const reg=await navigator.serviceWorker.ready;
+    const token=await firebase.messaging().getToken({vapidKey:PUSH_VAPID,serviceWorkerRegistration:reg});
+    if(!token)throw new Error('Tak dapat token notifikasi');
+    await F.fs.doc(F.base+'m/push').set({tokens:firebase.firestore.FieldValue.arrayUnion(token),tz:(Intl.DateTimeFormat().resolvedOptions().timeZone||'Asia/Kuala_Lumpur'),at:Date.now()},{merge:true});
+    try{localStorage.setItem('mm-push','1')}catch(x){}
+    pushSt='on';
+    if(!silent)reg.showNotification('Notifikasi aktif ✅',{body:'Peringatan kau akan sampai walaupun app ditutup.',icon:'kucing-192.png',badge:'kucing-192.png',tag:'mm-test'});
+  }catch(e){pushSt='err:'+((e&&e.message)||e)}
+  later();
+}
+window.pushEnable=pushEnable;
+function pushRow(){
+  const ios=/iPhone|iPad|iPod/.test(navigator.userAgent)&&!(navigator.standalone||matchMedia('(display-mode: standalone)').matches);
+  if(!pushKey())return '';
+  if(ios)return `<div class="rmpush hint"><span class="ic">🔔</span><span><b>Nak notifikasi di luar app?</b><small>Tekan Kongsi → "Add to Home Screen", lepas tu buka dari ikon.</small></span></div>`;
+  if(!pushSup())return '';
+  let on=pushSt==='on';try{on=on||(localStorage.getItem('mm-push')==='1'&&Notification.permission==='granted')}catch(e){}
+  if(on)return `<div class="rmpush on"><span class="ic">🔔</span><span><b>Notifikasi aktif</b><small>Peringatan sampai walaupun app ditutup.</small></span></div>`;
+  const er=pushSt.startsWith('err:')?pushSt.slice(4):'';
+  return `<button type="button" class="rmpush ${er?'err':''}" data-act="pushon"><span class="ic">🔔</span><span><b>Hidupkan notifikasi</b><small>${esc(er||'Terima peringatan walaupun app ditutup.')}</small></span></button>`;
+}
+function rmRing(f,fin){
+  const C=2*Math.PI*40,pr=fin||f.days==null?1:Math.max(.04,Math.min(1,1-Math.max(f.days,0)/30));
+  const n=fin?'✓':f.days==null?'?':Math.abs(f.days);
+  const lb=fin?'SIAP':f.days==null?'':f.days<0?'LEWAT':f.days===0?'HARI NI':'HARI';
+  return `<span class="rmr2${fin?' ok':''}"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="tr" cx="50" cy="50" r="40"/><circle class="pg" cx="50" cy="50" r="40" stroke-dasharray="${(pr*C).toFixed(1)} ${C.toFixed(1)}"/></svg><span class="nm"><b>${n}</b><small>${lb}</small></span></span>`}
+function vPeringatan(){
+  const a=state.custom.reminders||(state.custom.reminders=[]);
+  const rows=a.map((r,i)=>({r,i,f:rmInfo(r),fin:!!(r.done&&!r.rep)})).sort((x,y)=>{
+    if(x.fin!==y.fin)return x.fin?1:-1;
+    const ax=x.f.d?x.f.d.getTime():9e15,ay=y.f.d?y.f.d.getTime():9e15;return ax-ay});
+  const u=({f,fin})=>fin?3:f.days==null?3:f.days<=0?0:f.days<=3?1:f.days<=30?2:2;
+  const sub=({r,f})=>(f.d?f.d.getDate()+' '+MS[f.d.getMonth()]+' '+f.d.getFullYear():'')+(r.tm?' · '+r.tm:'')+(r.rep?' · '+RM_REP[r.rep]:'');
+  const chk=({r,i,fin})=>`<button class="rmc" data-act="rdone" data-i="${i}" aria-label="${fin?'Undur, belum siap':'Tanda siap'}: ${esc(r.t||'peringatan')}">${fin?RM_UNDO:RM_CHECK}</button>`;
+  const act=rows.filter(x=>!x.fin),first=act[0],rest=rows.filter(x=>x!==first);
+  const hero=first?`<div class="rmf u${u(first)}"><button class="rmf-b" data-act="redit" data-i="${first.i}">${rmRing(first.f,false)}<span class="rmf-t"><em>SETERUSNYA</em><b>${esc(first.r.e||'🔔')} ${esc(first.r.t||'Tanpa nama')}</b><small>${esc(sub(first))}</small></span></button>${chk(first)}</div>`:'';
+  const list=rest.map(x=>`<div class="rmq u${u(x)}${x.fin?' done':''}"><button class="rmq-b" data-act="redit" data-i="${x.i}">${rmRing(x.f,x.fin)}<span class="rmq-t"><b>${esc(x.r.e||'🔔')} ${esc(x.r.t||'Tanpa nama')}</b><small>${esc(sub(x))}</small></span></button>${chk(x)}</div>`).join('');
+  const empty=`<p class="rm-hint">Tak nak terlupa? Letak tarikh, nanti app kira berapa hari lagi.</p><div class="rm-ex">${['Tukar penapis air','Bayar cukai','Renew insurans','Servis kereta'].map(t=>`<button type="button" class="chq" data-act="radd" data-t="${esc(t)}">${esc(t)}</button>`).join('')}</div>`;
+  const n=act.length;
+  return `<section class="panel rmpanel"><div class="sec-h"><div class="rmt"><h2>Peringatan</h2>${n?`<span class="rmcnt">${n} AKTIF</span>`:''}</div><button class="btn ghost" data-act="radd">+ Tambah</button></div>
+    ${pushRow()}
+    ${rows.length?hero+(list?`<div class="rmf-l">${list}</div>`:''):empty}</section>`;
+}
+/* sheet peringatan */
+const RM_ICONS=['🔔','💧','🚗','🏠','💊','📄','💡','🎂','🛠️','📶','🐾','✈️'];
+let RMS={i:-1,d:null};
+function rmDateISO(kind){const n=new Date(),t0=new Date(n.getFullYear(),n.getMonth(),n.getDate());let d;
+  if(kind==='1d')d=new Date(t0.getFullYear(),t0.getMonth(),t0.getDate()+1);
+  else if(kind==='7d')d=new Date(t0.getFullYear(),t0.getMonth(),t0.getDate()+7);
+  else{const m=parseInt(kind,10),x=new Date(t0.getFullYear(),t0.getMonth()+m,1);d=new Date(x.getFullYear(),x.getMonth(),Math.min(t0.getDate(),new Date(x.getFullYear(),x.getMonth()+1,0).getDate()))}
+  return RM_ISO(d)}
+function rmSheetEl(){
+  let el=document.getElementById('rmsheet');if(el)return el;
+  el=document.createElement('div');el.id='rmsheet';el.hidden=true;el.setAttribute('role','dialog');el.setAttribute('aria-modal','true');el.setAttribute('aria-label','Peringatan');
+  el.innerHTML=`<div class="shc" id="rmC"><div class="rmdrag" id="rmDrag"><div class="rmgrab" aria-hidden="true"></div>
+    <div class="rmh" id="rmHero"><button type="button" class="rmx" id="rmX" aria-label="Tutup">&times;</button><div class="rmh-e" id="rmHE">🔔</div><div class="rmh-t"><div class="rmh-n" id="rmHN">–</div><div class="rmh-d" id="rmHD">Pilih tarikh di bawah</div></div></div></div>
+    <input class="in t" id="rmT" maxlength="60" autocomplete="off" placeholder="Apa nak diingatkan? cth Tukar penapis air" aria-label="Apa nak diingatkan">
+    <div class="rms" id="rmE" aria-label="Ikon">${RM_ICONS.map(e=>`<button type="button" class="rme" data-e="${e}">${e}</button>`).join('')}</div>
+    <div><p class="eyebrow" style="margin-bottom:8px">Bila?</p><div class="rms" id="rmQ">${[['1d','Esok'],['7d','1 minggu'],['1m','1 bulan'],['3m','3 bulan'],['6m','6 bulan'],['12m','1 tahun']].map(q=>`<button type="button" class="chq" data-q="${q[0]}">${q[1]}</button>`).join('')}</div></div>
+    <div class="rmg"><label class="lab">Tarikh<input class="in" type="date" id="rmD"></label><label class="lab">Masa (pilihan)<input class="in" type="time" id="rmM"></label></div>
+    <div><p class="eyebrow" style="margin-bottom:8px">Ulang</p><div class="rmseg" id="rmP">${[['','Sekali'],['m','Bulanan'],['m3','3 bln'],['m6','6 bln'],['y','Tahunan']].map(q=>`<button type="button" data-p="${q[0]}">${q[1]}</button>`).join('')}</div></div>
+    <div class="rmb"><button class="btn" id="rmOk">Simpan</button><div class="row2"><button class="btn ghost" id="rmCal">${CALIC} Masuk Kalendar</button><button class="btn ghost" id="rmDel" hidden>Padam</button></div></div></div>`;
+  document.body.appendChild(el);
+  const $=id=>document.getElementById(id),C=$('rmC');
+  const sync=()=>{const d=RMS.d;
+    [...$('rmP').children].forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.p===d.rep)));
+    [...$('rmQ').children].forEach(b=>b.setAttribute('aria-pressed',String(!!d.d&&rmDateISO(b.dataset.q)===d.d)));
+    [...$('rmE').children].forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.e===d.e)));
+    $('rmHE').textContent=d.e||'🔔';
+    const f=d.d?rmInfo(Object.assign({},d,{done:false,doneOn:''})):null,H=$('rmHero');
+    if(f&&f.d){const a=Math.abs(f.days);$('rmHN').innerHTML=(f.days===0?'Hari ni':f.days===1?'Esok':a+'<small>'+(f.days<0?'hari lewat':'hari lagi')+'</small>');
+      $('rmHD').textContent=f.d.getDate()+' '+MS[f.d.getMonth()]+' '+f.d.getFullYear()+(d.tm?' · '+d.tm:'')+(d.rep?' · '+RM_REP[d.rep]:'');
+      H.className='rmh '+(f.days<=0?'bad':f.days<=3?'warn':'')}
+    else{$('rmHN').textContent='–';$('rmHD').textContent='Pilih tarikh di bawah';H.className='rmh'}};
+  RMS.sync=sync;
+  /* tutup: animasi turun */
+  let closing=false;
+  const fin=()=>{el.hidden=true;el.classList.remove('out');closing=false;C.style.transition=C.style.transform='';el.style.opacity='';document.documentElement.classList.remove('rmlock')};
+  const close=()=>{if(el.hidden||closing)return;closing=true;
+    if(C.style.transform){C.style.transition='transform .22s ease-in';C.style.transform='translateY(100%)';el.style.transition='opacity .22s';el.style.opacity='0';setTimeout(()=>{el.style.transition='';fin()},230)}
+    else{el.classList.add('out');setTimeout(fin,240)}};
+  RMS.close=close;RMS.fin=fin;
+  el.addEventListener('click',e=>{if(e.target===el)close()});
+  /* seret ke bawah untuk tutup (zon atas: pegangan + kad) */
+  const Z=$('rmDrag');let y0=0,dy=0,drag=false,t0=0,pid=null;
+  const mv=y=>{dy=y-y0;C.style.transition='none';C.style.transform='translateY('+Math.max(0,dy)+'px)';el.style.opacity=String(Math.max(.25,1-dy/520))};
+  Z.addEventListener('pointerdown',e=>{if(closing||e.target.closest('#rmX'))return;pid=e.pointerId;y0=e.clientY;dy=0;drag=true;t0=Date.now();try{Z.setPointerCapture(pid)}catch(x){}});
+  Z.addEventListener('pointermove',e=>{if(!drag||e.pointerId!==pid)return;mv(e.clientY)});
+  const end=e=>{if(!drag||(e&&e.pointerId!==pid))return;drag=false;try{Z.releasePointerCapture(pid)}catch(x){}
+    const v=dy/Math.max(1,Date.now()-t0);
+    if(dy>90||(dy>30&&v>.6)){close()}else if(dy>0){C.style.transition='transform .25s cubic-bezier(.2,.9,.3,1)';C.style.transform='';el.style.opacity='';setTimeout(()=>{C.style.transition=''},260)}};
+  Z.addEventListener('pointerup',end);Z.addEventListener('pointercancel',end);
+  $('rmX').addEventListener('click',close);
+  /* kotak */
+  $('rmE').onclick=e=>{const b=e.target.closest('[data-e]');if(!b)return;RMS.d.e=b.dataset.e;sync()};
+  $('rmQ').onclick=e=>{const b=e.target.closest('[data-q]');if(!b)return;RMS.d.d=rmDateISO(b.dataset.q);$('rmD').value=RMS.d.d;sync()};
+  $('rmP').onclick=e=>{const b=e.target.closest('[data-p]');if(!b)return;RMS.d.rep=b.dataset.p;sync()};
+  $('rmD').onchange=()=>{RMS.d.d=$('rmD').value;sync()};
+  $('rmM').onchange=()=>{RMS.d.tm=$('rmM').value;sync()};
+  $('rmT').oninput=()=>{RMS.d.t=$('rmT').value};
+  $('rmT').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('rmT').blur()}});
+  const valid=()=>{RMS.d.t=$('rmT').value.trim();RMS.d.d=$('rmD').value;RMS.d.tm=$('rmM').value;
+    if(!RMS.d.t){$('rmT').focus();return false}
+    if(!RM_D(RMS.d.d)){$('rmD').focus();try{$('rmD').showPicker&&$('rmD').showPicker()}catch(x){}return false}return true};
+  $('rmOk').onclick=()=>{if(!valid())return;const a=state.custom.reminders=state.custom.reminders||[];
+    if(RMS.i>=0&&a[RMS.i]){const o=a[RMS.i];if(o.d!==RMS.d.d||o.rep!==RMS.d.rep){RMS.d.done=false;RMS.d.doneOn=''}a[RMS.i]=Object.assign({},o,RMS.d)}else a.push(RMS.d);
+    touch('custom');close();later()};
+  $('rmCal').onclick=()=>{if(valid())rmICS(Object.assign({},RMS.d,{done:false,doneOn:''}))};
+  $('rmDel').onclick=function(){
+    if(!this.dataset.armed){this.dataset.armed='1';this.classList.add('danger');this.textContent='Pasti padam?';setTimeout(()=>{if(this.isConnected){delete this.dataset.armed;this.classList.remove('danger');this.textContent='Padam'}},3000);return}
+    const a=state.custom.reminders||[],ix=RMS.i,item=a[ix];if(!item)return;a.splice(ix,1);touch('custom');close();later();
+    setUndo('Peringatan dipadam',()=>{const b=state.custom.reminders;b.splice(Math.min(ix,b.length),0,item);touch('custom');later()})};
+  /* butang Batal untuk back-handler */
+  const no=document.createElement('button');no.id='rmNo';no.type='button';no.hidden=true;no.onclick=close;el.appendChild(no);
+  return el;
+}
+function rmOpen(i,title){
+  const el=rmSheetEl(),$=id=>document.getElementById(id),r=i>=0?(state.custom.reminders||[])[i]:null;
+  if(RMS.fin&&el.classList.contains('out'))RMS.fin();
+  RMS.i=r?i:-1;RMS.d=r?Object.assign({e:'🔔'},r):{id:uidx(),t:title||'',e:'🔔',d:'',tm:'',rep:'',done:false,doneOn:''};
+  $('rmOk').textContent=r?'Simpan':'Tambah peringatan';$('rmT').value=RMS.d.t;$('rmD').value=RMS.d.d;$('rmM').value=RMS.d.tm||'';
+  const dl=$('rmDel');dl.hidden=!r;delete dl.dataset.armed;dl.classList.remove('danger');dl.textContent='Padam';
+  $('rmC').scrollTop=0;RMS.sync();document.documentElement.classList.add('rmlock');el.hidden=false;
+  if(!r&&!RMS.d.t)setTimeout(()=>{try{$('rmT').focus({preventScroll:true})}catch(x){$('rmT').focus()}},120)}
 function vRingkasan(C){
   const s=state.saving,k=state.komitmen,p=state.spaylater,a=state.advance;
   const serial=Math.floor(Date.UTC(new Date().getFullYear(),new Date().getMonth(),new Date().getDate())/86400000)+25569;
@@ -1762,7 +2042,8 @@ function vRingkasan(C){
     const pn=planSum(o,ymN(nowYm())).now;
     att.push({s:di.days<=1?'bad':'warn',t:`${esc(nm)} · ${di.txt}`,d:`Hari bayar: ${Math.round(+o.due)}`+(pn>0?` · ansuran bulan ni ${rm(pn)}`:''),to:'bil'});
   });
-  if(k.notes.filter(Boolean).length)att.push({s:'info',t:`${k.notes.filter(Boolean).length} peringatan`,d:'Dalam tab Komitmen',to:'komitmen'});
+  (state.custom.reminders||[]).forEach(r=>{const f=rmInfo(r);if(f.days==null||f.days>3)return;att.push({s:f.days<=0?'bad':'warn',t:'⏰ '+esc(r.t||'Peringatan'),d:esc(f.txt),to:'ringkasan'})});
+  if(k.notes.filter(Boolean).length)att.push({s:'info',t:`${k.notes.filter(Boolean).length} nota`,d:'Dalam tab Komitmen',to:'komitmen'});
   const empty=!s.accounts.length&&!k.items.length&&!state.delivery.rows.length&&!p.target&&!a.amount;
   return `
   <section class="hero" aria-label="Total aset">
@@ -1779,6 +2060,7 @@ function vRingkasan(C){
   <section class="panel"><div class="sec-h">${head('Perlu perhatian')}</div>
     ${att.length?`<ul class="att">${att.map(x=>`<li><a href="#${x.to}" data-s="${x.s}"><span class="dot"></span><span><b>${x.t}</b><small>${x.d||''}</small></span>${chev}</a></li>`).join('')}</ul>`:'<p class="empty">Tiada apa-apa lagi.</p>'}
   </section>
+  ${vPeringatan()}
   <section class="mods" aria-label="Ringkasan modul">
     <a class="mod hi" href="#simpanan"><span class="eyebrow">Simpanan bulan ni</span><span class="v num">${rm(C.thisMonth,0)}</span><small>Sasaran ${rm(s.goal,0)} · streak ${C.streak} bulan</small>${bar(s.goal>0?C.thisMonth/s.goal:0)}</a>
     <a class="mod ${C.k.baki<0?'neg':''}" href="#komitmen"><span class="eyebrow">Baki lepas komitmen</span><span class="v num">${rm(C.k.baki)}</span><small>${C.k.n-C.k.unpaidN} / ${C.k.n} dibayar</small>${bar(C.k.payProg)}</a>
@@ -1958,7 +2240,7 @@ function vKomitmen(C){
   const ratioCls=C.k.income>0?(C.k.ratio<=.7?['Sihat','']:C.k.ratio<=.9?['Berhati-hati','warn']:['Bahaya','bad']):['-',''];
   const inc=k.income.map((x,i)=>`<div class="row">${inT(`komitmen.income.${i}.name`,x.name,'Sumber pendapatan','Sumber')}${inN(`komitmen.income.${i}.amt`,x.amt,'Jumlah '+(x.name||'pendapatan'))}${del('komitmen.income',i,x.name||'pendapatan')}</div>`).join('');
   const items=k.items.map((x,i)=>`<div class="row chk ${x.paid?'paid':''}"><input type="checkbox" class="tick" data-k="komitmen.items.${i}.paid" data-t="b" ${x.paid?'checked':''} aria-label="Dah bayar ${esc(x.name)}">${inT(`komitmen.items.${i}.name`,x.name,'Nama komitmen','Nama')}${inN(`komitmen.items.${i}.amt`,x.amt,'Jumlah '+(x.name||'komitmen'))}${del('komitmen.items',i,x.name||'komitmen')}<span class="pc">${C.k.income>0&&x.amt>0?pc(x.amt/C.k.income,1)+' pendapatan':''}</span></div>`).join('');
-  const notes=k.notes.map((x,i)=>`<div class="row note pinned">${PIN}${inA(`komitmen.notes.${i}`,String(x==null?'':x).replace(/^\s*\uD83D\uDCCC\uFE0F?\s*/,''),'Peringatan','Tulis peringatan')}${del('komitmen.notes',i,'peringatan')}</div>`).join('');
+  const notes=k.notes.map((x,i)=>`<div class="row note pinned">${PIN}${inA(`komitmen.notes.${i}`,String(x==null?'':x).replace(/^\s*\uD83D\uDCCC\uFE0F?\s*/,''),'Nota','Tulis nota')}${del('komitmen.notes',i,'nota')}</div>`).join('');
   return `
   <section class="panel">
     <div class="sec-h">${head('Komitmen bulanan')}<label class="lab" style="width:190px"><span class="sr" style="position:absolute;left:-9999px">Bulan</span><input class="in t" type="month" data-k="komitmen.label" data-t="m" value="${esc(labYm(k.label))}" aria-label="Bulan"></label></div>
@@ -2000,8 +2282,8 @@ function vKomitmen(C){
   </section>
 
   <section class="panel">
-    <div class="sec-h">${head('Peringatan')}${add('komitmen.notes','Nota')}</div>
-    <div class="list">${notes||'<p class="empty">Tiada peringatan.</p>'}</div>
+    <div class="sec-h">${head(NOTEIC+'Nota')}${add('komitmen.notes','Nota')}</div>
+    <div class="list">${notes||'<p class="empty">Tiada nota.</p>'}</div>
   </section>`;
 }
 
@@ -2692,7 +2974,8 @@ const NEW={
   'advance.extra.#.items':()=>({name:'',amt:null}),
   'advance.extra.#.notes':()=>'',
   'belanja.rows':()=>({d:blSel,name:'',amt:null}),
-  'delivery.rows':()=>({d:todayISO(),cur:'MYR',inc:null,sav:null,tgt:null})
+  'delivery.rows':()=>({d:todayISO(),cur:'MYR',inc:null,sav:null,tgt:null}),
+  'custom.reminders':()=>({id:uidx(),t:'',d:todayISO(),tm:'',rep:'',done:false,doneOn:''})
 };
 
 document.addEventListener('change',e=>{const t=e.target;if(t.dataset&&t.dataset.bl==='date'&&/^\d{4}-\d{2}-\d{2}$/.test(t.value)){blSel=t.value;blMonth=t.value.slice(0,7);later()}});
@@ -2762,6 +3045,11 @@ document.addEventListener('click',e=>{
       else fxMsg='Tak dapat ambil kadar (tiada internet atau disekat). Kadar lama masih dipakai, boleh isi manual. ['+er.join(' | ')+']';
       later()})();return}
   if(act==='xadd'){const a=state.advance;a.extra=a.extra||[];const x=NEW['advance.extra']();a.extra.push(x);bilTab='x:'+x.id;try{localStorage.setItem('bilTab',bilTab)}catch(e){}touch('advance');pendingFocus='advance.extra.'+(a.extra.length-1)+'.name';later();return}
+  if(act==='rdone'){const r=(state.custom.reminders||[])[+b.dataset.i];if(r){if(r.rep){const o=rmOcc(r);if(o)r.doneOn=RM_ISO(o)}else r.done=!r.done;touch('custom');later()}return}
+  if(act==='pushon'){pushSt='';pushEnable(false);return}
+  if(act==='redit'){rmOpen(+b.dataset.i);return}
+  if(act==='radd'){rmOpen(-1,b.dataset.t||'');return}
+  if(act==='rics'){const r=(state.custom.reminders||[])[+b.dataset.i];if(r)rmICS(r);return}
   if(act==='tabnew'){e.preventDefault();openSheet();return}
   if(act==='cadd'){const t=state.custom.tabs[+b.dataset.i];if(t){t.rows=t.rows||[];t.rows.push({name:'',amt:null,paid:false});touch('custom');pendingFocus='custom.tabs.'+b.dataset.i+'.rows.'+(t.rows.length-1)+'.name';later()}return}
   if(act==='ctdel'){
@@ -3795,6 +4083,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 (function(){
   var D=[
     {id:'sheet',open:function(){var e=document.getElementById('sheet');return e&&!e.hidden},close:'#shNo'},
+    {id:'rmsheet',open:function(){var e=document.getElementById('rmsheet');return e&&!e.hidden},close:'#rmNo'},
     {id:'vedit',open:function(){var e=document.getElementById('vedit');return e&&!e.hidden},close:'#veNo'},
     {id:'rcp',open:function(){var e=document.getElementById('rcp');return e&&!e.hidden},close:'#rcpNo'},
     {id:'set',open:function(){var e=document.getElementById('set');return e&&!e.hidden&&e.classList.contains('open')},close:'#setX'},
