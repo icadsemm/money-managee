@@ -2269,7 +2269,6 @@ function vBil(C){
     <section class="panel">
       <div class="sec-h">${head(esc(sx(p,'logTitle','Kotak belanja')))}${add('spaylater.entries','Kotak')}</div>
       <div class="list">${ent||'<p class="empty">Belum ada kotak.</p>'}</div>
-      <div class="total"><span>Jumlah guna</span><b class="num">${rm(C.p.got)}</b></div>
     </section>
     ${bilPlus('spaylater',p)}
     <section class="panel">
@@ -2294,7 +2293,6 @@ function vBil(C){
   <section class="panel">
     <div class="sec-h">${head(esc(sx(a,'boxTitle','Kotak belanja')))}${add('advance.items','Kotak')}</div>
     <div class="list">${it||'<p class="empty">Belum ada kotak.</p>'}</div>
-    <div class="total"><span>Jumlah guna</span><b class="num">${rm(C.a.used)}</b></div>
   </section>
   ${bilPlus('advance',a)}
   <section class="panel">
@@ -2352,14 +2350,14 @@ function bilHero(inp,used,baki,prog,msg){
   return `<div class="bh ${over?'over':''}">
     <div class="bh-top"><div class="bh-l"><span class="bh-k">Baki lagi</span><b class="bh-n" data-nk="bh-baki">${rm(baki)}</b></div><span class="bh-badge">${pc(prog)} diguna</span></div>
     <div class="bh-meter" role="img" aria-label="${pc(prog)}"><i style="width:${(clamp(prog)*100).toFixed(1)}%"></i></div>
-    <div class="bh-msg ${over?'neg':'pos'}">${msg}</div>
-    <div class="bh-chips"><div class="bh-in"><span>Jumlah (RM)</span>${inp}</div><div><span>Jumlah guna</span><b data-nk="bh-used">${rm(used)}</b></div></div>
+    <div class="bh-msg ${over?'neg':'pos'}"><i></i>${msg}</div>
+    <div class="bh-chips"><div class="bh-in"><span>Jumlah (RM)</span>${inp}</div><div class="bh-u"><span>Jumlah guna</span><b data-nk="bh-used">${rm(used)}</b></div></div>
   </div>`;
 }
 function bilDue(P,o){
   const di=dueInfo(o.due),dueSet=o.due!==''&&o.due!=null&&+o.due!==0;
   const pill=di?`<span class="dpill ${di.days<=1?'bad':di.days<=3?'warn':''}">${di.txt}</span>`:`<span class="hint" style="margin:0">${dueSet?'Isi hari 1 hingga 31':'Isi hari bil kena bayar'}</span>`;
-  return `<section class="panel pdue"><div class="pd-l"><h2>Tarikh bayar</h2>${pill}</div><label class="lab dday">Hari bayar${inN(P+'.due',o.due,'Tarikh bayar','cth 1')}</label></section>`;
+  return `<section class="panel pdue"><div class="pd-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="3.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></div><div class="pd-l"><h2>Tarikh bayar</h2>${pill}</div><label class="lab dday">Hari bayar${inN(P+'.due',o.due,'Tarikh bayar','cth 1')}</label></section>`;
 }
 function vXtra(x,i){
   const P='advance.extra.'+i,used=sum(x.items||[],t=>t.amt),baki=(+x.amount||0)-used,prog=x.amount>0?clamp(used/x.amount):0,nm=x.name||'Tab '+(i+3);
@@ -2373,7 +2371,7 @@ function vXtra(x,i){
     <label class="lab" style="max-width:240px">Bulan<input class="in t" type="month" data-k="${P}.month" data-t="d" value="${esc(x.month||nowYm())}" aria-label="Bulan"></label>
     ${bilHero(inN(P+'.amount',x.amount,'Jumlah'),used,baki,prog,x.amount>0?(baki<0?'Melebihi had, semak balik kotak':baki===0?'Dah habis diguna':'Masih ada baki'):esc(sx(x,'emptyMsg','Isi jumlah dulu')))}</section>
   ${bilDue(P,x)}
-  <section class="panel"><div class="sec-h">${head(esc(sx(x,'boxTitle','Kotak belanja')))}${add(P+'.items','Kotak')}</div><div class="list">${it||'<p class="empty">Belum ada kotak.</p>'}</div><div class="total"><span>Jumlah guna</span><b class="num">${rm(used)}</b></div></section>
+  <section class="panel"><div class="sec-h">${head(esc(sx(x,'boxTitle','Kotak belanja')))}${add(P+'.items','Kotak')}</div><div class="list">${it||'<p class="empty">Belum ada kotak.</p>'}</div></section>
   ${bilPlus(P,x)}
   <section class="panel"><div class="sec-h">${head(NOTEIC+'Nota')}${add(P+'.notes','Nota')}</div><div class="list">${nt||'<p class="empty">Tiada nota.</p>'}</div></section>`;
 }
@@ -4154,6 +4152,60 @@ html.mm-bg .hstars *,html.mm-bg .voicebtn,html.mm-bg .voicebtn::after,html.mm-bg
 .row.chk .in.t{text-decoration:none}
 .row.chk.paid .in.t{text-decoration:line-through;text-decoration-thickness:2px}
 </style>
+<style id="bilredesign">
+/* ===== Bil: reka semula (hijau app, padat) ===== */
+.bh{display:flex;flex-direction:column;gap:10px;padding:14px;border-radius:20px;border:1px solid color-mix(in srgb,var(--mint) 26%,transparent);
+ background:radial-gradient(100% 80% at 0% 0%,color-mix(in srgb,var(--mint) 18%,transparent),transparent 65%),linear-gradient(160deg,var(--g-in1),var(--g-in2));box-shadow:inset 0 1px 0 color-mix(in srgb,#fff 7%,transparent)}
+.bh-top{align-items:center}
+.bh-k{font-size:10px;letter-spacing:.16em}
+.bh-n{font-size:34px;background:linear-gradient(180deg,var(--mint),var(--accent));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 12px color-mix(in srgb,var(--mint) 35%,transparent))}
+.bh.over .bh-n{background:none;-webkit-text-fill-color:var(--bad);filter:none}
+.bh-badge{font-size:11.5px;font-weight:800;padding:5px 12px;background:color-mix(in srgb,var(--mint) 14%,transparent)}
+.bh-meter{position:relative;height:10px;margin-top:2px;box-shadow:inset 0 1px 3px color-mix(in srgb,var(--ink) 22%,transparent)}
+.bh-meter i{position:relative;background:linear-gradient(90deg,color-mix(in srgb,var(--mint) 60%,#000),var(--mint) 70%,color-mix(in srgb,var(--mint) 70%,#fff));box-shadow:0 0 12px color-mix(in srgb,var(--mint) 60%,transparent)}
+.bh-meter i::after{content:"";position:absolute;right:2px;top:2px;bottom:2px;width:5px;border-radius:99px;background:#fff;opacity:.8}
+.bh.over .bh-meter i{box-shadow:0 0 12px color-mix(in srgb,var(--bad) 50%,transparent)}
+.bh-msg{display:inline-flex;align-items:center;gap:7px;margin-top:0;font-size:12px;font-weight:700;width:fit-content}
+.bh-msg i{width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 8px currentColor}
+.bh-chips{display:grid;grid-template-columns:1fr 1fr;gap:0;padding:0;border-radius:14px;background:color-mix(in srgb,var(--surface) 72%,transparent);border:1px solid color-mix(in srgb,var(--mint) 24%,transparent);overflow:hidden}
+.bh-chips>div{background:none;border:0;border-radius:0;padding:9px 14px}
+.bh-chips>div+div{border-left:1px solid color-mix(in srgb,var(--mint) 18%,transparent)}
+.bh-chips span{font-size:9px;letter-spacing:.12em}
+.bh-chips b{font-size:16px}
+/* tarikh bayar: baris ringkas */
+.panel.pdue{grid-template-columns:auto minmax(0,1fr) auto;gap:12px;padding:12px 14px;border-radius:18px}
+.pdue .pd-ic{display:grid;place-items:center;width:42px;height:42px;border-radius:13px;color:var(--accent);background:color-mix(in srgb,var(--mint) 14%,transparent);border:1px solid color-mix(in srgb,var(--mint) 30%,transparent)}
+.pdue .pd-ic svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.pdue .pd-l{gap:6px}.pdue .pd-l h2{font-size:15px}
+.pdue .dday{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--mute)}
+.pdue .dday .in{width:64px;min-height:38px;border-radius:12px;font-weight:800;font-size:16px;color:var(--accent);background:color-mix(in srgb,var(--surface) 80%,transparent);border:1px solid color-mix(in srgb,var(--mint) 34%,transparent)}
+</style>
+<style id="attlight">
+/* kotak Perlu perhatian: ikut mod cerah (mod gelap kekal asal) */
+@media (prefers-color-scheme:light){
+:root:root:root:not([data-theme="dark"]) .panel:has(>.att){background:radial-gradient(80% 90% at 100% 0%,rgba(246,196,83,.16),transparent 60%),radial-gradient(70% 80% at 0% 100%,rgba(52,211,153,.14),transparent 62%),linear-gradient(160deg,#FFFFFF,#F2F8F5);box-shadow:inset 0 1px 0 #fff,0 14px 30px -20px rgba(15,23,42,.35)}
+:root:root:root:not([data-theme="dark"]) .panel:has(>.att) .sec-h h2,:root:root:root:not([data-theme="dark"]) .panel:has(>.att) .sec-h h3{background:linear-gradient(180deg,#0F172A,#0F5132);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+:root:root:root:not([data-theme="dark"]) .att a{border-color:rgba(15,23,42,.08);background:linear-gradient(135deg,color-mix(in srgb,var(--c) 12%,#fff),#fff 75%);box-shadow:inset 0 1px 0 #fff,0 6px 14px -10px rgba(15,23,42,.3)}
+:root:root:root:not([data-theme="dark"]) .att li:first-child a{border-top-color:rgba(15,23,42,.08)}
+:root:root:root:not([data-theme="dark"]) .att b{color:#0F172A}
+:root:root:root:not([data-theme="dark"]) .att small{color:#5B6B7A}
+}
+:root:root:root[data-theme="light"] .panel:has(>.att){background:radial-gradient(80% 90% at 100% 0%,rgba(246,196,83,.16),transparent 60%),radial-gradient(70% 80% at 0% 100%,rgba(52,211,153,.14),transparent 62%),linear-gradient(160deg,#FFFFFF,#F2F8F5);box-shadow:inset 0 1px 0 #fff,0 14px 30px -20px rgba(15,23,42,.35)}
+:root:root:root[data-theme="light"] .panel:has(>.att) .sec-h h2,:root:root:root[data-theme="light"] .panel:has(>.att) .sec-h h3{background:linear-gradient(180deg,#0F172A,#0F5132);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+:root:root:root[data-theme="light"] .att a{border-color:rgba(15,23,42,.08);background:linear-gradient(135deg,color-mix(in srgb,var(--c) 12%,#fff),#fff 75%);box-shadow:inset 0 1px 0 #fff,0 6px 14px -10px rgba(15,23,42,.3)}
+:root:root:root[data-theme="light"] .att li:first-child a{border-top-color:rgba(15,23,42,.08)}
+:root:root:root[data-theme="light"] .att b{color:#0F172A}
+:root:root:root[data-theme="light"] .att small{color:#5B6B7A}
+</style>
+<style id="navtouch">
+/* penambahbaikan kecil bar menu (rupa asal kekal) */
+.tabs a[aria-current="page"]{font-weight:800;box-shadow:inset 0 1px 0 var(--g-hi),0 6px 16px -5px var(--g-sh),0 0 18px -6px color-mix(in srgb,var(--mint) 55%,transparent)}
+.tabs a[aria-current="page"] svg{filter:drop-shadow(0 0 6px color-mix(in srgb,var(--mint) 60%,transparent))}
+.tabs a[aria-current="page"] span{color:var(--accent)}
+.tabs a:not([aria-current="page"]):active{background:color-mix(in srgb,var(--mint) 10%,transparent)}
+</style>
+
+
 
 
 <script>
