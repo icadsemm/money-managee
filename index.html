@@ -906,7 +906,7 @@ h2{font-family:var(--display);font-size:17px;margin:0;font-weight:700;letter-spa
 #rmsheet.out{animation:rmFadeOut .24s both}
 @keyframes rmFadeOut{to{opacity:0}}
 @keyframes rmDown{to{transform:translateY(100%)}}
-#rmsheet .shc{max-height:92vh;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;gap:16px;padding-top:10px;will-change:transform}
+#rmsheet .shc{max-height:92vh;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;gap:16px;padding-top:10px;will-change:transform;animation:sheetUp .4s cubic-bezier(.2,.9,.3,1) backwards}
 #rmsheet.out .shc{animation:rmDown .24s ease-in both}
 html.rmlock,html.rmlock body{overflow:hidden!important;overscroll-behavior:none}
 .rmdrag{touch-action:none;cursor:grab;display:flex;flex-direction:column;gap:12px;margin:-10px -18px 0;padding:10px 18px 0;user-select:none;-webkit-user-select:none;flex:none}
