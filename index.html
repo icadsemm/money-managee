@@ -2829,7 +2829,7 @@ function render(){
   const ae=document.activeElement,key=ae&&ae.dataset?ae.dataset.k:null;let ss=null;try{ss=ae.selectionStart}catch(e){}
   main.innerHTML=html;
   animEnter(tab);animNums(tab);popNew();applyBlFilter();
-  if(pendingFocus){const el=[...main.querySelectorAll('[data-k]')].find(e=>e.dataset.k.startsWith(pendingFocus));pendingFocus=null;if(el)el.focus();}
+  if(pendingFocus){const el=[...main.querySelectorAll('[data-k]')].find(e=>e.type!=='checkbox'&&(e.dataset.k===pendingFocus||e.dataset.k.startsWith(pendingFocus+'.')||e.dataset.k.startsWith(pendingFocus)));pendingFocus=null;if(el){try{el.focus({preventScroll:true})}catch(e){el.focus()}setTimeout(()=>{try{if(document.activeElement===el)el.scrollIntoView({block:'center',behavior:'smooth'})}catch(e){}},320)}}
   else if(key){const el=[...main.querySelectorAll('[data-k]')].find(e=>e.dataset.k===key);if(el){el.focus();try{if(ss!=null)el.setSelectionRange(ss,ss)}catch(e){}}}
   try{document.dispatchEvent(new Event('mm-sec'))}catch(e){}
 }
@@ -3059,7 +3059,7 @@ document.addEventListener('click',e=>{
   if(act==='logo-clear'){const ix=+b.dataset.i,a=state.saving.accounts[ix];if(a){const old=a.logo,nm=a.name;delete a.logo;touch('saving');later();setUndo('Logo dibuang',()=>{/* cari akaun semula ikut kedudukan & nama, sebab data boleh dimuat semula dari awan */const L=state.saving.accounts;let t=L[ix]&&L[ix].name===nm?L[ix]:L.find(x=>x.name===nm);if(!t)t=L[ix];if(t&&old){t.logo=old;touch('saving');later()}})}return}
   if(act==='nwr'){nwRange=b.dataset.v;try{localStorage.setItem('nwRange',nwRange)}catch(x){}later();return}
   if(act==='seg'){bilTab=b.dataset.v;try{localStorage.setItem('bilTab',bilTab)}catch(x){}later();return}
-  if(act==='add'){const k=b.dataset.k;const [doc,arr]=getArr(k);arr.push((NEW[k]||NEW[k.replace(/\.\d+\./g,'.#.')])());touch(doc);if(k==='saving.accounts'){accOpen[arr.length-1]=true}if(k==='saving.goals'){gOpen[arr.length-1]=true}pendingFocus=k+'.'+(arr.length-1);later();return}
+  if(act==='add'){const k=b.dataset.k;const [doc,arr]=getArr(k);arr.push((NEW[k]||NEW[k.replace(/\.\d+\./g,'.#.')])());touch(doc);if(k==='saving.accounts'){accOpen[arr.length-1]=true}if(k==='saving.goals'){gOpen[arr.length-1]=true}pendingFocus=k+'.'+(arr.length-1);cancelAnimationFrame(rq);render();return}
   if(act==='del'){
     if(!b.dataset.armed){b.dataset.armed='1';b.textContent='Pasti?';setTimeout(()=>{if(b.isConnected){delete b.dataset.armed;b.innerHTML='&times;'}},3000);return}
     const [doc,arr]=getArr(b.dataset.k),ix=+b.dataset.i,item=arr[ix],kk=b.dataset.k;arr.splice(ix,1);if(kk==='saving.accounts')accOpen={};if(kk==='saving.goals')gOpen={};touch(doc);later();
@@ -4150,6 +4150,11 @@ html.mm-bg .hstars *,html.mm-bg .voicebtn,html.mm-bg .voicebtn::after,html.mm-bg
 .goalc .gmv .btn[disabled]{opacity:1;color:color-mix(in srgb,var(--mint) 45%,transparent);background:color-mix(in srgb,var(--mint) 6%,transparent);border:1px dashed color-mix(in srgb,var(--mint) 30%,transparent);box-shadow:none}
 .goalc .gmv .btn:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
 </style>
+<style id="chkfix">
+.row.chk .in.t{text-decoration:none}
+.row.chk.paid .in.t{text-decoration:line-through;text-decoration-thickness:2px}
+</style>
+
 
 <script>
 (function(){
