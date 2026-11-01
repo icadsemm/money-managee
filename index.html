@@ -980,12 +980,6 @@ html.rmlock,html.rmlock body{overflow:hidden!important;overscroll-behavior:none}
 .rmq.done .rmc{background:transparent;color:var(--mute);border-color:var(--line);border-style:dashed}
 .rmq.done .rmc svg{width:14px;height:14px;stroke-width:2.4}
 
-.rmpush{display:flex;align-items:center;gap:10px;width:100%;margin:0 0 12px;padding:11px 14px;border-radius:14px;font:inherit;text-align:left;color:var(--ink);background:color-mix(in srgb,var(--accent) 8%,transparent);border:1px dashed color-mix(in srgb,var(--accent) 50%,transparent);cursor:pointer}
-.rmpush b{display:block;font-size:13.5px}.rmpush small{display:block;color:var(--mute);font-size:12px;margin-top:1px}
-.rmpush .ic{font-size:20px;flex:none}
-.rmpush.on{border-style:solid;cursor:default;background:color-mix(in srgb,var(--accent) 12%,transparent)}
-.rmpush.on b{color:var(--accent)}.rmpush.err small{color:var(--bad)}
-.rmpush.hint{cursor:default;border-style:solid;border-color:var(--line);background:transparent}
 /* module cards */
 .mods{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .mod{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:6px;color:inherit;text-decoration:none;min-width:0}
@@ -1622,7 +1616,6 @@ button:focus:not(:focus-visible),[role=button]:focus:not(:focus-visible){outline
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
 <script>
 (function(){
 var cfg={apiKey:"AIzaSyBLIav5hacsI-gV6zz5SQN5ar0LidFw7Og",authDomain:"money-manage-38a74.firebaseapp.com",projectId:"money-manage-38a74",messagingSenderId:"183837622600",appId:"1:183837622600:web:384a65afc27d8454e7f37d"};
@@ -1652,7 +1645,6 @@ window.claude={use:function(k){
       if(done)return;done=true;
       var base='users/'+u.uid+'/';
       window.mmFb={fs:fs,base:base,uid:u.uid};
-      setTimeout(function(){try{if(localStorage.getItem('mm-push')==='1'&&window.pushEnable)window.pushEnable(true)}catch(e){}},3500);
       res({
         doc:function(p){return{set:function(b){return fs.doc(base+p).set(b)}}},
         collection:function(p){return{onSnapshot:function(cb,eb){
@@ -1891,37 +1883,6 @@ const CALIC='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke=
 const RM_UNDO='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h11a5 5 0 010 10H9"/><path d="M8 5L4 9l4 4"/></svg>';
 const RM_CHECK='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 const RM_REP={'':'Sekali','m':'Tiap bulan','m3':'Tiap 3 bulan','m6':'Tiap 6 bulan','y':'Tiap tahun'};
-const PUSH_VAPID='BGn7e2tS4OuE4qYx4kF90VEZJ80hQ96o6XGfoTeKD-o3-BEubd8cwXJ4flUaW54kLe6eK3ebyfOPE6j-eBAaaEI';
-let pushSt='';
-const pushKey=()=>/^B[\w-]{60,}$/.test(PUSH_VAPID);
-const pushSup=()=>pushKey()&&('Notification' in window)&&('serviceWorker' in navigator)&&('PushManager' in window)&&typeof firebase!=='undefined'&&!!firebase.messaging;
-async function pushEnable(silent){
-  try{
-    if(!pushSup())throw new Error('Browser ni tak sokong notifikasi');
-    if(Notification.permission==='default'&&!silent)await Notification.requestPermission();
-    if(Notification.permission!=='granted'){pushSt=Notification.permission==='denied'?'err:Notifikasi disekat. Benarkan di tetapan browser/app.':'';later();return}
-    const F=window.mmFb;if(!F)throw new Error('Log masuk Google dahulu');
-    const reg=await navigator.serviceWorker.ready;
-    const token=await firebase.messaging().getToken({vapidKey:PUSH_VAPID,serviceWorkerRegistration:reg});
-    if(!token)throw new Error('Tak dapat token notifikasi');
-    await F.fs.doc(F.base+'m/push').set({tokens:firebase.firestore.FieldValue.arrayUnion(token),tz:(Intl.DateTimeFormat().resolvedOptions().timeZone||'Asia/Kuala_Lumpur'),at:Date.now()},{merge:true});
-    try{localStorage.setItem('mm-push','1')}catch(x){}
-    pushSt='on';
-    if(!silent)reg.showNotification('Notifikasi aktif ✅',{body:'Peringatan kau akan sampai walaupun app ditutup.',icon:'kucing-192.png',badge:'kucing-192.png',tag:'mm-test'});
-  }catch(e){pushSt='err:'+((e&&e.message)||e)}
-  later();
-}
-window.pushEnable=pushEnable;
-function pushRow(){
-  const ios=/iPhone|iPad|iPod/.test(navigator.userAgent)&&!(navigator.standalone||matchMedia('(display-mode: standalone)').matches);
-  if(!pushKey())return '';
-  if(ios)return `<div class="rmpush hint"><span class="ic">🔔</span><span><b>Nak notifikasi di luar app?</b><small>Tekan Kongsi → "Add to Home Screen", lepas tu buka dari ikon.</small></span></div>`;
-  if(!pushSup())return '';
-  let on=pushSt==='on';try{on=on||(localStorage.getItem('mm-push')==='1'&&Notification.permission==='granted')}catch(e){}
-  if(on)return `<div class="rmpush on"><span class="ic">🔔</span><span><b>Notifikasi aktif</b><small>Peringatan sampai walaupun app ditutup.</small></span></div>`;
-  const er=pushSt.startsWith('err:')?pushSt.slice(4):'';
-  return `<button type="button" class="rmpush ${er?'err':''}" data-act="pushon"><span class="ic">🔔</span><span><b>Hidupkan notifikasi</b><small>${esc(er||'Terima peringatan walaupun app ditutup.')}</small></span></button>`;
-}
 function rmRing(f,fin){
   const C=2*Math.PI*40,pr=fin||f.days==null?1:Math.max(.04,Math.min(1,1-Math.max(f.days,0)/30));
   const n=fin?'✓':f.days==null?'?':Math.abs(f.days);
@@ -1941,7 +1902,6 @@ function vPeringatan(){
   const empty=`<p class="rm-hint">Tak nak terlupa? Letak tarikh, nanti app kira berapa hari lagi.</p><div class="rm-ex">${['Tukar penapis air','Bayar cukai','Renew insurans','Servis kereta'].map(t=>`<button type="button" class="chq" data-act="radd" data-t="${esc(t)}">${esc(t)}</button>`).join('')}</div>`;
   const n=act.length;
   return `<section class="panel rmpanel"><div class="sec-h"><div class="rmt"><h2>Peringatan</h2>${n?`<span class="rmcnt">${n} AKTIF</span>`:''}</div><button class="btn ghost" data-act="radd">+ Tambah</button></div>
-    ${pushRow()}
     ${rows.length?hero+(list?`<div class="rmf-l">${list}</div>`:''):empty}</section>`;
 }
 /* sheet peringatan */
@@ -3046,7 +3006,6 @@ document.addEventListener('click',e=>{
       later()})();return}
   if(act==='xadd'){const a=state.advance;a.extra=a.extra||[];const x=NEW['advance.extra']();a.extra.push(x);bilTab='x:'+x.id;try{localStorage.setItem('bilTab',bilTab)}catch(e){}touch('advance');pendingFocus='advance.extra.'+(a.extra.length-1)+'.name';later();return}
   if(act==='rdone'){const r=(state.custom.reminders||[])[+b.dataset.i];if(r){if(r.rep){const o=rmOcc(r);if(o)r.doneOn=RM_ISO(o)}else r.done=!r.done;touch('custom');later()}return}
-  if(act==='pushon'){pushSt='';pushEnable(false);return}
   if(act==='redit'){rmOpen(+b.dataset.i);return}
   if(act==='radd'){rmOpen(-1,b.dataset.t||'');return}
   if(act==='rics'){const r=(state.custom.reminders||[])[+b.dataset.i];if(r)rmICS(r);return}
