@@ -4080,6 +4080,40 @@ html.mm-bg .hstars *,html.mm-bg .voicebtn,html.mm-bg .voicebtn::after,html.mm-bg
 /* blur dalam kandungan scroll dibuang (latar gradien kekal) */
 .bch,.cat2-list{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 </style>
+<style id="heropremium2">
+/* Kad Total Aset: kaca gelap premium */
+:root:root:root .hero{position:relative;overflow:hidden;isolation:isolate;border-radius:26px;padding:22px 20px;gap:11px;
+ background:
+  radial-gradient(70% 120% at 100% 0%,rgba(52,211,153,.40),transparent 58%),
+  radial-gradient(60% 90% at 0% 100%,rgba(96,165,250,.22),transparent 62%),
+  radial-gradient(40% 50% at 78% 108%,rgba(246,215,123,.14),transparent 70%),
+  linear-gradient(158deg,#0f2a24 0%,#0a1a1f 48%,#070f0d 100%);
+ border:0;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.28),inset 0 -24px 40px -28px rgba(0,0,0,.6),0 30px 54px -26px rgba(5,150,105,.55),0 2px 0 rgba(0,0,0,.35)}
+/* cincin garis halus: emas > hijau > lut */
+:root:root:root .hero::before{content:"";position:absolute;inset:0;z-index:2;right:auto;top:0;width:auto;height:auto;border-radius:inherit;padding:1px;filter:none;pointer-events:none;
+ background:linear-gradient(140deg,rgba(246,215,123,.85),rgba(255,255,255,.16) 24%,rgba(52,211,153,.12) 55%,rgba(52,211,153,.7) 100%);
+ -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+/* kilat sapuan + butiran halus */
+:root:root:root .hero::after{content:"";position:absolute;z-index:0;inset:0;top:0;left:0;width:auto;height:auto;transform:none;pointer-events:none;
+ background:
+  linear-gradient(115deg,transparent 36%,rgba(255,255,255,.10) 48%,transparent 60%) no-repeat -120% 0/60% 100%,
+  linear-gradient(180deg,rgba(255,255,255,.09),transparent 34%);
+ animation:hpSweep 7s ease-in-out 1.2s infinite}
+@keyframes hpSweep{0%{background-position:-120% 0,0 0}45%,100%{background-position:260% 0,0 0}}
+:root:root:root .hero>*{position:relative;z-index:1}
+:root:root:root .hero .eyebrow{color:#F6D77B;font-weight:800;letter-spacing:.2em;font-size:10.5px;opacity:.95}
+:root:root:root .hero .big{font-size:42px;letter-spacing:-.025em;font-weight:800;
+ background:linear-gradient(180deg,#fff 20%,#c9f7e2 62%,#6EE7B7 130%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;
+ filter:drop-shadow(0 2px 14px rgba(52,211,153,.35))}
+:root:root:root .hero .lvl{display:inline-flex;align-self:flex-start;align-items:center;padding:5px 12px 5px 8px;border-radius:99px;font-size:11.5px;letter-spacing:.14em;color:#F4FBF7;
+ background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,.04));border:1px solid rgba(246,215,123,.4);box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 6px 14px -8px rgba(0,0,0,.7)}
+:root:root:root .hero .lvl-ic{font-size:17px}
+:root:root:root .hero .bar{height:8px;background:rgba(255,255,255,.09);box-shadow:inset 0 1px 3px rgba(0,0,0,.6),0 1px 0 rgba(255,255,255,.08)}
+:root:root:root .hero .bar i{background:linear-gradient(90deg,#10B981,#6EE7B7 70%,#F6D77B);box-shadow:0 0 12px rgba(52,211,153,.65),inset 0 1px 0 rgba(255,255,255,.6)}
+:root:root:root .hero p:not(.eyebrow){color:#B9CEC5;font-size:12.5px;line-height:1.5}
+@media (prefers-reduced-motion:reduce){:root:root:root .hero::after{animation:none}}
+</style>
 <script>
 (function(){
   var raf=0,H=document.documentElement;
