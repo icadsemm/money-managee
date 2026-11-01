@@ -2016,7 +2016,7 @@ function vRingkasan(C){
   <p class="quote">${QUOTES[serial%10]}</p>
   ${nwView(C)}
   ${empty&&loaded?`<p class="empty">Belum ada data lagi. Isi di tab Simpanan, Komitmen, Bil dan Income.</p>`:''}
-  ${vBulan(C)}
+  <!-- kad bulan (vBulan) disembunyikan: vBulan(C) -->
   <section class="panel"><div class="sec-h">${head('Perlu perhatian')}</div>
     ${att.length?`<ul class="att">${att.map(x=>`<li><a href="#${x.to}" data-s="${x.s}"><span class="dot"></span><span><b>${x.t}</b><small>${x.d||''}</small></span>${chev}</a></li>`).join('')}</ul>`:'<p class="empty">Tiada apa-apa lagi.</p>'}
   </section>
@@ -4113,6 +4113,30 @@ html.mm-bg .hstars *,html.mm-bg .voicebtn,html.mm-bg .voicebtn::after,html.mm-bg
 :root:root:root .hero .bar i{background:linear-gradient(90deg,#10B981,#6EE7B7 70%,#F6D77B);box-shadow:0 0 12px rgba(52,211,153,.65),inset 0 1px 0 rgba(255,255,255,.6)}
 :root:root:root .hero p:not(.eyebrow){color:#B9CEC5;font-size:12.5px;line-height:1.5}
 @media (prefers-reduced-motion:reduce){:root:root:root .hero::after{animation:none}}
+</style>
+<style id="attpremium">
+/* Kad Perlu perhatian: kaca premium */
+:root:root:root .panel:has(>.att){position:relative;overflow:hidden;isolation:isolate;border-radius:24px;padding:20px 16px 14px;border:0;
+ background:radial-gradient(80% 90% at 100% 0%,rgba(246,215,123,.10),transparent 60%),radial-gradient(70% 80% at 0% 100%,rgba(52,211,153,.12),transparent 62%),linear-gradient(160deg,#10231f,#0a1514 55%,#070e0d);
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -20px 36px -26px rgba(0,0,0,.6),0 24px 44px -28px rgba(0,0,0,.8)}
+:root:root:root .panel:has(>.att)::after{content:"";position:absolute;inset:0;z-index:2;border-radius:inherit;padding:1px;pointer-events:none;background:linear-gradient(140deg,rgba(246,215,123,.6),rgba(255,255,255,.12) 26%,rgba(52,211,153,.10) 60%,rgba(52,211,153,.5));
+ -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+:root:root:root .panel:has(>.att)>*{position:relative;z-index:1}
+:root:root:root .panel:has(>.att) .sec-h{margin-bottom:4px}
+:root:root:root .panel:has(>.att) .sec-h h2,:root:root:root .panel:has(>.att) .sec-h h3{background:linear-gradient(180deg,#fff,#c9f7e2);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-.01em}
+:root:root:root .att{gap:8px}
+:root:root:root .att a{--c:#9AA9A3;grid-template-columns:auto 1fr auto;gap:13px;padding:13px 12px 13px 14px;border:1px solid rgba(255,255,255,.08);border-radius:16px;
+ background:linear-gradient(135deg,color-mix(in srgb,var(--c) 11%,rgba(255,255,255,.05)),rgba(255,255,255,.02) 70%);
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 8px 16px -12px rgba(0,0,0,.8);transition:transform .15s ease,border-color .2s}
+:root:root:root .att li:first-child a{padding:13px 12px 13px 14px;border-top:1px solid rgba(255,255,255,.08)}
+:root:root:root .att a:active{transform:scale(.985);border-color:color-mix(in srgb,var(--c) 55%,transparent)}
+:root:root:root .att [data-s="warn"]{--c:#F6C453}
+:root:root:root .att [data-s="bad"]{--c:#FB7185}
+:root:root:root .att [data-s="good"]{--c:#34D399}
+:root:root:root .att .dot{width:11px;height:11px;background:radial-gradient(circle at 35% 30%,#fff,var(--c) 45%);box-shadow:0 0 0 4px color-mix(in srgb,var(--c) 18%,transparent),0 0 12px color-mix(in srgb,var(--c) 70%,transparent)}
+:root:root:root .att b{font-weight:700;letter-spacing:-.005em}
+:root:root:root .att small{display:block;margin-top:2px;color:#9DB3AA}
+:root:root:root .att svg{box-sizing:content-box;width:14px;height:14px;padding:6px;border-radius:50%;stroke:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent)}
 </style>
 <script>
 (function(){
