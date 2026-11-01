@@ -2739,7 +2739,7 @@ function goalsHtml(C){
         :`<span>Perlu simpan</span><b>${rm(r.need,0)} / bulan</b><i class="gpill2 ${r.ok?'ok':'no'}">${r.ok?'Cukup':'Kurang '+rm(r.gap,0)}</i>`)
       :`<span>Tiada tarikh</span><i class="gpill2 ok">Tetapkan tarikh untuk kira</i>`);
     const plan=`<div class="gplan${!r.met&&t>0&&g.date&&r.dl<0?' no':''}">${pl}${tg}</div>`;
-    const meta=P.wfN>=2&&r.wf?`<div class="gmeta"><span class="grank">Keutamaan ${r.rank}</span><span class="gmv"><button type="button" class="btn ghost" data-act="gmove" data-i="${i}" data-d="-1" aria-label="Naikkan keutamaan" ${r.rank===1?'disabled':''}>↑</button><button type="button" class="btn ghost" data-act="gmove" data-i="${i}" data-d="1" aria-label="Turunkan keutamaan" ${r.rank===P.wfN?'disabled':''}>↓</button></span></div>`:'';
+    const meta=P.wfN>=2&&r.wf?`<div class="gmeta"><span class="grank">Keutamaan ${r.rank}</span><span class="gmv"><button type="button" class="btn ghost" data-act="gmove" data-i="${i}" data-d="-1" aria-label="Naikkan keutamaan" ${r.rank===1?'disabled':''}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V6M6 11.5l6-6 6 6"/></svg></button><button type="button" class="btn ghost" data-act="gmove" data-i="${i}" data-d="1" aria-label="Turunkan keutamaan" ${r.rank===P.wfN?'disabled':''}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v13M6 12.5l6 6 6-6"/></svg></button></span></div>`:'';
     return `<div class="acc goalc${r.met?' met':''}"><div class="acc-h">${inT(`saving.goals.${i}.name`,g.name,'Nama sasaran','Nama sasaran')}${del('saving.goals',i,g.name||'sasaran')}</div>
     ${meta}
     <div class="gl2"><div class="gtop"><div class="gbig" role="img" aria-label="${pc(p)}"><b>${Math.round(p*100)}</b><i>%</i></div><div class="gr"><span class="glab">Terkumpul</span><div class="num"><b>${rm(cur,0)}</b> <small>/ ${rm(t,0)}</small></div></div></div>
@@ -4138,6 +4138,19 @@ html.mm-bg .hstars *,html.mm-bg .voicebtn,html.mm-bg .voicebtn::after,html.mm-bg
 :root:root:root .att small{display:block;margin-top:2px;color:#9DB3AA}
 :root:root:root .att svg{box-sizing:content-box;width:14px;height:14px;padding:6px;border-radius:50%;stroke:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent)}
 </style>
+<style id="gmvpremium">
+.goalc .gmv{gap:8px}
+.goalc .gmv .btn{position:relative;min-width:46px;height:38px;padding:0;display:grid;place-items:center;border-radius:13px;color:#04130C;font-size:0;
+ background:linear-gradient(160deg,color-mix(in srgb,var(--mint) 95%,#fff),var(--mint) 55%,color-mix(in srgb,var(--mint) 70%,#000));
+ border:1px solid color-mix(in srgb,var(--mint) 70%,#fff);
+ box-shadow:0 8px 18px -8px color-mix(in srgb,var(--mint) 85%,transparent),inset 0 1px 0 rgba(255,255,255,.45);
+ transition:transform .15s,box-shadow .2s,filter .2s}
+.goalc .gmv .btn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.goalc .gmv .btn:not([disabled]):active{transform:scale(.88);filter:brightness(1.1);box-shadow:0 0 0 4px color-mix(in srgb,var(--mint) 25%,transparent)}
+.goalc .gmv .btn[disabled]{opacity:1;color:color-mix(in srgb,var(--mint) 45%,transparent);background:color-mix(in srgb,var(--mint) 6%,transparent);border:1px dashed color-mix(in srgb,var(--mint) 30%,transparent);box-shadow:none}
+.goalc .gmv .btn:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
+</style>
+
 <script>
 (function(){
   var raf=0,H=document.documentElement;
