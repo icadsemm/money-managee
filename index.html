@@ -831,6 +831,30 @@ html{touch-action:manipulation;-webkit-overflow-scrolling:touch}
 .acc.accc{padding:12px 14px}
 .acc.accc .share{margin-top:2px}
 </style>
+<style id="achring-warna">
+/* Cincin pencapaian: warna sama macam bar Total Aset (hijau -> mint -> emas) */
+:root:root .ach-hero .achring{
+ background:conic-gradient(from 0deg,#10B981 0,#6EE7B7 calc(var(--p)*.7%),#F6D77B calc(var(--p)*1%),color-mix(in srgb,var(--track) 75%,transparent) 0);
+ filter:drop-shadow(0 0 10px rgba(52,211,153,.55)) drop-shadow(0 0 22px rgba(246,215,123,.28))}
+:root:root .ach-hero .achring::after{box-shadow:0 0 0 2px rgba(246,215,123,.7),0 0 12px 3px #F6D77B}
+</style>
+<style id="bar-hijau-emas">
+/* Semua bar progress: hijau -> mint -> emas (sama macam Total Aset) */
+:root:root .bar:not(.warn):not(.bad) i,
+:root:root .gtrack i,:root:root .goalc.met .gtrack i,
+:root:root .sv-track i,
+:root:root .ladder .lv.done .bar i,:root:root .ladder .lv.next .bar i{background:linear-gradient(90deg,#10B981,#6EE7B7 70%,#F6D77B);box-shadow:0 0 10px rgba(52,211,153,.45)}
+:root:root .sv-track em{background:#F6D77B;box-shadow:0 0 0 3px rgba(246,215,123,.32),0 0 12px rgba(246,215,123,.6)}
+:root:root .mod.hi .bar i{background:linear-gradient(90deg,#10B981,#6EE7B7 70%,#F6D77B);box-shadow:none}
+:root:root .mod.hi .bar{background:rgba(4,19,12,.28)}
+</style>
+<style id="bar-hijau-emas-2">
+:root:root:root .bh:not(.over) .bh-meter i{background:linear-gradient(90deg,#10B981,#6EE7B7 70%,#F6D77B);box-shadow:0 0 12px rgba(52,211,153,.5)}
+:root:root:root .bh:not(.over) .bh-meter i::after{background:#fff8dc;opacity:.9}
+:root:root:root .dvv-bar i{background:linear-gradient(90deg,#10B981,#6EE7B7 70%,#F6D77B)}
+:root:root:root .cmh-ring,:root:root:root .bx-ring:not(.x){background:conic-gradient(from 0deg,#10B981 0,#6EE7B7 calc(var(--p)*.7%),#F6D77B calc(var(--p)*1%),color-mix(in srgb,var(--mint) 16%,transparent) 0)}
+:root:root:root .bx-main.over .bx-ring{background:conic-gradient(var(--bad) 100%,var(--bad) 0)}
+</style>
 </head><body>
 <title>Money Manage</title>
 <meta name="claude:viewport-fit-sides" content="cover">
