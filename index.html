@@ -1654,27 +1654,17 @@ button:focus:not(:focus-visible),[role=button]:focus:not(:focus-visible){outline
 .pl-top{display:flex;gap:8px;align-items:center}.pl-top .in{flex:1;min-width:0}
 .pl-g{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .pl-s{margin:0;font-weight:700;font-size:13px;line-height:1.45;color:var(--accent)}
-/* butang bayar ansuran: kaca premium */
-.pl-pay{position:relative;display:flex;align-items:center;gap:14px;width:100%;min-height:64px;padding:12px 16px;border-radius:20px;border:1px solid color-mix(in srgb,var(--accent) 38%,transparent);background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 16%,transparent),color-mix(in srgb,var(--accent) 4%,transparent));box-shadow:0 1px 0 color-mix(in srgb,#fff 14%,transparent) inset,0 10px 26px -14px color-mix(in srgb,var(--accent) 60%,transparent);color:var(--ink,inherit);font:inherit;text-align:left;cursor:pointer;overflow:hidden;-webkit-tap-highlight-color:transparent;transition:transform .15s,background .3s,box-shadow .3s,border-color .3s}
-.pl-pay:active{transform:scale(.985)}
-.pl-pay.on{background:linear-gradient(135deg,var(--mint),var(--accent));border-color:color-mix(in srgb,#fff 35%,transparent);color:var(--accent-ink);box-shadow:0 1px 0 color-mix(in srgb,#fff 45%,transparent) inset,0 14px 30px -12px color-mix(in srgb,var(--accent) 80%,transparent)}
-.pl-chk{flex:none;display:grid;place-items:center;width:34px;height:34px;border-radius:50%;border:2px solid color-mix(in srgb,var(--accent) 70%,transparent);transition:background .3s,border-color .3s,transform .3s}
-.pl-chk svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:26;stroke-dashoffset:26;transition:stroke-dashoffset .35s .05s;color:var(--accent-ink)}
-.pl-pay.on .pl-chk{background:var(--accent-ink);border-color:transparent;transform:scale(1.05)}
-.pl-pay.on .pl-chk svg{stroke-dashoffset:0;color:var(--accent)}
-.pl-pt{display:grid;gap:2px;min-width:0}
-.pl-pt b{font-size:15px;font-weight:800;letter-spacing:.01em;color:var(--accent)}
-.pl-pt small{font-size:12px;font-weight:600;opacity:.75;color:inherit}
-.pl-pay.on .pl-pt b{color:var(--accent-ink)}
+.pl-pay{width:100%;justify-content:center}
+.pl-pay.on{font-weight:800;background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .pl-dots{display:flex;gap:4px;margin-top:2px}
 .pl-dot{position:relative;flex:1;display:grid;justify-items:center;gap:6px;padding:0;border:0;background:none;color:var(--mute);font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .pl-dot::before{content:"";position:absolute;top:10px;left:-50%;right:50%;height:2px;background:var(--line);z-index:0}
 .pl-dot:first-child::before{display:none}
 .pl-dot.on::before{background:var(--accent)}
-.pl-dot i{position:relative;z-index:1;width:22px;height:22px;border-radius:50%;border:2px solid var(--line);background:var(--surface,transparent);transition:background .25s,border-color .25s,box-shadow .25s}
-.pl-dot.on i{background:var(--accent);border-color:var(--accent);box-shadow:0 0 14px -2px color-mix(in srgb,var(--accent) 70%,transparent)}
+.pl-dot i{position:relative;z-index:1;width:22px;height:22px;border-radius:50%;border:2px solid var(--line);background:var(--surface,transparent);}
+.pl-dot.on i{background:var(--accent);border-color:var(--accent)}
 .pl-dot.now i{border-color:var(--accent)}
-.pl-dot.late i{border-color:#ff6b6b;box-shadow:0 0 12px -4px #ff6b6b}
+.pl-dot.late i{border-color:#ff6b6b}
 .pl-dot em{font-style:normal;font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
 .pl-dot.on em,.pl-dot.now em{color:var(--accent)}
 .pl-dot.late em{color:#ff6b6b}
@@ -2449,7 +2439,7 @@ function bilPlus(P,o){
     let st='Isi jumlah beli dan berapa bulan',res='',pay='',dots='';
     if(c.ok){
       st=c.done?`Langsai 🎉 · ${c.n} / ${c.n} bulan dah bayar`:c.k<1?`Belum mula · bermula ${ymL(c.st)}`:`Dah bayar ${c.paidN} / ${c.n} bulan · baki ${rm(c.left)} · tamat ${c.end}`+(c.late>0?` · ⚠ ${c.late} bulan lewat`:'');
-      pay=c.act&&!c.done||c.act&&c.done&&c.paidNow?`<button type="button" class="pl-pay ${c.paidNow?'on':''}" data-act="plpay" data-k="${K}" data-m="${c.curY}" aria-pressed="${c.paidNow}"><span class="pl-chk"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.5 12.5l4.2 4.2L18.5 8"/></svg></span><span class="pl-pt"><b>${c.paidNow?'Dah bayar bulan ni':'Tanda dah bayar bulan ni'}</b><small>${c.paidNow?'Tekan untuk batalkan':rm(c.amt)+' · '+ymL(cur)}</small></span></button>`:'';
+      pay=c.act&&!c.done||c.act&&c.done&&c.paidNow?`<button type="button" class="btn ghost pl-pay${c.paidNow?' on':''}" data-act="plpay" data-k="${K}" data-m="${c.curY}" aria-pressed="${c.paidNow}">${c.paidNow?'✓ Dah bayar bulan ni':'Tanda dah bayar bulan ni'}</button>`:'';
       dots=`<div class="pl-dots">${c.ms.map((m,j)=>`<button type="button" class="pl-dot ${m.ok?'on':(c.st+j<cur?'late':(c.st+j===cur?'now':''))}" data-act="plpay" data-k="${K}" data-m="${m.y}" aria-label="${ymL(c.st+j)} ${m.ok?'dah bayar':'belum bayar'}" title="${ymL(c.st+j)}"><i></i><em>${ML[((c.st+j)%12+12)%12].slice(0,3)}</em></button>`).join('')}</div>`;
       res=`<div class="pl-res"><div><span>Sebulan</span><b>${rm(c.amt)}</b></div><div><span>Caj ansuran</span><b>${c.rate>0?rm(c.charge):'tanpa caj'}</b></div><div><span>Jumlah bayar akhir</span><b>${rm(c.total)}</b></div></div>`;
     }
@@ -3031,15 +3021,17 @@ function applyRO(){const ro=isRO();document.body.classList.toggle('ro',ro);
 window.addEventListener('offline',applyRO);window.addEventListener('online',()=>{if(!offlineCache)applyRO()});
 function setSync(s,t){if(isRO()){s='err';t='Luar talian'}const e=document.getElementById('sync');e.dataset.s=s;document.getElementById('syncT').textContent=t}
 function touch(name){dirty.add(name);clearTimeout(timers[name]);setSync('saving','Menyimpan');timers[name]=setTimeout(()=>flush(name),600)}
+var wroteAt={},lateData={},lateT={};
+function canon(o){return JSON.stringify(o,(k,v)=>v&&typeof v==='object'&&!Array.isArray(v)?Object.keys(v).sort().reduce((a,x)=>(a[x]=v[x],a),{}):v)}
 async function flush(name){
   if(isRO()){dirty.delete(name);return}
   if(!db){
     if(localMode){if(offlineCache){dirty.delete(name);return}try{localStorage.setItem(KEY,JSON.stringify(state));dirty.delete(name);if(!dirty.size)setSync('ok','Tersimpan di peranti')}catch(e){setSync('err','Tak boleh simpan');dbErr='Browser ni tak benarkan simpan data. Guna Simpan fail untuk sandaran.';later()}return}
     setSync('err','Tak disimpan');return}
   if(writing[name]){again[name]=true;return}
-  writing[name]=true;dirty.delete(name);
+  writing[name]=true;wroteAt[name]=Date.now();dirty.delete(name);
   const body=JSON.parse(JSON.stringify(state[name]));
-  try{await db.doc('m/'+name).set(body);last[name]=JSON.stringify(body);dbErr='';if(!dirty.size&&!again[name])setSync('ok','Tersimpan')}
+  try{await db.doc('m/'+name).set(body);wroteAt[name]=Date.now();last[name]=JSON.stringify(body);dbErr='';if(!dirty.size&&!again[name])setSync('ok','Tersimpan')}
   catch(e){setSync('err','Gagal simpan');dbErr='Data gagal disimpan ('+(e&&e.code||'ralat')+'). Cuba lagi sekejap.';later()}
   writing[name]=false;
   if(again[name]||dirty.has(name)){again[name]=false;flush(name)}
@@ -3920,8 +3912,14 @@ render();
     snap.docs.forEach(doc=>{
       const n=doc.id;if(!DOCS.includes(n))return;
       if(dirty.has(n)||writing[n])return;
-      const raw=JSON.stringify(doc.data());if(raw===last[n])return;
-      last[n]=raw;state[n]=Object.assign(DEF[n](),JSON.parse(raw));changed=true;
+      if(doc.metadata&&doc.metadata.hasPendingWrites)return;/* gema tulisan sendiri, bukan data baru */
+      const dd=doc.data(),raw=JSON.stringify(dd);if(raw===last[n]){delete lateData[n];clearTimeout(lateT[n]);return}
+      const nx=Object.assign(DEF[n](),JSON.parse(raw));
+      /* sama isi cuma beza susunan kunci: jangan ganti state / lukis semula */
+      if(state[n]&&canon(nx)===canon(state[n])){last[n]=raw;delete lateData[n];clearTimeout(lateT[n]);return}
+      /* baru lepas simpan: awan mungkin hantar versi lama, tahan dulu dan semak semula */
+      if(Date.now()-(wroteAt[n]||0)<2000){lateData[n]=raw;clearTimeout(lateT[n]);lateT[n]=setTimeout(()=>{const r=lateData[n];delete lateData[n];if(!r||dirty.has(n)||writing[n]||r===last[n])return;const x=Object.assign(DEF[n](),JSON.parse(r));if(state[n]&&canon(x)===canon(state[n])){last[n]=r;return}last[n]=r;state[n]=x;later()},2200);return}
+      delete lateData[n];last[n]=raw;state[n]=nx;changed=true;
     });
     if(snap.docs.length){try{localStorage.setItem('mm-cloud-cache-v1',JSON.stringify(state))}catch(e){}}
     loaded=true;if(!snap.metadata.fromCache&&snap.docs.some(d=>d.id==='saving')){ensureMonth();changed=true}if(!dirty.size)setSync('ok','Tersimpan');
