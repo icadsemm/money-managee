@@ -3916,14 +3916,16 @@ render();
     ensureMonth();if(offlineCache)document.body.classList.add('ro');setSync(offlineCache?'err':'ok',offlineCache?'Luar talian':'Mod peranti');later();return}
   applyRO();
   db.collection('m').onSnapshot(snap=>{
+    let changed=!loaded;
     snap.docs.forEach(doc=>{
       const n=doc.id;if(!DOCS.includes(n))return;
       if(dirty.has(n)||writing[n])return;
       const raw=JSON.stringify(doc.data());if(raw===last[n])return;
-      last[n]=raw;state[n]=Object.assign(DEF[n](),JSON.parse(raw));
+      last[n]=raw;state[n]=Object.assign(DEF[n](),JSON.parse(raw));changed=true;
     });
     if(snap.docs.length){try{localStorage.setItem('mm-cloud-cache-v1',JSON.stringify(state))}catch(e){}}
-    loaded=true;if(!snap.metadata.fromCache&&snap.docs.some(d=>d.id==='saving'))ensureMonth();if(!dirty.size)setSync('ok','Tersimpan');
+    loaded=true;if(!snap.metadata.fromCache&&snap.docs.some(d=>d.id==='saving')){ensureMonth();changed=true}if(!dirty.size)setSync('ok','Tersimpan');
+    if(!changed)return;/* tiada data berubah (cuma pengesahan simpan): jangan lukis semula, elak berkelip */
     const ae=document.activeElement;
     if(ae&&/^(INPUT|TEXTAREA)$/.test(ae.tagName)&&ae.dataset.k){ae.addEventListener('blur',()=>later(),{once:true})}else later();
   },err=>{loaded=true;dbErr='Data tak dapat dimuat ('+(err&&err.code||'ralat')+').';setSync('err','Ralat');later()});
