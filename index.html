@@ -3325,7 +3325,7 @@ document.addEventListener('mm-sec',()=>{const sc=document.getElementById('svSc')
 (function(){const n=document.querySelector('.tabs');if(!n)return;n.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('a[data-tab]');if(!a||a.classList.contains('addtab'))return;n.querySelectorAll('a').forEach(x=>x.removeAttribute('aria-current'));a.setAttribute('aria-current','page')},true)})();
 (function(){let h=null,raf=0,ev=null;
 const set=(el,e)=>{const r=el.getBoundingClientRect();let x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;x=Math.max(0,Math.min(1,x));y=Math.max(0,Math.min(1,y));
-  const px=(x-.5)*2,py=(y-.5)*2,st=el.style;st.setProperty('--ry',(px*9).toFixed(2)+'deg');st.setProperty('--rx',(-py*7).toFixed(2)+'deg');st.setProperty('--px',px.toFixed(3));st.setProperty('--py',py.toFixed(3));st.setProperty('--ga','1')};
+  const px=(x-.5)*2,py=(y-.5)*2,st=el.style;st.setProperty('--ry',(px*3.5).toFixed(2)+'deg');st.setProperty('--rx',(-py*3).toFixed(2)+'deg');st.setProperty('--px',(px*.5).toFixed(3));st.setProperty('--py',(py*.5).toFixed(3));st.setProperty('--ga','1')};
 const go=()=>{raf=0;if(h&&h.isConnected&&ev)set(h,ev)};
 const on=(el,e)=>{if(h&&h!==el)off();h=el;ev=e;el.classList.add('h3d-on');el.style.setProperty('--sc',e.pointerType==='mouse'?'1.012':'.985');if(!raf)raf=requestAnimationFrame(go)};
 const off=()=>{if(!h)return;const st=h.style;h.classList.remove('h3d-on');['--rx','--ry','--px','--py','--ga'].forEach(k=>st.setProperty(k,'0'));st.setProperty('--sc','1');h=null;ev=null};
@@ -3346,9 +3346,9 @@ function apply(){raf=0;
   const el=heroEl;if(!el){return}
   if(window.__h3dBusy&&window.__h3dBusy()){raf=requestAnimationFrame(apply);return}
   const r=el.getBoundingClientRect();if(r.bottom<0||r.top>innerHeight){on=false;el.classList.remove('h3d-on');return}
-  cx+=(tx-cx)*.14;cy+=(ty-cy)*.14;
+  cx+=(tx-cx)*.06;cy+=(ty-cy)*.06;
   if(!on){el.classList.add('h3d-on');on=true}
-  const st=el.style;st.setProperty('--ry',(cx*9).toFixed(2)+'deg');st.setProperty('--rx',(-cy*7).toFixed(2)+'deg');st.setProperty('--px',cx.toFixed(3));st.setProperty('--py',cy.toFixed(3));st.setProperty('--ga',Math.min(1,Math.hypot(cx,cy)*1.4).toFixed(2));
+  const st=el.style;st.setProperty('--ry',(cx*2.2).toFixed(2)+'deg');st.setProperty('--rx',(-cy*1.8).toFixed(2)+'deg');st.setProperty('--px',(cx*.35).toFixed(3));st.setProperty('--py',(cy*.35).toFixed(3));st.setProperty('--ga',Math.min(1,Math.hypot(cx,cy)*.8).toFixed(2));
   if(Math.abs(tx-cx)>.003||Math.abs(ty-cy)>.003)raf=requestAnimationFrame(apply);
   else{on=false;el.classList.remove('h3d-on')}}
 function onOri(e){
@@ -3356,7 +3356,7 @@ function onOri(e){
   const ang=(screen.orientation&&screen.orientation.angle)||0;if(ang!==0)return;
   if(bB==null){bB=e.beta;bG=e.gamma}
   bB+=(e.beta-bB)*.004;bG+=(e.gamma-bG)*.004;
-  tx=clamp((e.gamma-bG)/16,1);ty=clamp((e.beta-bB)/16,1);
+  tx=clamp((e.gamma-bG)/45,1);ty=clamp((e.beta-bB)/45,1);
   if(!raf)raf=requestAnimationFrame(apply)}
 function start(){if(asked)return;asked=true;window.addEventListener('deviceorientation',onOri,{passive:true})}
 start();
@@ -3748,7 +3748,7 @@ function vCat(words){
   for(const w of words)for(const c of cats){const k=keys(c)[0];if(k&&(V_SYN[k]||'').split(' ').includes(w))return c}
   return null}
 /* emoji ikut makanan: guna emoji makanan tu kalau ada, kalau takde baru guna emoji kategori */
-const FOOD_E={nasi:'🍚',bubur:'🍚',ayam:'🍗',chicken:'🍗',kfc:'🍗',nugget:'🍗',telur:'🥚',egg:'🥚',roti:'🍞',bread:'🍞',mee:'🍜',mi:'🍜',maggi:'🍜',laksa:'🍜',bihun:'🍜',kuetiau:'🍜',soto:'🍜',sup:'🍜',ramen:'🍜',pasta:'🍝',spaghetti:'🍝',burger:'🍔',pizza:'🍕',kentang:'🍟',fries:'🍟',sandwich:'🥪',sandwic:'🥪',kari:'🍛',curry:'🍛',ikan:'🐟',fish:'🐟',sushi:'🍣',daging:'🥩',steak:'🥩',beef:'🥩',sate:'🍢',satay:'🍢',sayur:'🥗',salad:'🥗',hotdog:'🌭',taco:'🌮',kebab:'🌯',kopi:'☕',coffee:'☕',latte:'☕',teh:'🧃',tea:'🧃',milo:'🧃',susu:'🧃',milk:'🧃',air:'🧃',mineral:'🧃',water:'🧃',jus:'🧃',juice:'🧃',sirap:'🧃',soda:'🧃',cola:'🧃',pepsi:'🧃',boba:'🧃',bubble:'🧃',bir:'🧃',beer:'🧃',epal:'🍎',apple:'🍎',pisang:'🍌',anggur:'🍇',tembikai:'🍉',oren:'🍊',mangga:'🥭',strawberi:'🍓',nanas:'🍍',kek:'🍰',cake:'🍰',aiskrim:'🍦',coklat:'🍫',chocolate:'🍫',donut:'🍩',biskut:'🍪',cookies:'🍪',popcorn:'🍿',kuih:'🍡',kueh:'🍡',karipap:'🥟',oden:'🍢',kelapa:'🥥',ais:'🧃',cendol:'🧃',bandung:'🧃',tebu:'🧃',plus:'🧃','100plus':'🧃',isotonik:'🧃',nescafe:'☕',horlicks:'☕',pau:'🥟',popia:'🥟',wantan:'🥟',dim:'🥟',keropok:'🍘',jagung:'🌽',ubi:'🍠',kacang:'🥜',keju:'🧀',kandar:'🍛',tomyam:'🍛',lempeng:'🥞',pancake:'🥞',murtabak:'🌯',capati:'🌯',durian:'🍈',buah:'🍉',cucur:'🍤',udang:'🦐',prawn:'🦐',sotong:'🦑',siput:'🐚',ketam:'🦀',kupang:'🦪',kerang:'🦪',pengat:'🥣',kasturi:'🍋',limau:'🍋',lemon:'🍋',senja:'🍽️',pulut:'🍚',lemang:'🍚',ketupat:'🍙',rendang:'🍛',gulai:'🍛',tempe:'🍘',tauhu:'🍘',tahu:'🍘',terung:'🍆',kobis:'🥬',bayam:'🥬',kangkung:'🥬',puding:'🍮',pudding:'🍮',jeli:'🍮',nangka:'🍈',rambutan:'🍒',timun:'🥒',betik:'🍈',sambal:'🌶️',cili:'🌶️',lokching:'🍢',lokcing:'🍢',penyet:'🍗',wings:'🍗',drumstick:'🍗',kerabu:'🍚',dagang:'🍚',lauk:'🍛',siakap:'🐟',kerapu:'🐟',tilapia:'🐟',keli:'🐟',patin:'🐟',selar:'🐟',kembung:'🐟',bilis:'🐟',sawi:'🥬',taugeh:'🥬',jambu:'🍐',pear:'🍐',pir:'🍐',pic:'🍑',peach:'🍑',ceri:'🍒',cherry:'🍒',kiwi:'🥝',avocado:'🥑',alpukat:'🥑',melon:'🍈',langsat:'🍈',duku:'🍈',ciku:'🍈',manggis:'🍇',epal:'🍎',delima:'🍎',tembikai:'🍉',mandarin:'🍊',tangerin:'🍊',blueberi:'🫐',blueberry:'🫐',berry:'🍓',markisa:'🍈',tomato:'🍅',lobak:'🥕',carrot:'🥕',brokoli:'🥦',bawang:'🧅'};
+const FOOD_E={nasi:'🍚',bubur:'🍚',ayam:'🍗',chicken:'🍗',kfc:'🍗',nugget:'🍗',telur:'🥚',egg:'🥚',roti:'🍞',bread:'🍞',mee:'🍜',mi:'🍜',maggi:'🍜',laksa:'🍜',bihun:'🍜',kuetiau:'🍜',soto:'🍜',sup:'🍜',ramen:'🍜',pasta:'🍝',spaghetti:'🍝',burger:'🍔',pizza:'🍕',kentang:'🍟',fries:'🍟',sandwich:'🥪',sandwic:'🥪',kari:'🍛',curry:'🍛',ikan:'🐟',fish:'🐟',sushi:'🍣',daging:'🥩',steak:'🥩',beef:'🥩',sate:'🍢',satay:'🍢',sayur:'🥗',salad:'🥗',hotdog:'🌭',taco:'🌮',kebab:'🌯',kopi:'☕',coffee:'☕',latte:'☕',teh:'🧃',tea:'🧃',milo:'🧃',susu:'🧃',milk:'🧃',air:'🧃',mineral:'🧃',water:'🧃',jus:'🧃',juice:'🧃',sirap:'🧃',soda:'🧃',cola:'🧃',pepsi:'🧃',boba:'🧃',bubble:'🧃',bir:'🧃',beer:'🧃',epal:'🍎',apple:'🍎',pisang:'🍌',anggur:'🍇',tembikai:'🍉',oren:'🍊',mangga:'🥭',strawberi:'🍓',nanas:'🍍',kek:'🍰',cake:'🍰',aiskrim:'🍦',coklat:'🍫',chocolate:'🍫',donut:'🍩',donuts:'🍩',donat:'🍩',donats:'🍩',doughnut:'🍩',doughnuts:'🍩',biskut:'🍪',cookies:'🍪',popcorn:'🍿',kuih:'🍡',kueh:'🍡',karipap:'🥟',oden:'🍢',kelapa:'🥥',ais:'🧃',cendol:'🧃',bandung:'🧃',tebu:'🧃',plus:'🧃','100plus':'🧃',isotonik:'🧃',nescafe:'☕',horlicks:'☕',pau:'🥟',popia:'🥟',wantan:'🥟',dim:'🥟',keropok:'🍘',jagung:'🌽',ubi:'🍠',kacang:'🥜',keju:'🧀',kandar:'🍛',tomyam:'🍛',lempeng:'🥞',pancake:'🥞',murtabak:'🌯',capati:'🌯',durian:'🍈',buah:'🍉',cucur:'🍤',udang:'🦐',prawn:'🦐',sotong:'🦑',siput:'🐚',ketam:'🦀',kupang:'🦪',kerang:'🦪',pengat:'🥣',kasturi:'🍋',limau:'🍋',lemon:'🍋',senja:'🍽️',pulut:'🍚',lemang:'🍚',ketupat:'🍙',rendang:'🍛',gulai:'🍛',tempe:'🍘',tauhu:'🍘',tahu:'🍘',terung:'🍆',kobis:'🥬',bayam:'🥬',kangkung:'🥬',puding:'🍮',pudding:'🍮',jeli:'🍮',nangka:'🍈',rambutan:'🍒',timun:'🥒',betik:'🍈',sambal:'🌶️',cili:'🌶️',lokching:'🍢',lokcing:'🍢',penyet:'🍗',wings:'🍗',drumstick:'🍗',kerabu:'🍚',dagang:'🍚',lauk:'🍛',siakap:'🐟',kerapu:'🐟',tilapia:'🐟',keli:'🐟',patin:'🐟',selar:'🐟',kembung:'🐟',bilis:'🐟',sawi:'🥬',taugeh:'🥬',jambu:'🍐',pear:'🍐',pir:'🍐',pic:'🍑',peach:'🍑',ceri:'🍒',cherry:'🍒',kiwi:'🥝',avocado:'🥑',alpukat:'🥑',melon:'🍈',langsat:'🍈',duku:'🍈',ciku:'🍈',manggis:'🍇',epal:'🍎',delima:'🍎',tembikai:'🍉',mandarin:'🍊',tangerin:'🍊',blueberi:'🫐',blueberry:'🫐',berry:'🍓',markisa:'🍈',tomato:'🍅',lobak:'🥕',carrot:'🥕',brokoli:'🥦',bawang:'🧅'};
 /* frasa makanan Malaysia: semua jenis mee = 🍜 satu emoji je */
 const FOOD_R=[
 [/\bnasi/,'🍚'],
@@ -3774,6 +3774,7 @@ const FOOD_CAT=/^(makan|minum|kopi)\b/i;
 /* emoji satu item: ikut nama makanan dulu; kalau kategori Makan tapi tak kenal, guna 🍽️ (bukan burger) */
 function itemEmoji(name,catName,cats){
   const c=(cats||[]).find(c=>c.n===catName),fe=foodEmoji(name||'',!!(c&&FOOD_CAT.test(c.n)));
+  {const fo=foodEmoji(name||'',true);if(fo)return fo}
   if((!c||!c.e||FOOD_CAT.test(c.n))&&fe)return fe;
   if(c&&/^makan\b/i.test(c.n))return '🍽️';
   return c?c.e:''}
@@ -4022,7 +4023,7 @@ if(hasPin())lkShow('unlock');
 const RC_PRICE=/(?:RM|MYR)?\s*(\d{1,5}[.,]\d{2})\s*[A-Za-z]{0,2}\s*$/i;
 const RC_SKIP=/\b(sub\s*-?\s*total|change|baki|cash|tunai|tax|sst|gst|service|svc|rounding|round|disc|discount|diskaun|visa|master|card|kad|qr|tng|payment|bayaran|received|terima|invoice|inv|receipt|resit|tel|phone|fax|reg|order|table|meja|cashier|kaunter|thank|wifi|date|tarikh|time|masa|mykad|description|amt|qty|please|again|welcome|visit|kasih)\b/i;
 /* kamus makanan & minuman: untuk betulkan huruf yang salah baca */
-const RC_V=('nasi putih goreng ayam ikan siakap sotong udang sambal petai tumis hijau sayur masak lemak cili api kari sup sedut siput kopi teh tarik ais aiskrim krim kulfi kuih tapai pulut kelapa bayu kaseh kasturi limau santan cucur telur dadar kangkung belacan bakar asam pedas gulai rendang daging lembu kambing itik sate satay mee bihun kuey teow laksa roti canai tosai capati milo sirap bandung cendol jus oren epal tembikai mangga soda air mineral kosong panas sejuk set besar kecil nugget fries burger pizza cheese chicken fish prawn squid rice noodle tea coffee juice ice cream cake kek tomyam ketam kerang lala pari keli tilapia haruan jering terung bendi sawi kailan tauhu tempe tempeh ulam pegaga paru kerabu pucuk paku ubi keledek keropok lekor pisang cempedak durian cincau laici nira tebu sala masin manis kicap lada hitam bawang putih merah halia serai kunyit cekur kerisik ikan bilis kerang sepat patin baung lemuni ketupat lontong soto mamak maggi spaghetti pasta sandwich wrap donut latte mocha cappuccino americano espresso susu horlicks nescafe lemon coklat chocolate vanila strawberi stroberi buah campur boi pengat nangka cendol senandung senja yong chow thai style watan hor beef venison kungpoh herbal kangen water egg longan lychee sour sweet fried mixed vegetable soup curry steak fillet pork lamb duck salmon tuna cheese sauce').split(' ');
+const RC_V=('nasi putih goreng ayam ikan siakap sotong udang sambal petai tumis hijau sayur masak lemak cili api kari sup sedut siput kopi teh tarik ais aiskrim krim kulfi kuih tapai pulut kelapa bayu kaseh kasturi limau santan cucur telur dadar kangkung belacan bakar asam pedas gulai rendang daging lembu kambing itik sate satay mee bihun kuey teow laksa roti canai tosai capati milo sirap bandung cendol jus oren epal tembikai mangga soda air mineral kosong panas sejuk set besar kecil nugget fries burger pizza cheese chicken fish prawn squid rice noodle tea coffee juice ice cream cake kek tomyam ketam kerang lala pari keli tilapia haruan jering terung bendi sawi kailan tauhu tempe tempeh ulam pegaga paru kerabu pucuk paku ubi keledek keropok lekor pisang cempedak durian cincau laici nira tebu sala masin manis kicap lada hitam bawang putih merah halia serai kunyit cekur kerisik ikan bilis kerang sepat patin baung lemuni ketupat lontong soto mamak maggi spaghetti pasta sandwich wrap donut donat doughnut latte mocha cappuccino americano espresso susu horlicks nescafe lemon coklat chocolate vanila strawberi stroberi buah campur boi pengat nangka cendol senandung senja yong chow thai style watan hor beef venison kungpoh herbal kangen water egg longan lychee sour sweet fried mixed vegetable soup curry steak fillet pork lamb duck salmon tuna cheese sauce').split(' ');
 const RC_VS=new Set(RC_V);
 const rcSw=(x,y)=>(x==='l'&&y==='i')||(x==='i'&&y==='l');
 function rcLev(a,b,mx){
@@ -4054,7 +4055,7 @@ function rcName(raw){
 const rcTitle=t=>t.toLowerCase().replace(/(^|\s)(\p{L})/gu,(m,a,b)=>a+b.toUpperCase());
 const RC_KEYS=[['kopi',/\b(kopi|coffee|latte|cappuccino|americano|mocha|nescafe|espresso)\b/i],
  ['air',/\b(mineral|air\s*kosong|air\s*suam|plain\s*water|water)\b/i],
- ['makan',/\b(aiskrim|krim|cream|kulfi|kuih|tapai|pulut|cake|kek|puding|pudding|donut|cucur|keropok|lekor)\b/i],
+ ['makan',/\b(aiskrim|krim|cream|kulfi|kuih|tapai|pulut|cake|kek|puding|pudding|donut|donuts|donat|donats|doughnut|doughnuts|cucur|keropok|lekor)\b/i],
  ['minum',/\b(teh|tea|milo|jus|juice|sirap|bandung|boba|bubble|ais|ice|cola|plus|soda|susu|milk|cendol|smoothie|cincau|kelapa|kasturi|limau|lemon|oren|nira|tebu|laici|horlicks|sparkling|7\s*up|drink|minuman|air)\b/i],
  ['minyak',/\b(petrol|ron\s*9\d|diesel|petron|petronas|shell|caltex|bhp|fuel|minyak)\b/i],
  ['parking',/\b(parking|park|tol|toll|tng)\b/i],
