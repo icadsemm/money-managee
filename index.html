@@ -3329,12 +3329,41 @@ const set=(el,e)=>{const r=el.getBoundingClientRect();let x=(e.clientX-r.left)/r
 const go=()=>{raf=0;if(h&&h.isConnected&&ev)set(h,ev)};
 const on=(el,e)=>{if(h&&h!==el)off();h=el;ev=e;el.classList.add('h3d-on');el.style.setProperty('--sc',e.pointerType==='mouse'?'1.012':'.985');if(!raf)raf=requestAnimationFrame(go)};
 const off=()=>{if(!h)return;const st=h.style;h.classList.remove('h3d-on');['--rx','--ry','--px','--py','--ga'].forEach(k=>st.setProperty(k,'0'));st.setProperty('--sc','1');h=null;ev=null};
+window.__h3dBusy=()=>!!h;
 if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
 document.addEventListener('pointerdown',e=>{const t=e.target.closest&&e.target.closest('.hero');if(t)on(t,e)},{passive:true});
 document.addEventListener('pointermove',e=>{if(h){ev=e;if(!raf)raf=requestAnimationFrame(go);return}if(e.pointerType==='mouse'){const t=e.target.closest&&e.target.closest('.hero');if(t)on(t,e)}},{passive:true});
 document.addEventListener('pointerup',off,{passive:true});document.addEventListener('pointercancel',off,{passive:true});
 document.addEventListener('pointerout',e=>{if(h&&e.pointerType==='mouse'&&!(e.relatedTarget&&h.contains(e.relatedTarget)))off()},{passive:true});
 document.addEventListener('scroll',()=>{if(h&&ev&&ev.pointerType!=='mouse')off()},{passive:true,capture:true});
+})();
+(function(){
+if(matchMedia('(prefers-reduced-motion:reduce)').matches||typeof DeviceOrientationEvent==='undefined')return;
+let bB=null,bG=null,tx=0,ty=0,cx=0,cy=0,raf=0,on=false,asked=false,heroEl=null;
+const clamp=(v,m)=>Math.max(-m,Math.min(m,v));
+function apply(){raf=0;
+  if(!heroEl||!heroEl.isConnected)heroEl=document.querySelector('.hero');
+  const el=heroEl;if(!el){return}
+  if(window.__h3dBusy&&window.__h3dBusy()){raf=requestAnimationFrame(apply);return}
+  const r=el.getBoundingClientRect();if(r.bottom<0||r.top>innerHeight){on=false;el.classList.remove('h3d-on');return}
+  cx+=(tx-cx)*.14;cy+=(ty-cy)*.14;
+  if(!on){el.classList.add('h3d-on');on=true}
+  const st=el.style;st.setProperty('--ry',(cx*9).toFixed(2)+'deg');st.setProperty('--rx',(-cy*7).toFixed(2)+'deg');st.setProperty('--px',cx.toFixed(3));st.setProperty('--py',cy.toFixed(3));st.setProperty('--ga',Math.min(1,Math.hypot(cx,cy)*1.4).toFixed(2));
+  if(Math.abs(tx-cx)>.003||Math.abs(ty-cy)>.003)raf=requestAnimationFrame(apply);
+  else{on=false;el.classList.remove('h3d-on')}}
+function onOri(e){
+  if(e.beta==null||e.gamma==null)return;
+  const ang=(screen.orientation&&screen.orientation.angle)||0;if(ang!==0)return;
+  if(bB==null){bB=e.beta;bG=e.gamma}
+  bB+=(e.beta-bB)*.004;bG+=(e.gamma-bG)*.004;
+  tx=clamp((e.gamma-bG)/16,1);ty=clamp((e.beta-bB)/16,1);
+  if(!raf)raf=requestAnimationFrame(apply)}
+function start(){if(asked)return;asked=true;window.addEventListener('deviceorientation',onOri,{passive:true})}
+start();
+if(typeof DeviceOrientationEvent.requestPermission==='function'){
+  const ask=()=>{document.removeEventListener('pointerup',ask,true);try{const r=DeviceOrientationEvent.requestPermission();if(r&&r.catch)r.catch(()=>{})}catch(e){}};
+  document.addEventListener('pointerup',ask,true)
+}
 })();
 let numPrev={},numTab=null,popKey=null,ringPrev=null,barPrev=null;
 function animNums(tab){
@@ -4773,6 +4802,20 @@ html.mm-bg .hstars *,html.mm-bg .voicebtn,html.mm-bg .voicebtn::after,html.mm-bg
 .acc.rec .acc-h .seg.sm{flex:0 1 auto;max-width:176px!important}
 .acc.rec .acc-h .seg.sm button{padding:5px 6px;font-size:10.5px;white-space:nowrap}
 </style>
+<style id="soft-all">
+/* Semua kotak input: gaya lembut sama macam simpanan bulanan (gelap + cerah) */
+:root:root:root:root:root:root:root:root:root:root .panel :is(input.in,select.in,textarea.in):not(.ttl-r *):not(.hx-in *):not(.bh-in *):not(.bx-in *):not(.bx-chips *):not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]){background:color-mix(in srgb,var(--mint) 9%,transparent)!important;border:1px solid transparent!important;border-radius:12px!important;box-shadow:none!important;transition:background .2s,border-color .2s,box-shadow .2s}
+:root[data-theme="light"]:root:root:root:root:root:root:root:root:root:root .panel :is(input.in,select.in,textarea.in):not(.ttl-r *):not(.hx-in *):not(.bh-in *):not(.bx-in *):not(.bx-chips *):not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]),
+:root:not([data-theme="dark"]):not([data-theme="light"]):root:root:root:root:root:root:root:root:root:root .panel :is(input.in,select.in,textarea.in):not(.ttl-r *):not(.hx-in *):not(.bh-in *):not(.bx-in *):not(.bx-chips *):not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]){background:color-mix(in srgb,var(--accent) 9%,transparent)!important}
+:root:root:root:root:root:root:root:root:root:root .panel :is(input.in,select.in,textarea.in):not(.ttl-r *):not(.hx-in *):not(.bh-in *):not(.bx-in *):not(.bx-chips *):not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]):focus{background:color-mix(in srgb,var(--mint) 15%,transparent)!important;border-color:color-mix(in srgb,#F6D77B 70%,transparent)!important;box-shadow:0 0 0 3px color-mix(in srgb,#F6D77B 22%,transparent)!important}
+:root[data-theme="light"]:root:root:root:root:root:root:root:root:root:root .panel :is(input.in,select.in,textarea.in):not(.ttl-r *):not(.hx-in *):not(.bh-in *):not(.bx-in *):not(.bx-chips *):not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]):focus{background:color-mix(in srgb,var(--accent) 14%,transparent)!important}
+/* Tarikh/bulan tak terpotong */
+:root:root:root:root:root:root:root:root:root:root .panel input.in[type=month],:root:root:root:root:root:root:root:root:root:root .panel input.in[type=date]{min-width:0;width:100%;padding:0 6px 0 10px!important;font-size:14px!important;letter-spacing:-.02em;box-sizing:border-box}
+:root:root:root:root:root:root:root:root:root:root .panel input.in[type=month]::-webkit-datetime-edit,:root:root:root:root:root:root:root:root:root:root .panel input.in[type=date]::-webkit-datetime-edit{padding:0;min-width:0}
+:root:root:root:root:root:root:root:root:root:root .panel input.in[type=month]::-webkit-date-and-time-value,:root:root:root:root:root:root:root:root:root:root .panel input.in[type=date]::-webkit-date-and-time-value{min-width:0;text-align:left}
+:root:root:root:root:root:root:root:root:root:root .panel input.in[type=month]::-webkit-calendar-picker-indicator,:root:root:root:root:root:root:root:root:root:root .panel input.in[type=date]::-webkit-calendar-picker-indicator{margin:0 0 0 2px;padding:2px;width:16px;flex:none}
+</style>
+
 
 
 
