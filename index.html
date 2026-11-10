@@ -3053,8 +3053,7 @@ function blInsight(rows,tot,bud){
   if(!tot)return '';
   return `<section class="panel bi">${head('Analisis belanja',ML[m-1]+' '+y)}
   <div class="bt">${btT('Minggu ni',rm(wk),wkSub,wkH)}${btT(isCur?'Anggaran sebulan':'Jumlah bulan',rm(isCur?proj:tot),'','i')}${btT('Hari tertinggi',top.i>=0?rm(top.v):'-',top.i>=0?(top.i+1)+' '+MS[m-1]:'','a')}${btT('Bilangan belanja',rows.length,'','p')}${btT('Purata / hari',rm(avgD),'','i')}${low?btT('Hari paling jimat',rm(low.v),(low.i+1)+' '+MS[m-1],'g'):btT('Hari aktif',nz.length+' hari','','p')}${cap>0?btT('Bajet bulan guna',usedP+'%',tot<=cap?'Baki '+rm(cap-tot):'Lebih '+rm(tot-cap),tot<=cap?'g':'b',1):''}</div>
-  <div class="bch">${rseg}${chart}<div class="bi-cap"><span>Jumlah <b>${rm(rngTot)}</b></span><span>Purata <b>${rm(rngAvg)}</b> / ${blRange==='m'?'minggu':'hari'}</span></div>${bud>0?'<p class="hint" style="margin:6px 0 0">Merah = lebih bajet.</p>':''}</div>
-  <div><p class="eyebrow" style="margin-bottom:8px">Ikut kategori</p>${topC}${catBlock(list,tot,icon)}</div></section>`;
+  <div class="bch">${rseg}${chart}<div class="bi-cap"><span>Jumlah <b>${rm(rngTot)}</b></span><span>Purata <b>${rm(rngAvg)}</b> / ${blRange==='m'?'minggu':'hari'}</span></div>${bud>0?'<p class="hint" style="margin:6px 0 0">Merah = lebih bajet.</p>':''}</div></section>`;
 }
 const CATPAL=[100,80,64,50,40,32,25,18].map(n=>`color-mix(in srgb,var(--accent) ${n}%,transparent)`);
 function catBlock(list,tot,icon){
@@ -4851,6 +4850,12 @@ document.addEventListener('click',function(e){
    FOR WHOEVER EDITS THIS APP: on every change add ONE new entry at the TOP of CHANGELOG (unique id, date, short ms + en bullets). */
 (function(){
 var CHANGELOG=[
+ {id:'2026-11-10-c',d:'2026-11-10',
+  ms:['Buang bahagian \u201cIkut kategori\u201d dalam Analisis belanja (tak berfungsi)'],
+  en:['Removed the \u201cBy category\u201d section from Spending analysis (it did not work)']},
+ {id:'2026-11-10-b',d:'2026-11-10',
+  ms:['Bila Kategori, Imbas resit, Setting atau peringatan dibuka, latar belakang dah tak boleh di-scroll','Kurangkan kesan kabur (blur) berat pada Imbas resit, jadi lebih lancar','Latar belakang berhenti beranimasi masa panel terbuka, kurang lag'],
+  en:['When Category, Scan receipt, Settings or reminder sheets are open, the background no longer scrolls','Lighter blur on Scan receipt for smoother performance','Background animations pause while a sheet is open, less lag']},
  {id:'2026-11-10-a',d:'2026-11-10',
   ms:['Banner kemas kini keluar sendiri bila ada versi baru','Nombor versi dalam Tetapan, naik automatik','Seret turun Tetapan lebih lancar','Butang Apa yang baru untuk tengok ringkasan ini'],
   en:['Update banner appears automatically when a new version is out','Version number in Settings, increases automatically','Dragging Settings down is smoother','\u201cWhat\u2019s new\u201d button to review these notes']}
@@ -5754,6 +5759,32 @@ addEventListener('scroll',s,{passive:true,capture:true});
 addEventListener('touchmove',s,{passive:true});
 addEventListener('hashchange',function(){s()});
 })();
+</script>
+<style id="mm-lockfix">
+html.mmlock,html.mmlock body{overflow:hidden!important;overscroll-behavior:none!important;height:100%}
+#sheet,#rcp,#set,#rmsheet,#vedit,#wn{overscroll-behavior:contain;touch-action:none}
+#sheet .shc,#rcp .shc,#set .setsheet,#rmsheet .shc,#vedit .shc,#wn .wnc{overscroll-behavior:contain;touch-action:pan-y}
+#sheet .emj{overscroll-behavior:contain;touch-action:pan-y}
+/* Imbas resit: buang blur berat (lag), ganti latar lebih pekat */
+#rcp{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:rgba(7,16,13,.62)!important}
+#rcp .shc{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:color-mix(in srgb,var(--surface) 94%,transparent)!important}
+/* masa panel terbuka: latar belakang rehat (tiada animasi/blur) */
+html.mmlock :where(header.top,main,.tabs) *{animation-play-state:paused!important}
+html.mmlock :where(main,.tabs,header.top) :where(.tabs,.hero,.bt>div,.bch,.cat2-list,.scanbtn .sbi,.panel,.mod,.acc,.banner,.seg){-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+</style>
+<script>
+(function(){var H=document.documentElement,q=0,SEL='[role=dialog]:not([hidden]),#rmsheet:not([hidden]),#wn';
+function chk(){q=0;var on=!!document.querySelector(SEL);if(H.classList.contains('mmlock')!==on)H.classList.toggle('mmlock',on)}
+function sch(){if(!q)q=requestAnimationFrame(chk)}
+new MutationObserver(sch).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['hidden']});
+/* sentuh di luar kawasan boleh-scroll dalam panel = block (cegah latar bergerak) */
+document.addEventListener('touchmove',function(e){
+ if(!H.classList.contains('mmlock'))return;
+ var t=e.target,ov=t.closest&&t.closest(SEL);if(!ov){e.preventDefault();return}
+ for(var n=t;n&&n!==ov.parentNode;n=n.parentNode){
+  if(n.nodeType===1&&n.scrollHeight>n.clientHeight+1){var o=getComputedStyle(n).overflowY;if(o==='auto'||o==='scroll')return}}
+ if(e.cancelable)e.preventDefault()},{passive:false});
+sch()})();
 </script>
 <!-- NOTA / NOTE: tambah entri baru di atas CHANGELOG setiap kali fail ni diubah; nombor versi automatik, jangan edit. / Add a new entry at the TOP of CHANGELOG on every change; version is automatic. -->
 </body></html>
