@@ -2132,7 +2132,9 @@ requestAnimationFrame(function(){setTimeout(function(){
 'use strict';
 const MS=['Jan','Feb','Mac','Apr','Mei','Jun','Jul','Ogo','Sep','Okt','Nov','Dis'];
 const ML=['Januari','Februari','Mac','April','Mei','Jun','Julai','Ogos','September','Oktober','November','Disember'];
-const QUOTES=["Sikit-sikit lama-lama jadi bukit.","Disiplin hari ni, senang hari esok.","Setiap ringgit yang kau simpan, satu langkah ke bebas kewangan.","Penat hari ni, lega bila tengok angka naik.","Bukan berapa banyak, tapi berapa konsisten.","Rider pun boleh bina simpanan, yang penting tak putus.","Duit tidur pun kerja untuk kau.","Jangan banding dengan orang. Banding dengan kau bulan lepas.","Satu delivery lagi, satu langkah lagi.","Target RM100k bukan mimpi, cuma belum sampai lagi."];
+const QUOTES=["Sikit-sikit lama-lama jadi bukit.", "Setiap ringgit yang disimpan, satu langkah ke masa depan yang lebih tenang.", "Bukan berapa banyak, tapi berapa konsisten.", "Simpan hari ni, senang hari esok.", "Mula kecil pun tak apa, yang penting mula.", "Jangan berhenti, walaupun perlahan.", "Hari ni simpan sikit, esok jadi banyak.", "Setiap bulan yang awak simpan, satu kemenangan.", "Awak dah sampai sini, teruskan.", "Duit yang disimpan hari ni, tolong awak bila perlu nanti.", "Disiplin hari ni, tenang hari esok.", "Satu langkah kecil setiap hari, hasilnya besar.", "Jangan banding dengan orang lain, banding dengan diri awak bulan lepas.", "Bangga dengan progres awak, sekecil mana pun.", "Tak perlu sempurna, cukup konsisten.", "Simpan dulu, baru belanja.", "Belanja ikut keperluan, bukan ikut perasaan.", "Catat belanja hari ni, senang kira bulan depan.", "Dana kecemasan buat hati lebih tenang.", "Jangan tunggu gaji naik baru nak simpan.", "Mula dari RM1 pun dah okay.", "Setiap ringgit ada tugasnya.", "Awak lebih kuat daripada yang awak sangka.", "Penat hari ni, puas bila tengok angka naik.", "Bulan ni tak sempurna pun tak apa, esok boleh cuba lagi.", "Terlepas satu bulan bukan kegagalan, mula semula je.", "Sabar, hasilnya akan nampak.", "Kewangan yang kemas, hidup lebih tenang.", "Fikir panjang sebelum beli.", "Tanya diri: ini perlu, atau sekadar nak?", "Jimat bukan bermakna kedekut, tapi bijak.", "Hutang kurang, hati pun lega.", "Setiap simpanan hari ni bantu awak esok.", "Rancang duit awak, jangan biar duit yang atur awak.", "Satu keputusan bijak hari ni boleh ubah tahun depan.", "Percaya pada proses, jangan berhenti.", "Awak sedang buat sesuatu yang baik untuk diri sendiri.", "Walau sikit, tetap kira.", "Hari ni lebih baik daripada semalam.", "Masa depan awak akan berterima kasih.", "Tabiat baik bermula dengan langkah kecil.", "Teruskan, awak hampir sampai.", "Fokus pada sasaran, nikmati perjalanan.", "Setiap level bermula dengan satu ringgit pertama.", "Naik level sedikit demi sedikit.", "Jaga streak awak, bulan demi bulan.", "Hari ni tak perlu hebat, cuma jangan berhenti.", "Rehat boleh, jangan menyerah.", "Percaya diri, awak boleh capai target.", "Satu bulan lagi, satu langkah lagi.", "Kecil hari ni, besar bila digabungkan.", "Jangan risau lambat, yang penting terus bergerak.", "Tengok angka naik, hati pun gembira.", "Rezeki dicari, diurus dengan baik.", "Bersyukur dengan apa yang ada, sambil terus berusaha.", "Simpanan ialah hadiah untuk diri awak di masa depan.", "Mulakan hari dengan niat yang baik.", "Yang penting usaha, hasilnya serahkan pada Tuhan.", "Jangan putus asa, setiap usaha ada nilainya.", "Bila bersedia, hidup lebih tenang.", "Lebih baik mula hari ni daripada tunggu esok.", "Pilih untuk simpan, walaupun sikit.", "Terus melangkah, awak sedang menuju matlamat."];
+let QI=Math.floor(Math.random()*QUOTES.length);
+try{const last=+localStorage.getItem('mm-q');if(QUOTES.length>1&&QI===last)QI=(QI+1+Math.floor(Math.random()*(QUOTES.length-1)))%QUOTES.length;localStorage.setItem('mm-q',QI)}catch(e){}
 const BASE=['ringkasan','belanja','simpanan','komitmen','bil','delivery'],TABS=BASE.slice();
 const DOCS=['saving','delivery','komitmen','spaylater','advance','belanja','custom'];
 
@@ -2154,7 +2156,7 @@ const num=v=>{v=String(v).replace(/[^\d.\-]/g,'');if(v===''||v==='-'||v==='.')re
 const uidx=()=>Math.random().toString(36).slice(2,8);
 
 const DEF={
-  saving:()=>({usdRate:4.2,accounts:[],goals:[],target:100000,goal:1000,
+  saving:()=>({usdRate:4.2,accounts:[],goals:[],target:0,goal:1000,
     levels:[{icon:'🌱',name:'Benih',pct:0},{icon:'🥉',name:'Perunggu',pct:.1},{icon:'🥈',name:'Perak',pct:.25},{icon:'🥇',name:'Emas',pct:.5},{icon:'💎',name:'Platinum',pct:.75},{icon:'👑',name:'Berlian',pct:1}],
     monthly:[],history:[],updated:todayISO()}),
   delivery:()=>({title:'',target:0,tcur:'MYR',rows:[]}),
@@ -2195,7 +2197,7 @@ function calc(){
   C.months=C.mAvg>0?Math.ceil(C.remain/C.mAvg):null;
   C.eta=C.months!=null?addMonths(now,C.months):null;
   C.lv=s.levels.map(l=>({...l,amt:l.pct*s.target}));
-  C.li=0;C.lv.forEach((l,i)=>{if(C.nilai>=l.amt)C.li=i});
+  C.li=0;if(s.target>0)C.lv.forEach((l,i)=>{if(C.nilai>=l.amt)C.li=i});
   C.cur=C.lv[C.li];C.next=C.lv[C.li+1]||null;
   C.lProg=C.next?clamp((C.nilai-C.cur.amt)/((C.next.amt-C.cur.amt)||1)):1;
   C.toNext=C.next?Math.max(C.next.amt-C.nilai,0):0;
@@ -2445,6 +2447,18 @@ function rmOpen(i,title){
   const dl=$('rmDel');dl.hidden=!r;delete dl.dataset.armed;dl.classList.remove('danger');dl.textContent='Padam';
   $('rmC').scrollTop=0;RMS.sync();document.documentElement.classList.add('rmlock');el.hidden=false;
   if(!r&&!RMS.d.t)setTimeout(()=>{try{$('rmT').focus({preventScroll:true})}catch(x){$('rmT').focus()}},120)}
+function axSplit(C){
+  const COL=['#10B981','#6EE7B7','#2DD4BF','#F6D77B','#7DD3FC','#A5B4FC'];
+  let it=state.saving.accounts.map(x=>({n:x.name||'Akaun',v:(+x.nilai||0)*fx(x),logo:okLogo(x.logo)?x.logo:''})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v);
+  const tot=it.reduce((a,x)=>a+x.v,0);if(!it.length||tot<=0)return '';
+  if(it.length>6){const rest=it.slice(5);it=it.slice(0,5).concat([{n:'Lain-lain',v:rest.reduce((a,x)=>a+x.v,0),logo:''}])}
+  const R=46,CI=2*Math.PI*R,gap=it.length>1?2.2:0;let off=0;
+  const seg=it.map((x,i)=>{const f=x.v/tot,len=Math.max(f*CI-gap,.5);const c=`<circle class="axd-s" cx="60" cy="60" r="${R}" fill="none" stroke="${COL[i]}" stroke-width="13" stroke-linecap="butt" stroke-dasharray="${len.toFixed(2)} ${(CI-len).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}" transform="rotate(-90 60 60)"/>`;off+=f*CI;return c}).join('');
+  const rows=it.map((x,i)=>`<li><span class="axd-k">${x.logo?`<img src="${esc(x.logo)}" alt="">`:`<i style="background:${COL[i]}"></i>`}</span><span class="axd-n">${esc(x.n)}</span><b>${pc(x.v/tot,1)}</b><small>${rm(x.v,0)}</small><em style="--w:${(x.v/tot*100).toFixed(1)}%;--c:${COL[i]}"></em></li>`).join('');
+  return `<section class="panel axd"><div class="sec-h">${head('Pecahan aset','Duit awak tersimpan kat mana.')}</div>
+    <div class="axd-b"><div class="axd-d" role="img" aria-label="Pecahan aset ikut akaun"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="${R}" fill="none" stroke="rgba(127,160,145,.14)" stroke-width="13"/>${seg}</svg><div class="axd-c"><small>Jumlah</small><b>${rm(tot,0)}</b><span>${it.length} akaun</span></div></div>
+    <ul class="axd-l">${rows}</ul></div></section>`;
+}
 function vRingkasan(C){
   const s=state.saving,k=state.komitmen,p=state.spaylater,a=state.advance;
   const serial=Math.floor(Date.UTC(new Date().getFullYear(),new Date().getMonth(),new Date().getDate())/86400000)+25569;
@@ -2473,10 +2487,11 @@ function vRingkasan(C){
     <div class="big num">${rm(C.nilai)}</div>
     <div class="lvl"><span class="lvl-ic" aria-hidden="true">${esc(C.cur.icon)}</span><span>${esc(C.cur.name).toUpperCase()}</span></div>
     ${bar(C.lProg)}
-    <p>${C.next?`Seterusnya: ${esc(C.next.icon)} ${esc(C.next.name)} (${rm(C.next.amt,0)}) · lagi ${rm(C.toNext,0)}${C.nextMonths!=null?` · anggaran ${C.nextMonths} bulan`:''}`:'Level tertinggi, target dah tercapai!'}</p>
+    <p>${!(s.target>0)?'Belum set target. Isi dalam tab Simpanan untuk buka level.':C.next?`Seterusnya: ${esc(C.next.icon)} ${esc(C.next.name)} (${rm(C.next.amt,0)}) · lagi ${rm(C.toNext,0)}${C.nextMonths!=null?` · anggaran ${C.nextMonths} bulan`:''}`:'Level tertinggi, target dah tercapai!'}</p>
   </section>
-  <p class="quote">${QUOTES[serial%10]}</p>
+  <p class="quote">${QUOTES[QI]}</p>
   ${nwView(C)}
+  ${axSplit(C)}
   ${empty&&loaded?`<p class="empty">Belum ada data lagi. Isi di tab Simpanan, Komitmen, Bil dan Income.</p>`:''}
   <!-- kad bulan (vBulan) disembunyikan: vBulan(C) -->
   <section class="panel"><div class="sec-h">${head('Perlu perhatian')}</div>
@@ -2581,10 +2596,29 @@ function vSimpanan(C){
       <div class="acc-g"><label class="lab">Modal (${usd?'USD':'RM'})${inN(`saving.accounts.${i}.modal`,x.modal,'Modal '+(x.name||''))}</label><label class="lab">Nilai sekarang (${usd?'USD':'RM'})${inN(`saving.accounts.${i}.nilai`,x.nilai,'Nilai '+(x.name||''))}</label></div>`:''}
       <div class="share">${bar(share)}<span>${pc(share,1)} daripada jumlah</span>${okLogo(x.logo)?`<button class="lnk" data-act="logo-clear" data-i="${i}">Buang logo</button>`:''}</div>
     </div>`}).join('');
-  const ladder=C.lv.slice(1).map((l,i)=>{const idx=i+1;const done=C.nilai>=l.amt,isNext=idx===C.li+1;const p=l.amt>0?clamp(C.nilai/l.amt):0;
-    return `<div class="lv ${done?'done':isNext?'next':'lock'}" style="--p:${(p*100).toFixed(1)}%"><span class="ic" aria-hidden="true">${esc(l.icon)}</span><span class="nm">${esc(l.name)}<small>${rm(l.amt,0)}</small></span><span class="st">${done?'✓ Tercapai':isNext?'Seterusnya':'🔒 '+(p*100).toFixed(0)+'%'}</span>${bar(p)}</div>`}).join('');
-  const nx=C.next,nxP=nx&&nx.amt>0?clamp(C.nilai/nx.amt):1;
-  const hero=`<div class="ach-hero" style="--p:${(nxP*100).toFixed(1)}"><div class="achring"><b>${(nxP*100).toFixed(0)}<small>%</small></b></div><div class="ht"><span class="eyebrow">${nx?'Level seterusnya':'Tahniah'}</span><strong>${nx?esc(nx.icon)+' '+esc(nx.name):'Semua level dicapai 🎉'}</strong><em>${nx?'<b>Lagi '+rm(Math.max(nx.amt-C.nilai,0),0)+'</b>':'Terus kekalkan momentum'}</em></div></div>`;
+  const _lv=C.lv.slice(1),_n=_lv.length;
+  const axSeg=_lv.map((l,i)=>{const lo=i?_lv[i-1].amt:0;return clamp(l.amt>lo?(C.nilai-lo)/(l.amt-lo):1)});
+  const axRail=`<div class="ax-rail" aria-hidden="true">${_lv.map((l,i)=>{const done=C.nilai>=l.amt,isNext=i===C.li;return `<div class="ax-st ${done?'done':isNext?'next':'lock'}" data-t="${i%5}"><i class="ax-seg"><u style="width:${(axSeg[i]*100).toFixed(1)}%"></u></i><span class="ax-nd">${done?'<svg viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>':esc(l.icon)}</span><small>${rm(l.amt/1000,0).replace('RM','').trim()}k</small></div>`}).join('')}</div>`;
+  const ladder=_lv.map((l,i)=>{const done=C.nilai>=l.amt,isNext=i===C.li;const p=l.amt>0?clamp(C.nilai/l.amt):0;
+    return `<div class="ax-row ${done?'done':isNext?'next':'lock'}" data-t="${i%5}" style="--p:${(p*100).toFixed(1)}%"><span class="ax-ic" aria-hidden="true">${esc(l.icon)}</span><span class="ax-nm"><b>${esc(l.name)}</b><small>${rm(l.amt,0)}</small></span><span class="ax-chip">${done?'✓ Tercapai':isNext?'Seterusnya':'🔒 '+(p*100).toFixed(0)+'%'}</span><i class="ax-bar"><u></u></i></div>`}).join('');
+  const nx=C.next,nxP=nx&&nx.amt>0?clamp(C.nilai/nx.amt):1,nxI=nx?_lv.indexOf(nx):_n-1;
+  const hero=`<div class="ax-hero" data-t="${Math.max(nxI,0)%5}" style="--p:${(nxP*100).toFixed(1)}%">
+    <div class="ax-glow" aria-hidden="true"></div>
+    <div class="ax-h1"><span class="ax-eye">${nx?'Level seterusnya':'Tahniah'}</span><span class="ax-pct">${(nxP*100).toFixed(nxP>0&&nxP<.1?1:0)}<small>%</small></span></div>
+    <div class="ax-h2"><span class="ax-medal" aria-hidden="true">${nx?esc(nx.icon):'👑'}</span><div class="ax-tx"><strong>${nx?esc(nx.name):'Semua level dicapai 🎉'}</strong><em>${nx?'Lagi '+rm(Math.max(nx.amt-C.nilai,0),0):'Terus kekalkan momentum'}</em></div></div>
+    <div class="ax-meter" role="img" aria-label="${(nxP*100).toFixed(0)}%"><u></u></div>
+    <div class="ax-h3"><span>${rm(C.nilai,0)}</span><span>${nx?rm(nx.amt,0):''}</span></div>
+    ${axRail}
+  </div>`;
+  const axT=(ic,l,v,cls='')=>`<div class="ax-tile ${cls}"><span class="ax-ti" aria-hidden="true">${ic}</span><small>${l}</small><b>${v}</b></div>`;
+  const axStats=`<div class="ax-stats">
+    ${axT('🔥','Streak',`${C.streak} bulan`,'hi')}
+    ${axT('🎯','Capai sasaran',`${C.hits} / ${C.counted}`)}
+    ${axT('🏆','Rekod terbaik',C.best?`${rm(C.best.amt,0)}<em>${ymLab(C.best.ym)}</em>`:'-')}
+    ${axT('📅','Bulan ni',C.thisGap>0&&s.goal>0?`${rm(C.thisMonth,0)}<em>lagi ${rm(C.thisGap,0)}</em>`:rm(C.thisMonth,0))}
+    ${axT('🚀','Anggaran '+(C.next?esc(C.next.name):'level'),C.nextDate?fmtDate(C.nextDate):'-')}
+    ${axT('☕','Purata simpan sehari',rm(C.mAvg/30))}
+  </div>`;
   const mon=[...s.monthly].map((m,i)=>({m,i})).sort((x,y)=>x.m.ym<y.m.ym?-1:1);
   const shown=mon;
   const maxv=Math.max(s.goal*1.15,...shown.map(x=>+x.m.amt||0),1);
@@ -2654,16 +2688,8 @@ function vSimpanan(C){
   </section>
   <section class="panel">
     ${head('Pencapaian','Sasaran level ikut peratus dari target.')}
-    ${hero}
-    <div class="ladder">${ladder}</div>
-    <div class="kvs ach">
-      ${kv('🔥 Streak',`${C.streak} bulan`,'hi')}
-      ${kv('🎯 Capai sasaran',`${C.hits} / ${C.counted}`)}
-      ${kv('🏆 Rekod terbaik',C.best?`${rm(C.best.amt,0)} · ${ymLab(C.best.ym)}`:'-')}
-      ${kv('📅 Bulan ni',C.thisGap>0&&s.goal>0?`${rm(C.thisMonth,0)} (lagi ${rm(C.thisGap,0)})`:rm(C.thisMonth,0))}
-      ${kv('🚀 Anggaran '+(C.next?esc(C.next.name):'level'),C.nextDate?fmtDate(C.nextDate):'-')}
-      ${kv('☕ Purata simpan sehari',rm(C.mAvg/30))}
-    </div>
+    ${s.target>0?hero+'<div class="ax-list">'+ladder+'</div>':'<div class="ax-empty"><div aria-hidden="true" style="font-size:30px">🎯</div><b>Isi Target simpanan dulu</b><span>Level akan dibuka ikut peratus dari target awak.</span></div>'}
+    ${axStats}
     <p class="hint">Bulan semasa tak putuskan streak selagi belum tamat. Tarikh anggaran ikut purata simpanan awak.</p>
   </section>
 `;
@@ -4897,6 +4923,195 @@ html.mm-bg .hstars *,html.mm-bg .voicebtn,html.mm-bg .voicebtn::after,html.mm-bg
 /* 4) Syiling/pingat: bayang bawah */
 :root:root:root:root:root:root:root:root:root:root .hero .h3d-coin::after{content:"";position:absolute;left:14%;right:14%;bottom:-12px;height:12px;border-radius:50%;pointer-events:none;background:radial-gradient(ellipse,rgba(0,0,0,.5),transparent 70%);filter:blur(3px)}
 </style>
+<style id="axpro">
+/* Pencapaian v2: premium rank journey */
+.ax-hero,.ax-row{--t1:#1E5C49;--t2:#0C3328;--tg:rgba(52,211,153,.35)}
+.ax-hero{position:relative;overflow:hidden;isolation:isolate;margin:6px 0 14px;padding:18px 18px 16px;border-radius:26px;color:#EAFBF3;
+ background:radial-gradient(120% 90% at 0% 0%,#0F5A45 0,#0A3A2E 55%,#07251D 100%);
+ border:1px solid rgba(110,231,183,.22);
+ box-shadow:0 24px 44px -24px rgba(5,60,44,.75),inset 0 1px 0 rgba(255,255,255,.14),inset 0 -1px 0 rgba(0,0,0,.25)}
+.ax-glow{position:absolute;z-index:-1;right:-60px;top:-70px;width:220px;height:220px;border-radius:50%;
+ background:radial-gradient(circle,var(--tg),transparent 66%);filter:blur(6px)}
+.ax-hero::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+ background:linear-gradient(115deg,transparent 40%,rgba(255,255,255,.07) 50%,transparent 60%)}
+.ax-h1{display:flex;align-items:flex-start;justify-content:space-between}
+.ax-eye{font-size:10.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(234,251,243,.68)}
+.ax-pct{font-family:var(--display);font-size:34px;line-height:.9;font-weight:700;letter-spacing:-.03em;
+ background:linear-gradient(180deg,#fff,#6EE7B7);-webkit-background-clip:text;background-clip:text;color:transparent}
+.ax-pct small{font-size:15px;margin-left:2px;opacity:.85}
+.ax-h2{display:flex;align-items:center;gap:14px;margin:6px 0 16px}
+.ax-medal{flex:none;width:62px;height:62px;border-radius:50%;display:grid;place-items:center;font-size:30px;position:relative;
+ background:radial-gradient(circle at 30% 22%,var(--t1),var(--t2));
+ box-shadow:0 0 0 2px rgba(110,231,183,.5),0 0 0 6px rgba(110,231,183,.08),0 10px 26px -6px var(--tg),inset 0 1px 0 rgba(255,255,255,.2)}
+.ax-tx{display:flex;flex-direction:column;gap:3px;min-width:0}
+.ax-tx strong{font-family:var(--display);font-size:24px;letter-spacing:-.01em;line-height:1.05;color:#fff}
+.ax-tx em{font-style:normal;font-size:13.5px;font-weight:700;color:#6EE7B7}
+.ax-meter{height:10px;border-radius:99px;background:rgba(255,255,255,.1);box-shadow:inset 0 1px 2px rgba(0,0,0,.35);overflow:hidden}
+.ax-meter u{display:block;height:100%;width:var(--p);min-width:10px;border-radius:99px;position:relative;
+ background:linear-gradient(90deg,#059669,#34D399 70%,#6EE7B7);box-shadow:0 0 14px rgba(110,231,183,.6)}
+.ax-meter u::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.55) 50%,transparent 70%);
+ transform:translateX(-100%);animation:axSh 3.2s ease-in-out infinite}
+@keyframes axSh{60%,100%{transform:translateX(100%)}}
+.ax-h3{display:flex;justify-content:space-between;margin:7px 0 14px;font-size:11.5px;font-weight:600;color:rgba(234,251,243,.6);font-variant-numeric:tabular-nums}
+/* rail */
+.ax-rail{display:flex;padding-top:4px;border-top:1px solid rgba(255,255,255,.1);margin-top:2px;padding-top:16px}
+.ax-st{flex:1;display:flex;flex-direction:column;align-items:flex-end;position:relative;min-width:0}
+.ax-st .ax-seg{position:absolute;left:0;right:20px;top:19px;height:3px;border-radius:3px;background:rgba(255,255,255,.14);overflow:hidden}
+.ax-st:first-child .ax-seg{left:-2px}
+.ax-seg u{display:block;height:100%;background:linear-gradient(90deg,#059669,#6EE7B7);box-shadow:0 0 8px rgba(110,231,183,.6)}
+.ax-nd{position:relative;z-index:1;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:17px;
+ background:#0B2F25;border:2px solid rgba(255,255,255,.16);filter:grayscale(1) opacity(.55)}
+.ax-st.done .ax-nd{filter:none;color:#04130C;border-color:transparent;background:linear-gradient(145deg,#6EE7B7,#10B981);box-shadow:0 4px 14px -3px rgba(52,211,153,.7)}
+.ax-nd svg{width:18px;height:18px}
+.ax-st.next .ax-nd{filter:none;border-color:#6EE7B7;box-shadow:0 0 0 4px rgba(110,231,183,.18),0 0 18px rgba(110,231,183,.5);animation:axPu 2.4s ease-in-out infinite}
+@keyframes axPu{50%{box-shadow:0 0 0 7px rgba(110,231,183,.06),0 0 24px rgba(110,231,183,.7)}}
+.ax-st small{width:38px;text-align:center;margin-top:6px;font-size:10.5px;font-weight:700;color:rgba(234,251,243,.55)}
+.ax-st.done small,.ax-st.next small{color:#EAFBF3}
+/* list */
+.ax-list{display:grid;gap:9px;margin-bottom:14px}
+.ax-row{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:6px 12px;align-items:center;padding:11px 14px;border-radius:18px;position:relative;overflow:hidden;
+ background:color-mix(in srgb,var(--surface) 88%,transparent);border:1px solid var(--line);transition:transform .2s}
+.ax-row.next{border-color:color-mix(in srgb,var(--mint) 55%,transparent);background:linear-gradient(135deg,color-mix(in srgb,var(--mint) 12%,var(--surface)),var(--surface));
+ box-shadow:0 10px 24px -16px color-mix(in srgb,var(--mint) 90%,transparent)}
+.ax-ic{grid-row:1/3;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:21px;
+ background:radial-gradient(circle at 30% 22%,#1E5C49,#0C3328);border:1.5px solid rgba(110,231,183,.45);box-shadow:0 6px 14px -6px var(--tg),inset 0 1px 0 rgba(255,255,255,.18)}
+.ax-row.lock .ax-ic{filter:grayscale(1) opacity(.5);box-shadow:none}
+.ax-nm{display:flex;align-items:baseline;gap:8px;min-width:0}
+.ax-nm b{font-family:var(--display);font-size:15px;color:var(--ink)}
+.ax-nm small{font-size:12px;color:var(--mute);font-variant-numeric:tabular-nums}
+.ax-row.lock .ax-nm b{color:var(--mute)}
+.ax-chip{font-size:11px;font-weight:700;padding:4px 10px;border-radius:99px;color:var(--mute);background:color-mix(in srgb,var(--track) 70%,transparent);white-space:nowrap}
+.ax-row.next .ax-chip{color:#04130C;background:linear-gradient(135deg,#34D399,#6EE7B7)}
+.ax-row.done .ax-chip{color:var(--accent);background:color-mix(in srgb,var(--mint) 16%,transparent)}
+.ax-bar{grid-column:2/4;height:6px;border-radius:99px;background:color-mix(in srgb,var(--track) 80%,transparent);overflow:hidden}
+.ax-bar u{display:block;height:100%;width:var(--p);border-radius:99px;background:linear-gradient(90deg,#059669,#34D399 70%,#6EE7B7)}
+.ax-row.lock .ax-bar u{opacity:.45}
+.ax-row.done .ax-bar u{background:linear-gradient(90deg,#059669,#34D399)}
+/* tiles */
+.ax-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ax-tile{position:relative;display:flex;flex-direction:column;gap:2px;padding:12px 14px;border-radius:18px;min-width:0;
+ background:color-mix(in srgb,var(--surface) 92%,transparent);border:1px solid var(--line)}
+.ax-tile small{font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--mute);padding-right:26px}
+.ax-tile b{font-family:var(--display);font-size:16px;color:var(--ink);display:flex;flex-direction:column;line-height:1.2;font-variant-numeric:tabular-nums}
+.ax-tile b em{font-style:normal;font-size:11px;font-weight:600;color:var(--mute)}
+.ax-ti{position:absolute;right:12px;top:11px;font-size:16px;opacity:.9}
+.ax-tile.hi{border-color:transparent;color:#fff;background:linear-gradient(135deg,#0F6B4F,#0A3A2E);box-shadow:0 14px 26px -16px rgba(5,80,56,.9)}
+.ax-tile.hi small{color:rgba(255,255,255,.7)}.ax-tile.hi b{color:#fff;font-size:20px}
+@media (prefers-reduced-motion:reduce){.ax-meter u::after,.ax-st.next .ax-nd{animation:none}}
+@media (max-width:340px){.ax-pct{font-size:28px}.ax-tx strong{font-size:20px}}
+.ax-empty{margin:6px 0 14px;padding:22px 18px;border-radius:22px;text-align:center;border:1px dashed color-mix(in srgb,var(--mint) 45%,transparent);background:color-mix(in srgb,var(--mint) 7%,transparent)}.ax-empty b{display:block;font-family:var(--display);font-size:16px;color:var(--ink);margin:6px 0 2px}.ax-empty span{font-size:13px;color:var(--mute)}
+/* aksen emas tipis (sama gaya bar Total Aset: hijau -> mint -> emas) */
+.ax-hero{border-color:rgba(246,215,123,.3)}
+.ax-hero::before{content:"";position:absolute;left:18px;right:18px;top:0;height:1px;background:linear-gradient(90deg,transparent,rgba(246,215,123,.75),transparent)}
+.ax-pct{background:linear-gradient(180deg,#fff 30%,#F6D77B);-webkit-background-clip:text;background-clip:text}
+.ax-medal{box-shadow:0 0 0 2px rgba(246,215,123,.55),0 0 0 6px rgba(110,231,183,.08),0 10px 26px -6px var(--tg),inset 0 1px 0 rgba(255,255,255,.2)}
+.ax-meter u{background:linear-gradient(90deg,#059669,#34D399 62%,#6EE7B7 85%,#F6D77B)}
+.ax-meter u::before{content:"";position:absolute;right:0;top:50%;width:12px;height:12px;margin:-6px -2px 0 0;border-radius:50%;background:#F6D77B;box-shadow:0 0 0 2px rgba(246,215,123,.35),0 0 10px #F6D77B}
+.ax-seg u{background:linear-gradient(90deg,#059669,#6EE7B7 80%,#F6D77B)}
+.ax-st.done .ax-nd{box-shadow:0 0 0 2px rgba(246,215,123,.6),0 4px 14px -3px rgba(52,211,153,.7)}
+.ax-bar u{background:linear-gradient(90deg,#059669,#34D399 75%,#F6D77B)}
+.ax-row.done .ax-bar u{background:linear-gradient(90deg,#059669,#34D399 80%,#F6D77B)}
+.ax-row.done .ax-ic{border-color:rgba(246,215,123,.6)}
+.ax-row.done .ax-chip{box-shadow:inset 0 0 0 1px rgba(246,215,123,.4)}
+.ax-tile.hi{box-shadow:0 14px 26px -16px rgba(5,80,56,.9),inset 0 0 0 1px rgba(246,215,123,.3)}
+/* betulkan petak dalam bulatan + bulatan emas bila tercapai */
+.ax-nd{border-width:2px;background-origin:border-box;background-clip:border-box}
+.ax-st.done .ax-nd{border-color:rgba(255,236,170,.55);color:#2A1E00;background:radial-gradient(circle at 32% 24%,#FFF3C4 0,#F6D77B 42%,#C9971F 100%);box-shadow:0 0 0 3px rgba(246,215,123,.14),0 6px 16px -4px rgba(246,215,123,.55),inset 0 -3px 6px rgba(120,80,0,.25)}
+.ax-st.next .ax-nd{background:#0B2F25;background-origin:border-box}
+.ax-row.done .ax-ic{background:radial-gradient(circle at 32% 24%,#FFF3C4 0,#F6D77B 45%,#C9971F 100%);border:1.5px solid rgba(255,236,170,.6);box-shadow:0 0 0 3px rgba(246,215,123,.14),0 8px 18px -6px rgba(246,215,123,.6),inset 0 -3px 6px rgba(120,80,0,.22)}
+.ax-row.done{border-color:rgba(246,215,123,.35);background:linear-gradient(135deg,rgba(246,215,123,.08),transparent 60%),color-mix(in srgb,var(--surface) 88%,transparent)}
+/* padatkan saiz */
+.ax-hero{margin:4px 0 10px;padding:13px 14px 11px;border-radius:20px}
+.ax-eye{font-size:9.5px;letter-spacing:.14em}
+.ax-pct{font-size:24px}.ax-pct small{font-size:12px}
+.ax-h2{gap:11px;margin:2px 0 10px}
+.ax-medal{width:44px;height:44px;font-size:22px}
+.ax-tx{gap:1px}.ax-tx strong{font-size:18px}.ax-tx em{font-size:12px}
+.ax-meter{height:7px}.ax-meter u::before{width:9px;height:9px;margin:-4.5px -1px 0 0}
+.ax-h3{margin:5px 0 9px;font-size:10.5px}
+.ax-rail{padding-top:10px;margin-top:0}
+.ax-nd{width:28px;height:28px;font-size:13px}.ax-nd svg{width:14px;height:14px}
+.ax-st .ax-seg{top:13px;right:14px}
+.ax-st small{width:28px;margin-top:4px;font-size:9.5px}
+.ax-list{gap:7px;margin-bottom:10px}
+.ax-row{grid-template-columns:34px minmax(0,1fr) auto;padding:8px 12px;gap:4px 10px;border-radius:15px}
+.ax-ic{width:34px;height:34px;font-size:16px}
+.ax-nm b{font-size:13.5px}.ax-nm small{font-size:11px}
+.ax-chip{font-size:10px;padding:3px 8px}
+.ax-bar{height:5px}
+.ax-stats{gap:8px}
+.ax-tile{padding:9px 12px;border-radius:15px}
+.ax-tile small{font-size:9.5px}.ax-tile b{font-size:14px}.ax-tile.hi b{font-size:16px}
+.ax-ti{font-size:14px;top:9px;right:10px}
+@media (max-width:340px){.ax-pct{font-size:22px}.ax-tx strong{font-size:17px}}
+</style>
+<style id="axquote">
+.quote{position:relative;margin:14px 0 4px!important;padding:12px 16px 12px 44px!important;border-radius:16px;font-size:13px!important;line-height:1.5;font-weight:500;color:color-mix(in srgb,var(--ink) 82%,var(--mute))!important;
+ background:linear-gradient(135deg,color-mix(in srgb,var(--mint) 9%,transparent),transparent 70%);border:1px solid color-mix(in srgb,var(--mint) 18%,transparent);border-left:2px solid rgba(246,215,123,.7)}
+.quote::before{content:"\201C";position:absolute;left:14px;top:2px;font-family:var(--display,serif);font-size:34px;line-height:1.1;color:#D4A93A;opacity:.9}
+.axd{margin-top:14px}
+.axd-b{display:grid;grid-template-columns:128px minmax(0,1fr);gap:14px;align-items:center;margin-top:6px}
+.axd-d{position:relative;width:128px;height:128px}
+.axd-d svg{width:100%;height:100%;display:block;filter:drop-shadow(0 6px 14px rgba(16,185,129,.25))}
+.axd-c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;line-height:1.15}
+.axd-c small{font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mute)}
+.axd-c b{font-family:var(--display);font-size:14px;color:var(--ink);font-variant-numeric:tabular-nums}
+.axd-c span{font-size:10px;color:var(--mute);margin-top:1px}
+.axd-l{list-style:none;margin:0;padding:0;display:grid;gap:9px;min-width:0}
+.axd-l li{display:grid;grid-template-columns:18px minmax(0,1fr) auto;column-gap:8px;row-gap:1px;align-items:center;position:relative;padding-bottom:7px}
+.axd-k{grid-row:1/3;width:18px;height:18px;display:grid;place-items:center}
+.axd-k i{width:10px;height:10px;border-radius:50%}
+.axd-k img{width:18px;height:18px;border-radius:50%;object-fit:cover}
+.axd-n{font-size:12.5px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.axd-l b{font-size:12.5px;font-family:var(--display);color:var(--ink);font-variant-numeric:tabular-nums}
+.axd-l small{grid-column:2/4;font-size:11px;color:var(--mute);font-variant-numeric:tabular-nums}
+.axd-l em{position:absolute;left:26px;right:0;bottom:0;height:3px;border-radius:3px;background:color-mix(in srgb,var(--track) 70%,transparent)}
+.axd-l em::after{content:"";position:absolute;inset:0 auto 0 0;width:var(--w);border-radius:3px;background:var(--c)}
+@media (max-width:360px){.axd-b{grid-template-columns:1fr;justify-items:center}.axd-l{width:100%}}
+</style>
+<style id="axcalm">
+/* kurangkan kesan berat: tiada animasi berterusan dalam bahagian baharu */
+.ax-meter u::after{animation:none!important;display:none}
+.ax-st.next .ax-nd{animation:none!important}
+.axd-d svg{filter:none!important}
+</style>
+<style id="axquote2">
+.quote{position:relative;display:block;margin:16px 0 18px!important;padding:14px 18px 14px 52px!important;min-height:54px;border-radius:18px;
+ font-size:14px!important;line-height:1.5;font-weight:600;letter-spacing:.005em;color:var(--ink)!important;
+ background:linear-gradient(135deg,color-mix(in srgb,var(--mint) 14%,var(--surface)),var(--surface) 75%);
+ border:1px solid color-mix(in srgb,var(--mint) 30%,var(--line));border-left:3px solid #E2B94A;
+ box-shadow:0 12px 24px -18px color-mix(in srgb,var(--mint) 80%,transparent)}
+.quote::before{content:"\201C";position:absolute;left:15px;top:3px;font-family:Georgia,"Times New Roman",serif;font-size:46px;line-height:1;font-weight:700;color:#E2B94A;opacity:1}
+</style>
+<style id="axquote3">
+.quote{position:relative;display:block;min-height:0;margin:20px 0 22px!important;padding:0 28px!important;text-align:center;
+ background:none!important;border:0!important;border-radius:0;box-shadow:none!important;
+ font-family:var(--display);font-size:15.5px!important;line-height:1.6;font-weight:500;letter-spacing:.01em;text-wrap:balance;
+ color:color-mix(in srgb,var(--ink) 88%,var(--mute))!important}
+.quote::before{content:"\2726";position:static;display:block;margin:0 auto 10px;font-family:inherit;font-size:11px;line-height:1;font-weight:400;letter-spacing:0;
+ color:#E2B94A;text-shadow:0 0 10px rgba(226,185,74,.55)}
+.quote::after{content:"";display:block;width:44px;height:1px;margin:12px auto 0;
+ background:linear-gradient(90deg,transparent,rgba(226,185,74,.85),transparent)}
+</style>
+<style id="axquote4">
+.quote{display:block;margin:14px 0 16px!important;padding:0 6px!important;text-align:left;background:none!important;border:0!important;box-shadow:none!important;
+ font-family:inherit;font-size:13px!important;line-height:1.5;font-weight:500;letter-spacing:0;color:var(--mute)!important}
+.quote::before,.quote::after{content:none!important;display:none!important}
+</style>
+<style id="axquote5">
+.quote{display:block;margin:18px 0 20px!important;padding:0 18px!important;text-align:center;
+ font-size:15.5px!important;line-height:1.55;font-weight:700;color:var(--ink)!important;text-wrap:balance}
+.quote::before,.quote::after{display:inline!important;position:static!important;content:"\201C"!important;font-family:Georgia,serif;font-size:22px;line-height:0;font-weight:700;color:#E2B94A;vertical-align:-.28em;margin-right:4px}
+.quote::after{content:"\201D"!important;margin:0 0 0 4px!important;width:auto!important;height:auto!important;background:none!important;text-shadow:none!important}
+.quote::before{margin:0 4px 0 0!important;width:auto!important;height:auto!important;text-shadow:none!important;background:none!important}
+</style>
+
+
+
+
+
+
+
 
 
 
