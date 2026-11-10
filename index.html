@@ -4649,7 +4649,7 @@ function secPaint(s){
   put2(dlg.querySelector('#setSecK'),kv(s.pin,i.pin?s.on:s.off,i.pin)+kv(s.fp,i.bio?s.on:s.off,i.bio));
   put2(dlg.querySelector('#setSecB'),i.pin?bt('pin-change',s.chg)+bt('pin-off',s.rmp)+(i.bioOK?(i.bio?bt('pin-bio-off',s.bioOff):bt('pin-bio-on',s.bioOn)):''):bt('pin-set',s.setp,1));
   dlg.querySelector('#setHlL').textContent=s.hl;
-  var uS=window.mmUpd;put2(dlg.querySelector('#setHlB'),bt('intro',s.intro)+bt('upd-check',uS==='busy'?s.chkB:s.chk)+'<small class="hint" style="width:100%">'+s.ver+': '+(window.mmVer||'…')+(uS==='ok'?' · '+s.upok:uS==='err'?' · '+s.uperr:'')+'</small>');
+  put2(dlg.querySelector('#setHlB'),bt('intro',s.intro));
   dlg.querySelector('#setBkL').textContent=s.bk;
   var bkLast=get('mm-bk-last',''),bkOn=get('mm-bk-auto','1')==='1',bkD=bkLast?bkLast.split('-').reverse().join('/'):s.bkn;
   dlg.querySelector('#setBkH').textContent=s.bkh+' '+s.bkl+': '+bkD+'.';
@@ -4662,7 +4662,7 @@ function secPaint(s){
   var ow=dlg.querySelector('#setOutW');ow.hidden=!!i.local;
   dlg.querySelector('#setOutH').textContent=s.outH;
   put2(dlg.querySelector('#setOutB'),'<button type="button" class="btn out'+(dlg.dataset.arm?' arm':'')+'" data-act="out"'+(off?' disabled':'')+'><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>'+(off?s.outOff:dlg.dataset.arm?s.outQ:s.out)+'</button>');
-  put2(dlg.querySelector('#setBkB'),bt('backup',s.save,1)+bt('bk-auto',s.bka+': '+(bkOn?s.on:s.off))+bt('intro',s.intro)+(i.local?'<label class="btn ghost" style="text-align:center;display:block;line-height:20px">'+s.rest+'<input id="imp" type="file" accept=".json,application/json" hidden></label>':''));
+  put2(dlg.querySelector('#setBkB'),bt('backup',s.save,1)+bt('bk-auto',s.bka+': '+(bkOn?s.on:s.off))+bt('intro',s.intro)+(i.local?'<label class="btn ghost" style="text-align:center;display:block;line-height:20px">'+s.rest+'<input id="imp" type="file" accept=".json,application/json" hidden></label>':'')+bt('upd-check',window.mmUpd==='busy'?s.chkB:s.chk)+'<small class="hint" style="width:100%;margin-top:2px">'+s.ver+': '+(window.mmVer||'…')+(window.mmUpd==='ok'?' · '+s.upok:window.mmUpd==='err'?' · '+s.uperr:'')+'</small>');
 }
 
 var IN={ms:{sk:'Langkau',nx:'Seterusnya',go:'Mula',sl:[
