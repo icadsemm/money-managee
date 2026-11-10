@@ -2328,7 +2328,7 @@ function nwView(C){
   return `<section class="panel">${head(TRENDIC+'Trend aset','Sentuh atau seret graf untuk lihat nilai tiap bulan.')}${seg}${body}
     <div class="kvs">${cmp(mm,'Bulan ke bulan')}${cmp(yy,'Tahun ke tahun')}</div></section>`;
 }
-function nwRead(p){const pr=p.n-p.m,pp=p.m>0?pr/p.m:null;return `<span class="nwr-d">${p.l}</span><b class="nwr-v num">${rm(p.n).replace(/^(-?)RM/,'$1<small class="cur">RM</small>')}</b>${p.m>0?`<span class="nwr-p"><span class="nwr-c">Modal <b>${rm(p.m)}</b></span><span class="nwr-c ${pr<0?'bad':'good'}">${pr<0?'▼':'▲'} Untung <b>${pr>0?'+':''}${rm(pr)}</b>${pp==null?'':` <em>${pr>0?'+':''}${(pp*100).toFixed(2)}%</em>`}</span></span>`:''}`}
+function nwRead(p){const pr=p.n-p.m,pp=p.m>0?pr/p.m:null;return `<span class="nwr-d">${p.l}</span><b class="nwr-v num">${rm(p.n)}</b>${p.m>0?`<span class="nwr-p"><span class="nwr-c">Modal <b>${rm(p.m)}</b></span><span class="nwr-c ${pr<0?'bad':'good'}">${pr<0?'▼':'▲'} Untung <b>${pr>0?'+':''}${rm(pr)}</b>${pp==null?'':` <em>${pr>0?'+':''}${(pp*100).toFixed(2)}%</em>`}</span></span>`:''}`}
 
 /* ---------- peringatan ---------- */
 const RM_ISO=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
@@ -5193,11 +5193,6 @@ html.mm-bg .hstars *,html.mm-bg .voicebtn,html.mm-bg .voicebtn::after,html.mm-bg
 :root:root:root:root:root .nwr{min-height:96px;gap:3px}
 :root:root:root:root:root .nwr .nwr-p{flex-wrap:nowrap;gap:5px;max-width:100%}
 :root:root:root:root:root .nwr .nwr-d{font-size:11px;letter-spacing:.14em;color:color-mix(in srgb,var(--nw-gold) 78%,var(--mute));font-weight:700}
-:root:root:root:root:root .nwr .nwr-v{font-size:38px;font-weight:800;letter-spacing:-.035em;line-height:1.05;
- background:none;-webkit-text-fill-color:var(--ink);color:var(--ink)}
-:root:root:root:root:root .nwr .nwr-v small{font-size:.42em;font-weight:700;letter-spacing:0;color:var(--mute);-webkit-text-fill-color:var(--mute)}
-:root:root:root:root:root .nwr .nwr-v small.cur{margin-right:4px;vertical-align:.68em}
-:root:root:root:root:root .nwr .nwr-v small.sen{margin-left:1px;opacity:.85}
 
 /* chip modal / untung */
 :root:root:root:root:root .nwr .nwr-c{padding:4px 9px;font-size:11px;font-weight:500;white-space:nowrap;background:color-mix(in srgb,var(--ink) 4%,transparent);border:1px solid color-mix(in srgb,var(--ink) 9%,transparent)}
