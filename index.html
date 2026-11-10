@@ -1987,7 +1987,18 @@ body.ro main :is(input,textarea,select,button,label,.tick,[data-act]){pointer-ev
 .h-ic{display:inline-flex;vertical-align:-4px;margin-right:8px;color:var(--accent)}
 /* ===== header hari (Belanja) ===== */
 .acc-h.dh{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:0 2px 6px}
-.dh .dname{font-family:var(--display);font-size:15px;font-weight:700;letter-spacing:-.005em}
+.acc-h.dh{width:100%;background:none;border:0;border-radius:0;padding:0 2px 6px;color:inherit;font:inherit;text-align:left;cursor:pointer;display:flex;align-items:center;gap:10px;margin:0;-webkit-tap-highlight-color:transparent}
+.acc-h.dh:active .dchev{transform-origin:center;opacity:.7}
+.acc-h.dh:focus-visible{outline:2px solid currentColor;outline-offset:2px}
+.dchev{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;flex:none;border-radius:50%;background:color-mix(in srgb,var(--ink) 12%,transparent);border:1px solid color-mix(in srgb,var(--ink) 22%,transparent);font-size:18px;font-weight:800;line-height:1;transition:transform .2s;transform:rotate(90deg)}
+.acc.shut .dchev{transform:rotate(0)}
+.dcnt{font-weight:500;opacity:.6;font-size:12px}
+.acc.shut .list,.acc.shut .res{display:none}
+#blPanel[data-filt="1"] .acc.shut .list{display:block}
+.acc.shut .acc-h.dh{padding-bottom:0}
+.blall{display:flex;gap:8px;margin:0 0 10px}
+.blall .btn{flex:1;min-height:36px;font-size:13px}
+.dh .dname{flex:1;min-width:0;font-family:var(--display);font-size:15px;font-weight:700;letter-spacing:-.005em}
 .dtot{font-family:var(--display);font-size:14px;font-weight:700;padding:5px 12px;border-radius:99px;background:var(--tint);color:var(--accent);white-space:nowrap}
 .dtot.neg{background:var(--bad-tint);color:var(--bad)}
 /* ===== toast: kaca gelap, butang lembut, bar detik ===== */
@@ -2258,7 +2269,7 @@ const DEF={
 const state={};DOCS.forEach(n=>state[n]=DEF[n]());
 const last={},dirty=new Set(),writing={},again={},timers={};
 let fxBusy=false,fxMsg='';
-let blSel=todayISO(),blMonth=nowYm(),catEdit=false,blRange='h',blQ='',blCat='';
+let blTog={},blSel=todayISO(),blMonth=nowYm(),catEdit=false,blRange='h',blQ='',blCat='';
 try{blRange=localStorage.getItem('blRange')||'h'}catch(e){}
 const DEFCATS=[{e:'🍽️',n:'Makan'},{e:'🥤',n:'Minum'},{e:'☕',n:'Kopi'},{e:'🧾',n:'Bil'},{e:'⛽',n:'Minyak'},{e:'🅿️',n:'Parking / Tol'},{e:'🛒',n:'Barang'},{e:'💊',n:'Ubat'},{e:'📱',n:'Topup'},{e:'📦',n:'Lain-lain'}];
 let dvMonth=nowYm(),dvSel=todayISO();
@@ -3033,11 +3044,17 @@ function blInsight(rows,tot,bud){
   const list=Object.entries(g).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).slice(0,8);
   const wk=(()=>{const t=new Date();t.setHours(0,0,0,0);t.setDate(t.getDate()-((t.getDay()+6)%7));const a=t.getFullYear()+'-'+pad(t.getMonth()+1)+'-'+pad(t.getDate());return sum(state.belanja.rows.filter(r=>r.d>=a&&r.d<=todayISO()),r=>r.amt)})();
   const proj=el>0?tot/el*dim:0;
+  const wk0=(()=>{const t=new Date();t.setHours(0,0,0,0);t.setDate(t.getDate()-((t.getDay()+6)%7)-7);const e=new Date(t);e.setDate(e.getDate()+6);const f=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());return sum(state.belanja.rows.filter(r=>r.d>=f(t)&&r.d<=f(e)),r=>r.amt)})();
+  const wkSub=wk0>0?((wk>=wk0?'▲ ':'▼ ')+Math.round(Math.abs(wk-wk0)/wk0*100)+'% vs lepas'):'',wkH=wk0>0?(wk>wk0?'b':'g'):'m';
+  const avgD=el>0?tot/el:0,cap=bud>0?bud*(isCur?el:dim):0,usedP=cap>0?Math.round(tot/cap*100):0;
+  const nz=byDay.map((v,i)=>({v,i})).filter(x=>x.v>0),low=nz.length>1?nz.reduce((a,x)=>x.v<a.v?x:a):null;
+  const topC=list[0]?`<p class="bi-note"><b>${esc(icon(list[0][0]))} ${esc(list[0][0])}</b> paling banyak makan duit, ${pc(list[0][1]/tot)} daripada jumlah bulan ni.</p>`:'';
+  const rngTot=sum(it,x=>x.v),rngAvg=it.length?rngTot/it.length:0;
   if(!tot)return '';
-  return `<section class="panel">${head('Analisis belanja',ML[m-1]+' '+y)}
-  <div class="bt">${btT('Minggu ni',rm(wk),'','m')}${btT(isCur?'Anggaran sebulan':'Jumlah bulan',rm(isCur?proj:tot),'','i')}${btT('Hari tertinggi',top.i>=0?rm(top.v):'-',top.i>=0?(top.i+1)+' '+MS[m-1]:'','a')}${btT('Bilangan belanja',rows.length,'','p')}</div>
-  <div class="bch">${rseg}${chart}${bud>0?'<p class="hint" style="margin:6px 0 0">Merah = lebih bajet.</p>':''}</div>
-  <div><p class="eyebrow" style="margin-bottom:8px">Ikut kategori</p>${catBlock(list,tot,icon)}</div></section>`;
+  return `<section class="panel bi">${head('Analisis belanja',ML[m-1]+' '+y)}
+  <div class="bt">${btT('Minggu ni',rm(wk),wkSub,wkH)}${btT(isCur?'Anggaran sebulan':'Jumlah bulan',rm(isCur?proj:tot),'','i')}${btT('Hari tertinggi',top.i>=0?rm(top.v):'-',top.i>=0?(top.i+1)+' '+MS[m-1]:'','a')}${btT('Bilangan belanja',rows.length,'','p')}${btT('Purata / hari',rm(avgD),'','i')}${low?btT('Hari paling jimat',rm(low.v),(low.i+1)+' '+MS[m-1],'g'):btT('Hari aktif',nz.length+' hari','','p')}${cap>0?btT('Bajet bulan guna',usedP+'%',tot<=cap?'Baki '+rm(cap-tot):'Lebih '+rm(tot-cap),tot<=cap?'g':'b',1):''}</div>
+  <div class="bch">${rseg}${chart}<div class="bi-cap"><span>Jumlah <b>${rm(rngTot)}</b></span><span>Purata <b>${rm(rngAvg)}</b> / ${blRange==='m'?'minggu':'hari'}</span></div>${bud>0?'<p class="hint" style="margin:6px 0 0">Merah = lebih bajet.</p>':''}</div>
+  <div><p class="eyebrow" style="margin-bottom:8px">Ikut kategori</p>${topC}${catBlock(list,tot,icon)}</div></section>`;
 }
 const CATPAL=[100,80,64,50,40,32,25,18].map(n=>`color-mix(in srgb,var(--accent) ${n}%,transparent)`);
 function catBlock(list,tot,icon){
@@ -3056,6 +3073,7 @@ function applyBlFilter(){
     const ok=blank||((!blCat||c===blCat)&&(!q||name.includes(q)||c.toLowerCase().includes(q)));
     r.hidden=!ok;all++;if(ok)vis++;
   });
+  const bp=document.getElementById('blPanel');if(bp)bp.dataset.filt=(q||blCat)?'1':'';
   main.querySelectorAll('.acc').forEach(a=>{const rs=a.querySelectorAll('.row[data-c]');if(rs.length)a.hidden=![...rs].some(r=>!r.hidden)});
   if(none)none.hidden=!(all&&!vis);
 }
@@ -3107,16 +3125,18 @@ async function lpImage(){
     const glass=(a,b,w,h,r)=>{
       x.save();x.shadowColor=G.sh;x.shadowBlur=34;x.shadowOffsetY=14;rr(a,b,w,h,r);const g=x.createLinearGradient(a,b,a+w*.7,b+h);g.addColorStop(0,G.a);g.addColorStop(1,G.b);x.fillStyle=g;x.fill();x.restore();
       x.save();rr(a,b,w,h,r);x.clip();const sg=x.createLinearGradient(a,b,a+w*.55,b+h*1.1);sg.addColorStop(0,'rgba(255,255,255,'+G.sheen+')');sg.addColorStop(.4,'rgba(255,255,255,0)');sg.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=sg;x.fillRect(a,b,w,h);x.restore();
+      x.save();rr(a,b,w,h,r);x.clip();const ag=x.createLinearGradient(0,b,0,b+h);ag.addColorStop(0,MINT);ag.addColorStop(1,'rgba(52,211,153,.12)');x.fillStyle=ag;x.fillRect(a,b+18,7,h-36);const rg=x.createRadialGradient(a+w,b,0,a+w,b,h*1.1);rg.addColorStop(0,'rgba(52,211,153,'+(dark?.22:.18)+')');rg.addColorStop(1,'rgba(52,211,153,0)');x.fillStyle=rg;x.fillRect(a,b,w,h);x.restore();
       rr(a+1,b+1,w-2,h-2,r);x.lineWidth=2;x.strokeStyle=G.brd;x.stroke();
       x.beginPath();x.moveTo(a+r,b+2);x.lineTo(a+w-r,b+2);x.lineWidth=2;x.strokeStyle=G.hi;x.stroke();
     };
     let y=P;
+    {const bg=x.createLinearGradient(P,0,P+150,0);bg.addColorStop(0,MINT);bg.addColorStop(1,ACC);rr(P,y-22,150,8,4);x.fillStyle=bg;x.fill()}
     x.fillStyle=col.ink;x.font='800 56px '+disp;x.fillText(T('Laporan belanja '+ML[d.m-1]+' '+d.y),P,y+52);
     x.fillStyle=col.mute;x.font='600 28px '+body;x.fillText('Money Manage',P,y+94);
     y+=HDR;
     glass(P,y,W-2*P,HERO,34);
     x.fillStyle=col.mute;x.font='700 23px '+body;ls('3px');x.fillText(EN?'TOTAL SPENDING':'JUMLAH BELANJA',P+40,y+58);ls('0px');
-    x.fillStyle=col.ink;x.font='800 86px '+disp;x.fillText(rm(d.tot),P+40,y+142);
+    {const tg=x.createLinearGradient(P+40,0,P+560,0);tg.addColorStop(0,col.ink);tg.addColorStop(1,ACC);x.fillStyle=tg}x.font='800 86px '+disp;x.fillText(rm(d.tot),P+40,y+142);
     x.fillStyle=col.mute;x.font='600 27px '+body;x.fillText(EN?d.days+(d.days===1?' day':' days')+' · avg '+rm(d.avg)+' / day · '+d.rows.length+(d.rows.length===1?' purchase':' purchases'):d.days+' hari · purata '+rm(d.avg)+' / hari · '+d.rows.length+' belanja',P+40,y+186);
     y+=HERO+GAP;
     if(top.length){
@@ -3165,7 +3185,7 @@ function vLaporan(C,ym){
   const d=laporanData(ym);
   if(!d.tot)return '';
   const top=d.cats.slice(0,3),mx=d.tot||1;
-  return `<section class="panel rpt">
+  return `<section class="panel rpt bi" id="lpPanel">
     <div class="sec-h">${head('Laporan belanja '+ML[d.m-1]+' '+d.y,'Ikut bulan yang dipilih, boleh kongsi sebagai gambar.')}<button class="btn ghost" data-act="lpshare">Kongsi gambar</button></div>
     <div class="rpt-hero"><span class="eyebrow">Jumlah belanja</span><b class="num">${rm(d.tot)}</b><small>${d.days} hari · purata ${rm(d.avg)} / hari · ${d.rows.length} belanja</small></div>
     ${top.length?catBlock(top,mx,catIcon):''}
@@ -3178,8 +3198,9 @@ function vBelanja(C){
   const tot=sum(rows,x=>x.r.amt),sel=sum(b.rows.filter(r=>r.d===blSel),r=>r.amt),byD={};
   rows.forEach(x=>{(byD[x.r.d]=byD[x.r.d]||[]).push(x)});
   const days=Object.keys(byD).sort().reverse(),avg=days.length?tot/days.length:0,over=bud>0&&sel>bud;
-  const groups=days.map(d=>{const t=sum(byD[d],x=>x.r.amt),ov=bud>0&&t>bud;
-    return `<div class="acc"><div class="acc-h dh"><b class="dname">${DAYN[new Date(d+'T00:00:00').getDay()]}, ${fmtISO(d)}</b><b class="num dtot ${ov?'neg':''}">${rm(t)}</b></div>
+  const groups=days.map((d,di)=>{const t=sum(byD[d],x=>x.r.amt),ov=bud>0&&t>bud;
+    const open=d in blTog?blTog[d]:(d===todayISO()||d===blSel);
+    return `<div class="acc${open?'':' shut'}"><button type="button" class="acc-h dh" data-act="bltog" data-d="${d}" aria-expanded="${open}"><span class="dchev" aria-hidden="true">›</span><b class="dname">${DAYN[new Date(d+'T00:00:00').getDay()]}, ${fmtISO(d)}<small class="dcnt"> · ${byD[d].length} item</small></b><b class="num dtot ${ov?'neg':''}">${rm(t)}</b></button>
     <div class="list">${byD[d].map(({r,i})=>`<div class="row" data-c="${esc(catOf(r))}">${inT(`belanja.rows.${i}.name`,r.name,'Nama belanja','Beli apa')}${inN(`belanja.rows.${i}.amt`,r.amt,'Jumlah '+(r.name||'belanja'))}${del('belanja.rows',i,r.name||'belanja')}</div>`).join('')}</div>
     ${bud>0?`<div class="res"><span>${ov?'Lebih bajet':'Baki bajet'}</span><b class="${ov?'neg':'pos'}">${rm(Math.abs(bud-t))}</b></div>`:''}</div>`}).join('');
   const tcat={};rows.forEach(x=>{const k=catOf(x.r);tcat[k]=(tcat[k]||0)+(+x.r.amt||0)});
@@ -3202,10 +3223,11 @@ function vBelanja(C){
       ${bud>0?`${bar(clamp(sel/bud),over?'bad':'')}`:''}
     </div>
   </section>
-  <section class="panel">
+  <section class="panel" id="blPanel">
     <div class="sec-h">${head('Senarai belanja')}<button class="btn ghost" data-act="bladd">+ Belanja</button></div>
     <div class="calh"><button class="btn ghost" data-act="blm" data-n="-1" aria-label="Bulan lepas">‹</button><b>${ML[m-1]} ${y}</b><button class="btn ghost" data-act="blm" data-n="1" aria-label="Bulan depan">›</button></div>
     ${filtUi}
+    ${days.length>2?`<div class="blall"><button class="btn ghost" data-act="blall" data-v="1">Buka semua</button><button class="btn ghost" data-act="blall" data-v="0">Tutup semua</button></div>`:''}
     ${groups||'<p class="empty">Belum ada belanja bulan ni. Tekan + Belanja.</p>'}
     <p class="empty" id="blNone" hidden>Tiada belanja yang padan.</p>
   </section>
@@ -3699,6 +3721,8 @@ document.addEventListener('click',e=>{
   if(act==='voice'){voiceToggle();return}
   if(act==='rcp'){rcpPick();return}
   if(act==='blf'){blCat=b.dataset.v||'';b.parentElement.querySelectorAll('.fchip').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));applyBlFilter();return}
+  if(act==='bltog'){const a=b.closest('.acc'),o=a.classList.contains('shut');a.classList.toggle('shut',!o);b.setAttribute('aria-expanded',String(o));blTog[b.dataset.d]=o;return}
+  if(act==='blall'){const o=b.dataset.v==='1';document.querySelectorAll('#blPanel .acc').forEach(a=>{a.classList.toggle('shut',!o);const h=a.querySelector('[data-act=bltog]');if(h){h.setAttribute('aria-expanded',String(o));blTog[h.dataset.d]=o}});return}
   if(act==='lpshare'){lpImage();return}
   if(act==='blr'){blRange=b.dataset.v;try{localStorage.setItem('blRange',blRange)}catch(x){}later();return}
   if(act==='catedit'){catEdit=!catEdit;later();return}
@@ -5425,6 +5449,56 @@ html.mm-bg .hstars *,html.mm-bg .voicebtn,html.mm-bg .voicebtn::after,html.mm-bg
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) section.panel:has(.nwc) .kv{box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 14px 26px -22px #000}:root:not([data-theme="light"]) .nwwell{box-shadow:inset 0 1px 0 rgba(255,255,255,.1)}}
 :root[data-theme="dark"] section.panel:has(.nwc) .kv{box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 14px 26px -22px #000}
 :root[data-theme="dark"] .nwwell{box-shadow:inset 0 1px 0 rgba(255,255,255,.1)}
+/* ===== premium day cards (belanja) ===== */
+#blPanel .acc{position:relative;overflow:hidden;padding:16px 16px 8px;gap:0;border:1px solid color-mix(in srgb,var(--accent) 22%,transparent);border-radius:22px;background:linear-gradient(155deg,color-mix(in srgb,var(--accent) 14%,var(--surface)) 0%,var(--surface) 46%,var(--surface2) 100%);box-shadow:0 10px 28px -14px rgba(0,0,0,.6),inset 0 1px 0 color-mix(in srgb,#fff 10%,transparent)}
+#blPanel .acc::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:3px;border-radius:0 3px 3px 0;background:linear-gradient(180deg,var(--mint),color-mix(in srgb,var(--accent) 30%,transparent))}
+#blPanel .acc::after{content:"";position:absolute;right:-50px;top:-60px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--mint) 20%,transparent),transparent 70%);pointer-events:none}
+#blPanel .acc.shut{padding-bottom:16px;opacity:.92}
+#blPanel .acc.shut::before{opacity:.35}
+#blPanel .acc-h.dh{position:relative;z-index:1;padding:0 0 12px}
+#blPanel .acc.shut .acc-h.dh{padding-bottom:0}
+#blPanel .dname{font-size:15.5px;letter-spacing:.005em}
+#blPanel .dcnt{font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;display:block;margin:2px 0 0;opacity:.55}
+#blPanel .dchev{width:30px;height:30px;background:linear-gradient(145deg,color-mix(in srgb,var(--mint) 26%,transparent),color-mix(in srgb,var(--mint) 8%,transparent));border:1px solid color-mix(in srgb,var(--mint) 40%,transparent);color:var(--mint);box-shadow:0 4px 10px -4px color-mix(in srgb,var(--mint) 60%,transparent)}
+#blPanel .dtot{padding:7px 14px;border-radius:999px;font-size:14px;color:var(--accent-ink);background:linear-gradient(135deg,var(--mint),var(--accent));box-shadow:0 6px 14px -6px color-mix(in srgb,var(--mint) 70%,transparent);letter-spacing:.01em}
+#blPanel .dtot.neg{background:linear-gradient(135deg,#fb7185,#e11d48);color:#fff}
+#blPanel .acc .list{position:relative;z-index:1}
+#blPanel .acc .row{padding:4px 0;gap:8px;border-top:1px solid color-mix(in srgb,var(--ink) 8%,transparent);grid-template-columns:minmax(0,1fr) 92px 32px}
+#blPanel .acc .row:first-child{border-top:0}
+#blPanel .acc .row .in{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:10px}
+#blPanel .acc .row .in.t{font-weight:600;font-size:15px}
+#blPanel .acc .row .in.n{text-align:right;font-weight:800;font-variant-numeric:tabular-nums;color:var(--mint)}
+#blPanel .acc .row .in:focus{background:color-mix(in srgb,var(--ink) 8%,transparent)!important;outline:1px solid color-mix(in srgb,var(--mint) 45%,transparent)}
+#blPanel .acc .row button{width:30px;height:30px;min-height:0;padding:0;border-radius:50%;background:transparent;border:1px solid color-mix(in srgb,var(--ink) 14%,transparent);opacity:.6}
+#blPanel .acc .row button:active{opacity:1;border-color:#fb7185}
+#blPanel .acc .res{position:relative;z-index:1;margin-top:6px;border-top:1px dashed color-mix(in srgb,var(--ink) 14%,transparent);padding-top:10px}
+#blPanel .blall .btn{border-radius:999px}
+/* ===== premium search ===== */
+#blPanel .bsrch{margin:4px 0 12px}
+#blPanel .bsrch .in{width:100%;min-height:50px;padding:0 20px;border-radius:999px;font-weight:600;font-size:15px;background:linear-gradient(135deg,color-mix(in srgb,var(--mint) 12%,var(--surface)),var(--surface2))!important;border:1px solid color-mix(in srgb,var(--mint) 26%,transparent)!important;box-shadow:inset 0 1px 0 color-mix(in srgb,#fff 10%,transparent),0 8px 20px -12px rgba(0,0,0,.7)!important;transition:border-color .2s,box-shadow .2s}
+#blPanel .bsrch .in::placeholder{color:var(--mute);font-weight:500}
+#blPanel .bsrch .in:focus{outline:0;border-color:var(--mint)!important;box-shadow:0 0 0 4px color-mix(in srgb,var(--mint) 20%,transparent),0 10px 24px -12px color-mix(in srgb,var(--mint) 60%,transparent)!important}
+/* ===== premium item rows ===== */
+#blPanel .acc .list{gap:8px}
+#blPanel .acc .row,#blPanel .acc .row:first-child{padding:6px 8px 6px 14px;border:1px solid color-mix(in srgb,var(--mint) 18%,transparent);border-left:3px solid var(--mint);border-radius:14px;background:linear-gradient(90deg,color-mix(in srgb,var(--mint) 9%,transparent),color-mix(in srgb,var(--ink) 4%,transparent));box-shadow:0 6px 14px -10px rgba(0,0,0,.7)}
+#blPanel .acc .row .in.n{background:color-mix(in srgb,var(--mint) 12%,transparent)!important;border-radius:10px;padding-right:12px}
+/* ===== premium analisis ===== */
+.panel.bi .bt>div{border-radius:18px;border:1px solid color-mix(in srgb,var(--mint) 20%,transparent);background:linear-gradient(150deg,color-mix(in srgb,var(--mint) 13%,var(--surface)),var(--surface2));box-shadow:0 10px 22px -14px rgba(0,0,0,.7),inset 0 1px 0 color-mix(in srgb,#fff 9%,transparent);padding:13px 14px}
+.panel.bi .bt .bt-v{font-size:19px}
+.panel.bi .bt .bt-s{font-weight:700}
+.panel.bi .bch{border-radius:22px;border:1px solid color-mix(in srgb,var(--mint) 24%,transparent);box-shadow:0 14px 30px -16px rgba(0,0,0,.75),inset 0 1px 0 color-mix(in srgb,#fff 8%,transparent);position:relative;overflow:hidden}
+.panel.bi .bch::before{content:"";position:absolute;right:-70px;top:-70px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--mint) 18%,transparent),transparent 70%);pointer-events:none}
+.bi-cap{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 14px;border-radius:14px;background:color-mix(in srgb,var(--ink) 6%,transparent);border:1px solid color-mix(in srgb,var(--ink) 10%,transparent);font-size:12px;color:var(--mute)}
+.bi-cap b{color:var(--mint);font-family:var(--display);font-size:13.5px;margin-left:3px}
+.bi-note{margin:0 0 10px;padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.45;background:linear-gradient(90deg,color-mix(in srgb,var(--mint) 14%,transparent),transparent);border-left:3px solid var(--mint)}
+.panel.bi .cat2-r{margin-top:8px;padding:12px 14px;border-radius:16px;border:1px solid color-mix(in srgb,var(--ink) 9%,transparent);border-top:1px solid color-mix(in srgb,var(--ink) 9%,transparent);background:linear-gradient(145deg,color-mix(in srgb,var(--mint) 8%,transparent),color-mix(in srgb,var(--ink) 3%,transparent))}
+.panel.bi .cat2-bar{height:12px;border-radius:999px;overflow:hidden}
+.panel.rpt .rpt-hero{border-radius:22px;border:1px solid color-mix(in srgb,var(--mint) 26%,transparent);background:linear-gradient(145deg,color-mix(in srgb,var(--mint) 18%,var(--surface)),var(--surface2));box-shadow:0 14px 30px -16px rgba(0,0,0,.7),inset 0 1px 0 color-mix(in srgb,#fff 10%,transparent);position:relative;overflow:hidden}
+.panel.rpt .rpt-hero::after{content:"";position:absolute;right:-60px;top:-60px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--mint) 24%,transparent),transparent 70%);pointer-events:none}
+.panel.rpt .rpt-hero .num{background:linear-gradient(90deg,var(--ink),var(--accent));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+.panel.rpt>.sec-h .btn,.panel.rpt>.sec-h .btn.ghost{border-radius:999px;font-weight:800;background:linear-gradient(135deg,var(--mint),var(--accent))!important;color:#04130C!important;border:0!important;box-shadow:0 8px 18px -8px color-mix(in srgb,var(--mint) 70%,transparent)}
+#lpPanel .sec-h .btn,#lpPanel .sec-h .btn.ghost{background:linear-gradient(135deg,#4ADE9F,#10B981)!important;color:#04130C!important;border:0!important;border-radius:999px!important;font-weight:800!important;padding:10px 18px!important;box-shadow:0 10px 22px -8px rgba(52,211,153,.75),inset 0 1px 0 rgba(255,255,255,.45)!important;text-shadow:none!important}
+#lpPanel .sec-h .btn:active{transform:scale(.97)}
 </style>
 
 
