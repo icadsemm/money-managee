@@ -2269,7 +2269,7 @@ const DEF={
 const state={};DOCS.forEach(n=>state[n]=DEF[n]());
 const last={},dirty=new Set(),writing={},again={},timers={};
 let fxBusy=false,fxMsg='';
-let blTog={},blSel=todayISO(),blMonth=nowYm(),catEdit=false,blRange='h',blQ='',blCat='';
+let blPick=-1,blTog={},blSel=todayISO(),blMonth=nowYm(),catEdit=false,blRange='h',blQ='',blCat='';
 try{blRange=localStorage.getItem('blRange')||'h'}catch(e){}
 const DEFCATS=[{e:'🍽️',n:'Makan'},{e:'🥤',n:'Minum'},{e:'☕',n:'Kopi'},{e:'🧾',n:'Bil'},{e:'⛽',n:'Minyak'},{e:'🅿️',n:'Parking / Tol'},{e:'🛒',n:'Barang'},{e:'💊',n:'Ubat'},{e:'📱',n:'Topup'},{e:'📦',n:'Lain-lain'}];
 let dvMonth=nowYm(),dvSel=todayISO();
@@ -3013,12 +3013,18 @@ function blInsight(rows,tot,bud){
   const mx=Math.max(...byDay,bud||0,1),top=byDay.reduce((a,v,i)=>v>a.v?{v,i}:a,{v:0,i:-1});
   let it=[];
   if(blRange==='m'){const wd=(new Date(y,m-1,1).getDay()+6)%7;let st=1,en=Math.min(dim,7-wd);for(;st<=dim;st=en+1,en=Math.min(dim,st+6)){let v=0;for(let d=st;d<=en;d++)v+=byDay[d-1];it.push({l:st+'-'+en,v,lim:bud>0?bud*(en-st+1):0})}}
-  else{const endD=isCur?new Date().getDate():dim;for(let d=Math.max(1,endD-6);d<=endD;d++){it.push({l:DAYN[new Date(y,m-1,d).getDay()].slice(0,3),v:byDay[d-1],lim:bud,sub:d})}}
+  else if(blRange==='b'){const endD=isCur?new Date().getDate():dim;for(let d=1;d<=endD;d++){it.push({l:String(d),v:byDay[d-1],lim:bud,d1:d,d2:d})}}
+  else{const endD=isCur?new Date().getDate():dim;for(let d=Math.max(1,endD-6);d<=endD;d++){it.push({l:DAYN[new Date(y,m-1,d).getDay()].slice(0,3),v:byDay[d-1],lim:bud,sub:d,d1:d,d2:d})}}
+  if(blRange==='m')it.forEach(q=>{const a=String(q.l).split('-').map(Number);q.d1=a[0];q.d2=a[1]});
   const mx2=Math.max(...it.map(x=>Math.max(x.v,x.lim||0)),1);
   const todD=new Date().getDate(),mxv=Math.max(...it.map(x=>x.v),0);
+  const avgIt=it.length?it.reduce((a,x)=>a+x.v,0)/it.length:0;
+  const selI=(blPick>=0&&blPick<it.length)?blPick:it.length-1;
   const chart=(()=>{
-    const CW=340,CH=184,pL=22,pR=22,pT=40,pB=26,N=it.length,pw=CW-pL-pR,ph=CH-pT-pB;
-    const X=i=>N>1?pL+i*pw/(N-1):CW/2,Y=v=>pT+(1-Math.min(1,v/mx2))*ph;
+    const CW=340,CH=232,pL=40,pR=16,pT=36,pB=30,N=it.length,pw=CW-pL-pR,ph=CH-pT-pB,dense=N>10;
+    const mxN=(()=>{const e=Math.pow(10,Math.floor(Math.log10(mx2))),f=mx2/e;return (f<=1?1:f<=2?2:f<=5?5:10)*e})();
+    const top2=Math.max(mxN,mx2);
+    const X=i=>N>1?pL+i*pw/(N-1):CW/2,Y=v=>pT+(1-Math.min(1,v/top2))*ph;
     const P=it.map((q,i)=>({x:X(i),y:Y(q.v),q,i}));
     const dxs=P.map((q,i)=>i?q.x-P[i-1].x:0);
     const sl=P.map((q,i)=>i?(q.y-P[i-1].y)/dxs[i]:0);
@@ -3027,18 +3033,52 @@ function blInsight(rows,tot,bud){
     for(let i=1;i<N;i++){const d=dxs[i]/3;ln+=' C'+(P[i-1].x+d).toFixed(1)+' '+(P[i-1].y+mt[i-1]*d).toFixed(1)+' '+(P[i].x-d).toFixed(1)+' '+(P[i].y-mt[i]*d).toFixed(1)+' '+P[i].x.toFixed(1)+' '+P[i].y.toFixed(1)}
     const base=pT+ph,area=N>1?ln+' L'+P[N-1].x.toFixed(1)+' '+base+' L'+P[0].x.toFixed(1)+' '+base+' Z':'';
     const lim=it.some(q=>q.lim>0)?'<polyline class="ac-b" fill="none" points="'+P.map(q=>q.x.toFixed(1)+','+Y(q.q.lim||0).toFixed(1)).join(' ')+'"/>':'';
-    const grid=[0,.5,1].map(f=>'<line class="ac-g" x1="'+pL+'" x2="'+(CW-pR)+'" y1="'+(pT+ph*f).toFixed(1)+'" y2="'+(pT+ph*f).toFixed(1)+'"/>').join('');
-    const pts=P.map(q=>{const pr=String(q.q.l).split('-').map(Number),cur=isCur&&(blRange==='m'?(todD>=pr[0]&&todD<=pr[1]):q.i===N-1),hi=mxv>0&&q.q.v===mxv,over=q.q.lim>0&&q.q.v>q.q.lim;
+    const kfmt=v=>v>=1000?(v/1000).toFixed(v%1000?1:0)+'k':String(Math.round(v));
+    const grid=[0,.25,.5,.75,1].map(f=>{const yy=(pT+ph*f).toFixed(1),val=top2*(1-f);return '<line class="ac-g'+(f===1?' z':'')+'" x1="'+pL+'" x2="'+(CW-pR)+'" y1="'+yy+'" y2="'+yy+'"/><text class="ac-y" x="'+(pL-6)+'" y="'+(+yy+3.5)+'" text-anchor="end">'+kfmt(val)+'</text>'}).join('');
+    const ay=Y(avgIt).toFixed(1);
+    const avgL=avgIt>0?'<line class="ac-avg" x1="'+pL+'" x2="'+(CW-pR)+'" y1="'+ay+'" y2="'+ay+'"/><text class="ac-avt" x="'+(CW-pR)+'" y="'+(+ay-4)+'" text-anchor="end">purata '+(avgIt>=100?Math.round(avgIt):avgIt.toFixed(1))+'</text>':'';
+    const bdg=it.some(q=>q.lim>0)&&!dense&&bud>0?'<text class="ac-bdt" x="'+(pL+2)+'" y="'+(Y(bud)-4).toFixed(1)+'">bajet '+Math.round(bud)+'</text>':'';
+    const stepX=dense?(N>20?5:3):1;
+    const pts=P.map(q=>{const pr=String(q.q.l).split('-').map(Number),cur=isCur&&(blRange==='m'?(todD>=pr[0]&&todD<=pr[1]):q.i===N-1),hi=mxv>0&&q.q.v===mxv,over=q.q.lim>0&&q.q.v>q.q.lim,sel=q.i===selI;
       let o='';
-      if(cur){o+='<circle class="ac-h" cx="'+q.x.toFixed(1)+'" cy="'+q.y.toFixed(1)+'" r="12"/>'}
-      o+='<circle class="ac-d'+(cur?' cur':'')+(over?' neg':'')+'" cx="'+q.x.toFixed(1)+'" cy="'+q.y.toFixed(1)+'" r="'+(cur?5.5:3.6)+'"/>';
-      if(q.q.v>0){
-        if(cur)o+='<rect class="ac-bub" x="'+(q.x-19).toFixed(1)+'" y="'+(q.y-36).toFixed(1)+'" width="38" height="21" rx="10.5"/><text class="ac-bt" x="'+q.x.toFixed(1)+'" y="'+(q.y-21.5).toFixed(1)+'" text-anchor="middle">'+Math.round(q.q.v)+'</text>';
-        else o+='<text class="ac-v'+(hi?' hi':'')+'" x="'+q.x.toFixed(1)+'" y="'+(q.y-11).toFixed(1)+'" text-anchor="middle">'+Math.round(q.q.v)+'</text>'}
-      o+='<text class="ac-x'+(cur?' cur':'')+'" x="'+q.x.toFixed(1)+'" y="'+(CH-7)+'" text-anchor="middle">'+esc(q.q.l)+'</text>';
+      if(cur){o+='<circle class="ac-h" cx="'+q.x.toFixed(1)+'" cy="'+q.y.toFixed(1)+'" r="11"/>'}
+      o+='<circle class="ac-d'+(cur?' cur':'')+(over?' neg':'')+'" cx="'+q.x.toFixed(1)+'" cy="'+q.y.toFixed(1)+'" r="'+(cur?5:dense?2.2:3.6)+'"/>';
+      if(q.q.v>0&&!sel){
+        if(!dense||hi)o+='<text class="ac-v'+(hi?' hi':'')+'" x="'+q.x.toFixed(1)+'" y="'+(q.y-9).toFixed(1)+'" text-anchor="middle">'+(Math.round(q.q.v*10)/10)+'</text>'}
+      if(!dense||q.i%stepX===0||q.i===N-1)o+='<text class="ac-x'+(cur?' cur':'')+'" x="'+q.x.toFixed(1)+'" y="'+(CH-8)+'" text-anchor="middle">'+esc(q.q.l)+'</text>';
       return o}).join('');
-    return '<svg class="ac" viewBox="0 0 '+CW+' '+CH+'" role="img" aria-label="Graf belanja" preserveAspectRatio="xMidYMid meet"><defs><linearGradient id="acg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--mint)" stop-opacity=".42"/><stop offset="1" stop-color="var(--mint)" stop-opacity="0"/></linearGradient></defs>'+grid+(area?'<path class="ac-a" d="'+area+'" fill="url(#acg)"/>':'')+lim+(N>1?'<path class="ac-l" pathLength="1" d="'+ln+'"/>':'')+pts+'</svg>'})();
-  const rseg=`<div class="seg" role="group" aria-label="Julat graf">${[['h','7 hari'],['m','Ikut minggu']].map(([v,t])=>`<button data-act="blr" data-v="${v}" aria-pressed="${blRange===v}">${t}</button>`).join('')}</div>`;
+    const hw=N>1?Math.max(pw/(N-1),14):40;
+    const hits=P.map(q=>'<rect class="ac-hit" data-act="blp" data-i="'+q.i+'" x="'+(q.x-hw/2).toFixed(1)+'" y="'+pT+'" width="'+hw.toFixed(1)+'" height="'+(ph+pB)+'"/>').join('');
+    const sx=P[selI]?P[selI].x.toFixed(1):0,sy=P[selI]?P[selI].y.toFixed(1):0;
+    const selg=P.length?'<g id="acSel"><line class="ac-sl" x1="'+sx+'" x2="'+sx+'" y1="'+pT+'" y2="'+base+'"/><circle class="ac-sc" cx="'+sx+'" cy="'+sy+'" r="6"/></g>':'';
+    return '<svg class="ac" id="acSvg" viewBox="0 0 '+CW+' '+CH+'" role="img" aria-label="Graf belanja" preserveAspectRatio="xMidYMid meet" data-px="'+P.map(q=>q.x.toFixed(1)).join(',')+'" data-py="'+P.map(q=>q.y.toFixed(1)).join(',')+'"><defs><linearGradient id="acg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--mint)" stop-opacity=".42"/><stop offset="1" stop-color="var(--mint)" stop-opacity="0"/></linearGradient></defs>'+grid+(area?'<path class="ac-a" d="'+area+'" fill="url(#acg)"/>':'')+lim+avgL+bdg+(N>1?'<path class="ac-l" pathLength="1" d="'+ln+'"/>':'')+selg+pts+hits+'</svg>'})();
+  /* butiran titik terpilih */
+  const _cats0=state.belanja.cats||DEFCATS,_ic0=n=>{const c=_cats0.find(c=>c.n===n);return c?c.e:(foodEmoji(n)||'\u{1F3F7}️')};
+  const blDet=it.map(q=>{const rs=rows.filter(x=>{const d=+((x.r.d||'').slice(8,10));return d>=q.d1&&d<=q.d2});
+    const gg={};rs.forEach(x=>{const k=catOf(x.r);gg[k]=(gg[k]||0)+(+x.r.amt||0)});
+    const tc=Object.entries(gg).sort((a,b)=>b[1]-a[1])[0];
+    const lab=q.d1===q.d2?(blRange==='h'?DAYN[new Date(y,m-1,q.d1).getDay()]+' ':'')+q.d1+' '+MS[m-1]:q.d1+'–'+q.d2+' '+MS[m-1];
+    return {lab,v:q.v,n:rs.length,tc:tc?_ic0(tc[0])+' '+tc[0]+' '+rm(tc[1]):'',lim:q.lim||0,days:q.d2-q.d1+1}});
+  window.__blDet={det:blDet,avg:avgIt,rng:blRange};
+  const detHtml=d=>{if(!d)return '';const df=avgIt>0?Math.round((d.v-avgIt)/avgIt*100):0,dc=!df?'':df>0?'up':'dn';
+    return '<div class="bdt-h"><b>'+esc(d.lab)+'</b><span class="bdt-v">'+rm(d.v)+'</span></div><div class="bdt-g">'
+    +'<div><small>Bilangan</small><b>'+d.n+' belanja</b></div>'
+    +'<div><small>Vs purata</small><b class="'+dc+'">'+(avgIt>0?(df>0?'▲ ':df<0?'▼ ':'')+Math.abs(df)+'%':'-')+'</b></div>'
+    +'<div><small>'+(d.days>1?'Purata / hari':'Terbesar')+'</small><b>'+(d.days>1?rm(d.v/d.days):(d.tc?esc(d.tc):'-'))+'</b></div>'
+    +(d.lim>0?'<div><small>Bajet</small><b class="'+(d.v>d.lim?'dn':'')+'">'+Math.round(d.v/d.lim*100)+'% ('+rm(d.lim)+')</b></div>':(d.days>1&&d.tc?'<div><small>Terbesar</small><b>'+esc(d.tc)+'</b></div>':''))
+    +'</div>'};
+  const detBox='<div class="bdt" id="blDet">'+detHtml(blDet[selI])+'</div>';
+  const chipsHtml=(()=>{const nzI=it.filter(q=>q.v>0);if(!nzI.length)return '';
+    const nm=q=>q.d1===q.d2?q.d1+' '+MS[m-1]:q.d1+'–'+q.d2;
+    const hiQ=nzI.reduce((a,q)=>q.v>a.v?q:a),loQ=nzI.length>1?nzI.reduce((a,q)=>q.v<a.v?q:a):null;
+    const h=Math.floor(it.length/2),f1=it.slice(0,h).reduce((a,q)=>a+q.v,0),f2=it.slice(h).reduce((a,q)=>a+q.v,0);
+    const tr=it.length>=4&&f1>0?Math.round((f2-f1)/f1*100):null;
+    const zero=blRange==='m'?0:it.filter(q=>!q.v).length;
+    const c=(k,v,sub,cl)=>'<div class="bcc"><small>'+k+'</small><b class="'+(cl||'')+'">'+v+'</b>'+(sub?'<i>'+sub+'</i>':'')+'</div>';
+    return '<div class="bcs">'+c('Tertinggi',rm(hiQ.v),nm(hiQ),'up')+(loQ?c('Terendah',rm(loQ.v),nm(loQ),'dn'):'')
+      +(blRange==='m'?c('Minggu aktif',nzI.length+'/'+it.length,''):c('Hari tiada belanja',zero+' hari','',zero?'':'dn'))
+      +(tr!==null?c('Trend',(tr>0?'▲ ':tr<0?'▼ ':'')+Math.abs(tr)+'%','separuh kedua vs pertama',tr>0?'up':tr<0?'dn':''):'')+'</div>'})();
+  const rseg=`<div class="seg" role="group" aria-label="Julat graf" style="display:grid;grid-template-columns:repeat(3,1fr)">${[['h','7 hari'],['b','Bulan'],['m','Ikut minggu']].map(([v,t])=>`<button data-act="blr" data-v="${v}" aria-pressed="${blRange===v}">${t}</button>`).join('')}</div>`;
   const g={};rows.forEach(x=>{const k=catOf(x.r);g[k]=(g[k]||0)+(+x.r.amt||0)});
   const cats=state.belanja.cats||DEFCATS,icon=n=>{const c=cats.find(c=>c.n===n);return c?c.e:(foodEmoji(n)||'🏷️')};
   const list=Object.entries(g).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).slice(0,8);
@@ -3053,7 +3093,7 @@ function blInsight(rows,tot,bud){
   if(!tot)return '';
   return `<section class="panel bi">${head('Analisis belanja',ML[m-1]+' '+y)}
   <div class="bt">${btT('Minggu ni',rm(wk),wkSub,wkH)}${btT(isCur?'Anggaran sebulan':'Jumlah bulan',rm(isCur?proj:tot),'','i')}${btT('Hari tertinggi',top.i>=0?rm(top.v):'-',top.i>=0?(top.i+1)+' '+MS[m-1]:'','a')}${btT('Bilangan belanja',rows.length,'','p')}${btT('Purata / hari',rm(avgD),'','i')}${low?btT('Hari paling jimat',rm(low.v),(low.i+1)+' '+MS[m-1],'g'):btT('Hari aktif',nz.length+' hari','','p')}${cap>0?btT('Bajet bulan guna',usedP+'%',tot<=cap?'Baki '+rm(cap-tot):'Lebih '+rm(tot-cap),tot<=cap?'g':'b',1):''}</div>
-  <div class="bch">${rseg}${chart}<div class="bi-cap"><span>Jumlah <b>${rm(rngTot)}</b></span><span>Purata <b>${rm(rngAvg)}</b> / ${blRange==='m'?'minggu':'hari'}</span></div>${bud>0?'<p class="hint" style="margin:6px 0 0">Merah = lebih bajet.</p>':''}</div></section>`;
+  <div class="bch">${rseg}${chart}${chipsHtml}<div class="bi-cap"><span>Jumlah <b>${rm(rngTot)}</b></span><span>Purata <b>${rm(rngAvg)}</b> / ${blRange==='m'?'minggu':'hari'}</span></div>${bud>0?'<p class="hint" style="margin:6px 0 0">Merah = lebih bajet.</p>':''}</div></section>`;
 }
 const CATPAL=[100,80,64,50,40,32,25,18].map(n=>`color-mix(in srgb,var(--accent) ${n}%,transparent)`);
 function catBlock(list,tot,icon){
@@ -3102,6 +3142,8 @@ function laporanTiles(d){
     if(i===2)return {l,m:pp[0],s:pp[1]||'',h:'p'};
     return {l,m:pp[0],s:l==='Anggaran sebulan'?'jika kadar sama diteruskan':'',h:'i',w:1}});
 }
+function lpDaily(d){const dim=new Date(d.y,d.m,0).getDate(),a=Array(dim).fill(0);d.rows.forEach(r=>{const k=+String(r.d||'').slice(8,10);if(k>=1&&k<=dim)a[k-1]+=(+r.amt||0)});return a}
+function lpDelta(d){if(!(d.prev>0))return null;const df=d.tot-d.prev;return {pct:Math.round(Math.abs(df)/d.prev*100),up:df>0,flat:df===0}}
 async function lpImage(){
   try{
     const EN=window.mmLang&&window.mmLang()==='en',T=x=>window.mmTr?window.mmTr(x):x;
@@ -3110,7 +3152,7 @@ async function lpImage(){
     const V=n=>cs.getPropertyValue(n).trim(),disp=V('--display')||'sans-serif',body=V('--body')||'sans-serif';
     const col={bg:V('--surface')||'#fff',ink:V('--ink')||'#111',mute:V('--mute')||'#667',bad:V('--bad')||'#DC2626',good:V('--good')||'#15803D'};
     if(document.fonts&&document.fonts.ready)await document.fonts.ready;
-    const MINT=V('--mint')||'#34D399',CATA=[1,.8,.64,.5,.4,.32,.25,.18],ACC=V('--accent')||MINT,top=d.cats.slice(0,3),tiles=laporanTiles(d),W=1080,P=64,HDR=124,HERO=210,GAP=30,ROW=118,CATS=top.length?20+18+top.length*ROW+16:0,TH=128,TG=18,TROWS=(()=>{let r=0,k=0;tiles.forEach(q=>{if(q.w){if(k){r++;k=0}r++}else{k++;if(k===2){r++;k=0}}});return r+(k?1:0)})(),GRID=TROWS*TH+(TROWS-1)*TG,FOOT=124;
+    const MINT=V('--mint')||'#34D399',CATA=[1,.8,.64,.5,.4,.32,.25,.18],ACC=V('--accent')||MINT,top=d.cats.slice(0,3),tiles=laporanTiles(d),W=1080,P=64,HDR=124,HERO=400,GAP=30,ROW=118,CATS=top.length?20+18+top.length*ROW+16:0,TH=128,TG=18,TROWS=(()=>{let r=0,k=0;tiles.forEach(q=>{if(q.w){if(k){r++;k=0}r++}else{k++;if(k===2){r++;k=0}}});return r+(k?1:0)})(),GRID=TROWS*TH+(TROWS-1)*TG,FOOT=124;
     const H=P+HDR+HERO+GAP+(CATS?CATS+GAP:0)+GRID+FOOT,cv=document.createElement('canvas');cv.width=W;cv.height=H;
     const x=cv.getContext('2d');
     const rr=(a,b,w,h,r)=>{x.beginPath();x.moveTo(a+r,b);x.arcTo(a+w,b,a+w,b+h,r);x.arcTo(a+w,b+h,a,b+h,r);x.arcTo(a,b+h,a,b,r);x.arcTo(a,b,a+w,b,r);x.closePath()};
@@ -3133,10 +3175,22 @@ async function lpImage(){
     x.fillStyle=col.ink;x.font='800 56px '+disp;x.fillText(T('Laporan belanja '+ML[d.m-1]+' '+d.y),P,y+52);
     x.fillStyle=col.mute;x.font='600 28px '+body;x.fillText('Money Manage',P,y+94);
     y+=HDR;
-    glass(P,y,W-2*P,HERO,34);
-    x.fillStyle=col.mute;x.font='700 23px '+body;ls('3px');x.fillText(EN?'TOTAL SPENDING':'JUMLAH BELANJA',P+40,y+58);ls('0px');
-    {const tg=x.createLinearGradient(P+40,0,P+560,0);tg.addColorStop(0,col.ink);tg.addColorStop(1,ACC);x.fillStyle=tg}x.font='800 86px '+disp;x.fillText(rm(d.tot),P+40,y+142);
-    x.fillStyle=col.mute;x.font='600 27px '+body;x.fillText(EN?d.days+(d.days===1?' day':' days')+' · avg '+rm(d.avg)+' / day · '+d.rows.length+(d.rows.length===1?' purchase':' purchases'):d.days+' hari · purata '+rm(d.avg)+' / hari · '+d.rows.length+' belanja',P+40,y+186);
+    {const hx=P,hw=W-2*P,hy=y;
+      const HC=dark?{g0:'#052a20',g1:'#0a5a43',g2:'#073a2d',sh:'rgba(0,0,0,.45)',gl1:'rgba(110,231,183,.16)',gl2:'rgba(52,211,153,.30)',brd:'rgba(110,231,183,.3)',lab:'rgba(232,251,243,.72)',n0:'#FFFFFF',n1:'#9BF0CC',sub:'rgba(232,251,243,.8)',on:'rgba(110,231,183,.85)',pk:'#CFFAE8',off:'rgba(255,255,255,.14)',ax:'rgba(232,251,243,.6)',upBg:'rgba(248,113,113,.22)',upFg:'#FCA5A5',dnBg:'rgba(52,211,153,.24)',dnFg:'#6EE7B7'}:{g0:'#FFFFFF',g1:'#E4F9EF',g2:'#FFF3D4',sh:'rgba(6,78,59,.22)',gl1:'rgba(246,200,80,.30)',gl2:'rgba(52,211,153,.26)',brd:'rgba(16,185,129,.38)',lab:'rgba(6,78,59,.62)',n0:'#064E3B',n1:'#059669',sub:'rgba(6,78,59,.72)',on:'#34D399',pk:'#E9B22F',off:'rgba(6,78,59,.10)',ax:'rgba(6,78,59,.55)',upBg:'rgba(220,38,38,.12)',upFg:'#B91C1C',dnBg:'rgba(5,150,105,.14)',dnFg:'#047857'};
+      x.save();x.shadowColor=HC.sh;x.shadowBlur=44;x.shadowOffsetY=18;rr(hx,hy,hw,HERO,44);const hg=x.createLinearGradient(hx,hy,hx+hw,hy+HERO);hg.addColorStop(0,HC.g0);hg.addColorStop(.55,HC.g1);hg.addColorStop(1,HC.g2);x.fillStyle=hg;x.fill();x.restore();
+      x.save();rr(hx,hy,hw,HERO,44);x.clip();
+      const r1=x.createRadialGradient(hx+hw-40,hy-30,0,hx+hw-40,hy-30,420);r1.addColorStop(0,HC.gl1);r1.addColorStop(1,'rgba(246,200,80,0)');x.fillStyle=r1;x.fillRect(hx,hy,hw,HERO);
+      const r2=x.createRadialGradient(hx+60,hy+HERO,0,hx+60,hy+HERO,420);r2.addColorStop(0,HC.gl2);r2.addColorStop(1,'rgba(52,211,153,0)');x.fillStyle=r2;x.fillRect(hx,hy,hw,HERO);
+      x.restore();
+      rr(hx+1,hy+1,hw-2,HERO-2,44);x.lineWidth=2;x.strokeStyle=HC.brd;x.stroke();
+      x.fillStyle=HC.lab;x.font='700 23px '+body;ls('4px');x.fillText(EN?'TOTAL SPENDING':'JUMLAH BELANJA',hx+48,hy+66);ls('0px');
+      const dl=lpDelta(d);
+      if(dl){const tx=(dl.flat?'= ':dl.up?'▲ ':'▼ ')+dl.pct+'% '+(EN?'vs last month':'vs bulan lepas');x.font='700 24px '+body;const tw2=x.measureText(tx).width+40;rr(hx+hw-48-tw2,hy+38,tw2,48,24);x.fillStyle=dl.up?HC.upBg:HC.dnBg;x.fill();x.fillStyle=dl.up?HC.upFg:HC.dnFg;x.textAlign='right';x.fillText(tx,hx+hw-48-20,hy+72);x.textAlign='left'}
+      {const tg=x.createLinearGradient(hx+48,0,hx+640,0);tg.addColorStop(0,HC.n0);tg.addColorStop(1,HC.n1);x.fillStyle=tg}x.font='800 104px '+disp;x.fillText(rm(d.tot),hx+48,hy+186);
+      x.fillStyle=HC.sub;x.font='600 27px '+body;x.fillText(EN?d.days+(d.days===1?' day':' days')+' · avg '+rm(d.avg)+' / day · '+d.rows.length+(d.rows.length===1?' purchase':' purchases'):d.days+' hari · purata '+rm(d.avg)+' / hari · '+d.rows.length+' belanja',hx+48,hy+234);
+      const dv=lpDaily(d),mxd=Math.max(...dv,1),bx0=hx+48,bw0=hw-96,by1=hy+HERO-62,bh=84,n=dv.length,gp=5,bwid=(bw0-gp*(n-1))/n;
+      dv.forEach((v,k)=>{const h2=v>0?Math.max(8,bh*v/mxd):5,pk=v>0&&v===mxd;rr(bx0+k*(bwid+gp),by1-h2,bwid,h2,Math.min(bwid/2,6));x.fillStyle=pk?HC.pk:v>0?HC.on:HC.off;x.fill()});
+      x.fillStyle=HC.ax;x.font='600 21px '+body;x.fillText('1',bx0,by1+34);x.textAlign='right';x.fillText(String(n),bx0+bw0,by1+34);x.textAlign='left'}
     y+=HERO+GAP;
     if(top.length){
       const bw=W-2*P,T0=d.tot>0?d.tot:1,sm=top.reduce((q,z)=>q+(+z[1]||0),0),rest=T0-sm,parts=top.map(([n,v],i)=>({v,c:ACC,a:CATA[Math.min(i,CATA.length-1)]}));
@@ -3174,7 +3228,7 @@ async function lpImage(){
     });
     x.fillStyle=col.mute;x.font='600 24px '+body;x.textAlign='center';x.fillText(T('Money Manage · '+t.getDate()+' '+ML[t.getMonth()]+' '+t.getFullYear()),W/2,H-P-6);x.textAlign='left';
     const blob=await new Promise(ok=>cv.toBlob(ok,'image/png'));if(!blob)throw new Error('blob');
-    const fname='laporan-belanja-'+d.ym+'.png',f=new File([blob],fname,{type:'image/png'});
+    const fname='laporan-belanja-'+d.ym+'-'+String(t.getHours()).padStart(2,'0')+String(t.getMinutes()).padStart(2,'0')+String(t.getSeconds()).padStart(2,'0')+'.png',f=new File([blob],fname,{type:'image/png'});
     if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:T('Laporan belanja '+ML[d.m-1])})}catch(e){}return}
     const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fname;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);
     setUndo('Gambar laporan dimuat turun',null);
@@ -3186,7 +3240,7 @@ function vLaporan(C,ym){
   const top=d.cats.slice(0,3),mx=d.tot||1;
   return `<section class="panel rpt bi" id="lpPanel">
     <div class="sec-h">${head('Laporan belanja '+ML[d.m-1]+' '+d.y,'Ikut bulan yang dipilih, boleh kongsi sebagai gambar.')}<button class="btn ghost" data-act="lpshare">Kongsi gambar</button></div>
-    <div class="rpt-hero"><span class="eyebrow">Jumlah belanja</span><b class="num">${rm(d.tot)}</b><small>${d.days} hari · purata ${rm(d.avg)} / hari · ${d.rows.length} belanja</small></div>
+    ${(()=>{const dv=lpDaily(d),mxd=Math.max(...dv,1),dl=lpDelta(d);return `<div class="lph"><div class="lph-top"><span class="lph-k">Jumlah belanja</span>${dl?`<span class="lph-p ${dl.up?'up':'dn'}">${dl.flat?'=':dl.up?'\u25B2':'\u25BC'} ${dl.pct}% vs bulan lepas</span>`:''}</div><b class="lph-n">${rm(d.tot)}</b><small>${d.days} hari \u00B7 purata ${rm(d.avg)} / hari \u00B7 ${d.rows.length} belanja</small><div class="lph-bars" aria-hidden="true">${dv.map(v=>`<i class="${v>0&&v===mxd?'pk':v>0?'on':''}" style="height:${v>0?Math.max(8,Math.round(v/mxd*100)):5}%"></i>`).join('')}</div><div class="lph-ax"><span>1</span><span>${dv.length}</span></div></div>`})()}
     ${top.length?catBlock(top,mx,catIcon):''}
     <div class="bt">${laporanTiles(d).map(q=>btT(q.l,esc(q.m),esc(q.s),q.h,q.w)).join('')}</div>
   </section>`;
@@ -3723,7 +3777,13 @@ document.addEventListener('click',e=>{
   if(act==='bltog'){const a=b.closest('.acc'),o=a.classList.contains('shut');a.classList.toggle('shut',!o);b.setAttribute('aria-expanded',String(o));blTog[b.dataset.d]=o;return}
   if(act==='blall'){const o=b.dataset.v==='1';document.querySelectorAll('#blPanel .acc').forEach(a=>{a.classList.toggle('shut',!o);const h=a.querySelector('[data-act=bltog]');if(h){h.setAttribute('aria-expanded',String(o));blTog[h.dataset.d]=o}});return}
   if(act==='lpshare'){lpImage();return}
-  if(act==='blr'){blRange=b.dataset.v;try{localStorage.setItem('blRange',blRange)}catch(x){}later();return}
+  if(act==='blp'){const i=+b.dataset.i,D=window.__blDet,svg=document.getElementById('acSvg');if(!D||!svg)return;blPick=i;
+    const px=svg.dataset.px.split(','),py=svg.dataset.py.split(','),g=svg.querySelector('#acSel');
+    if(g){const l=g.querySelector('.ac-sl'),c=g.querySelector('.ac-sc');l.setAttribute('x1',px[i]);l.setAttribute('x2',px[i]);c.setAttribute('cx',px[i]);c.setAttribute('cy',py[i])}
+    const d=D.det[i],box=document.getElementById('blDet');if(d&&box){const df=D.avg>0?Math.round((d.v-D.avg)/D.avg*100):0,dc=!df?'':df>0?'up':'dn';
+      box.innerHTML='<div class="bdt-h"><b>'+esc(d.lab)+'</b><span class="bdt-v">'+rm(d.v)+'</span></div><div class="bdt-g"><div><small>Bilangan</small><b>'+d.n+' belanja</b></div><div><small>Vs purata</small><b class="'+dc+'">'+(D.avg>0?(df>0?'\u25B2 ':df<0?'\u25BC ':'')+Math.abs(df)+'%':'-')+'</b></div><div><small>'+(d.days>1?'Purata / hari':'Terbesar')+'</small><b>'+(d.days>1?rm(d.v/d.days):(d.tc?esc(d.tc):'-'))+'</b></div>'+(d.lim>0?'<div><small>Bajet</small><b class="'+(d.v>d.lim?'dn':'')+'">'+Math.round(d.v/d.lim*100)+'% ('+rm(d.lim)+')</b></div>':(d.days>1&&d.tc?'<div><small>Terbesar</small><b>'+esc(d.tc)+'</b></div>':''))+'</div>'}
+    return}
+  if(act==='blr'){blRange=b.dataset.v;blPick=-1;try{localStorage.setItem('blRange',blRange)}catch(x){}later();return}
   if(act==='catedit'){catEdit=!catEdit;later();return}
   if(act==='cat'){
     const cats=state.belanja.cats||DEFCATS,c=cats[+b.dataset.i];if(!c)return;
@@ -4850,6 +4910,36 @@ document.addEventListener('click',function(e){
    FOR WHOEVER EDITS THIS APP: on every change add ONE new entry at the TOP of CHANGELOG (unique id, date, short ms + en bullets). */
 (function(){
 var CHANGELOG=[
+ {id:'2026-11-11-i',d:'2026-11-11',
+  ms:['Kad \u201cJumlah belanja\u201d mod cerah: warna putih-mint-krim dengan bar emas (juga dalam gambar kongsi)'],
+  en:['Light-mode \u201cTotal spending\u201d card: white-mint-cream colours with gold bar (also in the shared image)']},
+ {id:'2026-11-11-h',d:'2026-11-11',
+  ms:['Kad \u201cJumlah belanja\u201d: rupa baharu mint cerah (mod cerah) / hijau tua (mod gelap), ada carta bar harian, tanpa emas','Bahagian lain tak diubah'],
+  en:['\u201cTotal spending\u201d card: new look, light mint (light mode) / deep green (dark mode), with daily bars, no gold','Everything else unchanged']},
+ {id:'2026-11-11-g',d:'2026-11-11',
+  ms:['Kad \u201cJumlah belanja\u201d dalam Laporan belanja dipulihkan ke rupa asal (juga dalam gambar kongsi)'],
+  en:['\u201cTotal spending\u201d card in the spending report restored to its original look (also in the shared image)']},
+ {id:'2026-11-11-f',d:'2026-11-11',
+  ms:['Buang warna emas dalam Laporan belanja, kotak ringkas dan gambar kongsi; kini hijau zamrud bersih'],
+  en:['Removed gold accents from the spending report, summary boxes and shared image; clean emerald only']},
+ {id:'2026-11-11-e',d:'2026-11-11',
+  ms:['Kotak ringkas (Laporan & Analisis belanja) lebih premium: kaca zamrud, garis emas halus, tiada putih kelabu'],
+  en:['Summary boxes (Report & Spending analysis) are more premium: emerald glass, thin gold accent, no grey-white']},
+ {id:'2026-11-11-d',d:'2026-11-11',
+  ms:['Kad Laporan belanja kini ada rupa berbeza: cerah (putih-hijau muda-emas) dan gelap (hijau tua-emas)','Gambar kongsi pun ikut mod cerah/gelap'],
+  en:['Spending report card now looks different per theme: light (white-mint-gold) and dark (deep green-gold)','Shared image also follows light/dark mode']},
+ {id:'2026-11-11-c',d:'2026-11-11',
+  ms:['Laporan belanja lebih premium: kad utama hijau-emas, carta bar harian, perbandingan bulan lepas','Gambar kongsi ikut reka bentuk baharu dan sentiasa dijana dari data terkini','Nama fail gambar ada masa, tak bercampur dengan gambar lama'],
+  en:['Spending report is more premium: emerald-gold hero card, daily bar chart, vs last month','Shared image follows the new design and is always built from the latest data','Image file name includes the time, so it never mixes with older images']},
+ {id:'2026-11-11-b',d:'2026-11-11',
+  ms:['Buang kotak butiran besar di bawah graf belanja (maklumat berulang)'],
+  en:['Removed the large detail box under the spending chart (it repeated other info)']},
+ {id:'2026-11-11-a',d:'2026-11-11',
+  ms:['Graf belanja: kad ringkas baru di bawah graf (tertinggi, terendah, hari tiada belanja, trend)','Butang Imbas resit mod gelap hijau tua, graf terperinci (jika belum nampak, kemas kini app)'],
+  en:['Spending chart: new summary cards under the chart (highest, lowest, no-spend days, trend)','Dark-mode Scan receipt button is deep green, detailed chart (update the app if you do not see it yet)']},
+ {id:'2026-11-10-d',d:'2026-11-10',
+  ms:['Graf belanja lebih terperinci: label RM di paksi, garis purata dan bajet','Ketuk mana-mana titik untuk lihat butiran (jumlah, bilangan, vs purata, kategori terbesar)','Pilihan baharu "Bulan" untuk graf sepanjang bulan','Butang Imbas resit mod gelap kini hijau tua, tak silau'],
+  en:['More detailed spending chart: RM axis labels, average and budget lines','Tap any point for details (total, count, vs average, top category)','New "Month" range for a full-month chart','Scan receipt button in dark mode is now a deep green, no glare']},
  {id:'2026-11-10-c',d:'2026-11-10',
   ms:['Buang bahagian \u201cIkut kategori\u201d dalam Analisis belanja (tak berfungsi)'],
   en:['Removed the \u201cBy category\u201d section from Spending analysis (it did not work)']},
@@ -5760,6 +5850,30 @@ addEventListener('touchmove',s,{passive:true});
 addEventListener('hashchange',function(){s()});
 })();
 </script>
+<style id="mm-chart2">
+.bch .ac-g.z{stroke:color-mix(in srgb,var(--ink) 20%,transparent)}
+.ac-y{fill:var(--mute);font:600 9px var(--body)}
+.ac-avg{stroke:var(--gold,#E9C46A);stroke-width:1.2;stroke-dasharray:4 4;opacity:.85}
+.ac-avt{fill:var(--gold,#E9C46A);font:700 9px var(--body)}
+.ac-bdt{fill:var(--bad);font:700 9px var(--body);opacity:.9}
+.ac-hit{fill:transparent;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.ac-sl{stroke:var(--mint);stroke-width:1.2;stroke-dasharray:3 3;opacity:.8}
+.ac-sc{fill:none;stroke:var(--mint);stroke-width:2.2}
+.bdt{padding:12px 14px;border-radius:16px;background:color-mix(in srgb,var(--mint) 9%,transparent);border:1px solid color-mix(in srgb,var(--mint) 22%,transparent)}
+.bdt-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:8px}
+.bdt-h b{font-size:13px;color:var(--ink)}.bdt-v{font:800 20px var(--display);color:var(--accent);letter-spacing:-.02em}
+.bdt-g{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px}
+.bdt-g small{display:block;font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+.bdt-g b{font-size:13px;color:var(--ink);overflow-wrap:anywhere}.bdt-g b.up{color:var(--bad)}.bdt-g b.dn{color:var(--good,#10b981)}
+.bdt-g b.dn[class]{}
+/* butang Imbas resit: mod gelap = hijau tua, tak silau */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn.scanbtn{background:linear-gradient(120deg,#053b2d,#0a5a43,#0b6b52,#053b2d)!important;background-size:260% 100%;border:1px solid rgba(110,231,183,.28)!important;color:#E8FBF3!important;box-shadow:0 8px 22px -10px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.14)!important;animation:sbg 6s ease-in-out infinite alternate!important}
+:root:not([data-theme="light"]) .scanbtn .sbs{background:linear-gradient(115deg,transparent 40%,rgba(110,231,183,.16) 50%,transparent 60%)}
+:root:not([data-theme="light"]) .scanbtn .sbi{background:linear-gradient(145deg,rgba(110,231,183,.22),rgba(110,231,183,.06))!important;border:1px solid rgba(110,231,183,.25)}}
+:root[data-theme="dark"] .btn.scanbtn{background:linear-gradient(120deg,#053b2d,#0a5a43,#0b6b52,#053b2d)!important;background-size:260% 100%;border:1px solid rgba(110,231,183,.28)!important;color:#E8FBF3!important;box-shadow:0 8px 22px -10px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.14)!important;animation:sbg 6s ease-in-out infinite alternate!important}
+:root[data-theme="dark"] .scanbtn .sbs{background:linear-gradient(115deg,transparent 40%,rgba(110,231,183,.16) 50%,transparent 60%)}
+:root[data-theme="dark"] .scanbtn .sbi{background:linear-gradient(145deg,rgba(110,231,183,.22),rgba(110,231,183,.06))!important;border:1px solid rgba(110,231,183,.25)}
+</style>
 <style id="mm-lockfix">
 html.mmlock,html.mmlock body{overflow:hidden!important;overscroll-behavior:none!important;height:100%}
 #sheet,#rcp,#set,#rmsheet,#vedit,#wn{overscroll-behavior:contain;touch-action:none}
@@ -5786,5 +5900,42 @@ document.addEventListener('touchmove',function(e){
  if(e.cancelable)e.preventDefault()},{passive:false});
 sch()})();
 </script>
+<style id="mm-chartchips">
+.bcs{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-top:2px}
+.bcc{text-align:left;align-items:flex-start;padding:10px 12px;border-radius:14px;background:color-mix(in srgb,var(--mint) 7%,transparent);border:1px solid color-mix(in srgb,var(--mint) 18%,transparent);display:flex;flex-direction:column;gap:2px;min-width:0}
+.bcc small{font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+.bcc b{font:800 15px var(--display);color:var(--ink);letter-spacing:-.01em}
+.bcc b.up{color:var(--bad)}.bcc b.dn{color:var(--good,#10b981)}
+.bcc i{font-style:normal;font-size:11px;color:var(--mute)}
+</style>
+
+
+<style id="mm-tiles">
+/* Kad ringkas premium: kaca zamrud + garis emas halus, tiada putih */
+:root:root:root:root .panel .bt>div{--tp-a:#F2FCF7;--tp-b:#DDF3E8;--tp-brd:rgba(16,185,129,.30);--tp-gold:rgba(16,185,129,.9);--tp-sh:rgba(6,78,59,.38);--tp-in:rgba(255,255,255,.9);--tp-ac:#10B981;
+ border-radius:18px;border:1px solid var(--tp-brd);background:linear-gradient(145deg,var(--tp-a),var(--tp-b));box-shadow:0 12px 22px -14px var(--tp-sh),inset 0 1px 0 var(--tp-in);padding:12px 14px 12px 17px}
+:root:root:root:root .panel .bt>div::after{inset:0 auto 0 0;width:3px;border-radius:3px;background:linear-gradient(180deg,var(--tp-gold),transparent)}
+:root:root:root:root .panel .bt>div::before{content:none}
+@media (prefers-color-scheme:dark){:root:root:root:root:not([data-theme="light"]) .panel .bt>div{--tp-a:rgba(14,74,56,.62);--tp-b:rgba(4,28,21,.92);--tp-brd:rgba(110,231,183,.20);--tp-gold:rgba(110,231,183,.9);--tp-sh:rgba(0,0,0,.75);--tp-in:rgba(110,231,183,.16);--tp-ac:#34D399}}
+:root:root:root:root[data-theme="dark"] .panel .bt>div{--tp-a:rgba(14,74,56,.62);--tp-b:rgba(4,28,21,.92);--tp-brd:rgba(110,231,183,.20);--tp-gold:rgba(110,231,183,.9);--tp-sh:rgba(0,0,0,.75);--tp-in:rgba(110,231,183,.16);--tp-ac:#34D399}
+</style>
+<style id="mm-lph">
+.panel.rpt .lph{--l-bg:linear-gradient(135deg,#FFFFFF,#E4F9EF 55%,#FFF3D4);--l-brd:rgba(16,185,129,.38);--l-sh:0 16px 30px -18px rgba(6,78,59,.45),inset 0 1px 0 #fff;--l-ink:rgba(6,78,59,.72);--l-k:rgba(6,78,59,.62);--l-n:linear-gradient(90deg,#064E3B,#059669);--l-on:#34D399;--l-pk:#E9B22F;--l-off:rgba(6,78,59,.10);--l-g1:rgba(246,200,80,.30);--l-g2:rgba(52,211,153,.26);--l-ubg:rgba(220,38,38,.12);--l-ufg:#B91C1C;--l-dbg:rgba(5,150,105,.14);--l-dfg:#047857}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .panel.rpt .lph{--l-bg:linear-gradient(135deg,#052a20,#0a5a43 58%,#073a2d);--l-brd:rgba(110,231,183,.28);--l-sh:0 18px 34px -18px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.16);--l-ink:rgba(232,251,243,.8);--l-k:rgba(232,251,243,.72);--l-n:linear-gradient(90deg,#fff,#9BF0CC);--l-on:rgba(110,231,183,.85);--l-pk:#CFFAE8;--l-off:rgba(255,255,255,.14);--l-g1:rgba(110,231,183,.16);--l-g2:rgba(52,211,153,.32);--l-ubg:rgba(248,113,113,.22);--l-ufg:#FCA5A5;--l-dbg:rgba(52,211,153,.24);--l-dfg:#6EE7B7}}
+:root[data-theme="dark"] .panel.rpt .lph{--l-bg:linear-gradient(135deg,#052a20,#0a5a43 58%,#073a2d);--l-brd:rgba(110,231,183,.28);--l-sh:0 18px 34px -18px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.16);--l-ink:rgba(232,251,243,.8);--l-k:rgba(232,251,243,.72);--l-n:linear-gradient(90deg,#fff,#9BF0CC);--l-on:rgba(110,231,183,.85);--l-pk:#CFFAE8;--l-off:rgba(255,255,255,.14);--l-g1:rgba(110,231,183,.16);--l-g2:rgba(52,211,153,.32);--l-ubg:rgba(248,113,113,.22);--l-ufg:#FCA5A5;--l-dbg:rgba(52,211,153,.24);--l-dfg:#6EE7B7}
+:root:root:root .panel.rpt .lph{position:relative;isolation:isolate;overflow:hidden;display:flex;flex-direction:column;gap:4px;padding:18px 18px 14px;border-radius:26px;color:var(--l-ink);background:var(--l-bg);border:1px solid var(--l-brd);box-shadow:var(--l-sh)}
+.lph::before{content:"";position:absolute;z-index:-1;right:-70px;top:-80px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,var(--l-g1),transparent 70%)}
+.lph::after{content:"";position:absolute;z-index:-1;left:-60px;bottom:-90px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,var(--l-g2),transparent 70%)}
+.lph-top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.lph-k{font:700 10px var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--l-k)}
+.lph-p{font:700 11px var(--body);padding:5px 10px;border-radius:99px}
+.lph-p.up{background:var(--l-ubg);color:var(--l-ufg)}.lph-p.dn{background:var(--l-dbg);color:var(--l-dfg)}
+.lph-n{font:800 40px/1.05 var(--display);letter-spacing:-.03em;background:var(--l-n);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+.lph small{font-size:12px;color:var(--l-ink)}
+.lph-bars{display:flex;align-items:flex-end;gap:2px;height:54px;margin-top:12px}
+.lph-bars i{flex:1;min-width:0;border-radius:3px;background:var(--l-off)}
+.lph-bars i.on{background:var(--l-on)}.lph-bars i.pk{background:var(--l-pk)}
+.lph-ax{display:flex;justify-content:space-between;font:600 10px var(--body);color:var(--l-k)}
+</style>
 <!-- NOTA / NOTE: tambah entri baru di atas CHANGELOG setiap kali fail ni diubah; nombor versi automatik, jangan edit. / Add a new entry at the TOP of CHANGELOG on every change; version is automatic. -->
 </body></html>
