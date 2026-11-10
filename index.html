@@ -4910,6 +4910,9 @@ document.addEventListener('click',function(e){
    FOR WHOEVER EDITS THIS APP: on every change add ONE new entry at the TOP of CHANGELOG (unique id, date, short ms + en bullets). */
 (function(){
 var CHANGELOG=[
+ {id:'2026-11-11-k',d:'2026-11-11',
+  ms:['Butang Imbas resit mod gelap: hijau lebih terang dengan kilau kaca dan kilat bergerak'],
+  en:['Dark-mode Scan receipt button: brighter green with glass shine and moving sheen']},
  {id:'2026-11-11-j',d:'2026-11-11',
   ms:['Kad \u201cJumlah belanja\u201d mod gelap: versi gelap kepada rupa mod cerah (hijau tua ke zaitun, kilau kuning lembut, bar emas)'],
   en:['Dark-mode \u201cTotal spending\u201d card: dark version of the light look (deep green to olive, soft yellow glow, gold bar)']},
@@ -5870,12 +5873,12 @@ addEventListener('hashchange',function(){s()});
 .bdt-g b{font-size:13px;color:var(--ink);overflow-wrap:anywhere}.bdt-g b.up{color:var(--bad)}.bdt-g b.dn{color:var(--good,#10b981)}
 .bdt-g b.dn[class]{}
 /* butang Imbas resit: mod gelap = hijau tua, tak silau */
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn.scanbtn{background:linear-gradient(120deg,#053b2d,#0a5a43,#0b6b52,#053b2d)!important;background-size:260% 100%;border:1px solid rgba(110,231,183,.28)!important;color:#E8FBF3!important;box-shadow:0 8px 22px -10px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.14)!important;animation:sbg 6s ease-in-out infinite alternate!important}
-:root:not([data-theme="light"]) .scanbtn .sbs{background:linear-gradient(115deg,transparent 40%,rgba(110,231,183,.16) 50%,transparent 60%)}
-:root:not([data-theme="light"]) .scanbtn .sbi{background:linear-gradient(145deg,rgba(110,231,183,.22),rgba(110,231,183,.06))!important;border:1px solid rgba(110,231,183,.25)}}
-:root[data-theme="dark"] .btn.scanbtn{background:linear-gradient(120deg,#053b2d,#0a5a43,#0b6b52,#053b2d)!important;background-size:260% 100%;border:1px solid rgba(110,231,183,.28)!important;color:#E8FBF3!important;box-shadow:0 8px 22px -10px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.14)!important;animation:sbg 6s ease-in-out infinite alternate!important}
-:root[data-theme="dark"] .scanbtn .sbs{background:linear-gradient(115deg,transparent 40%,rgba(110,231,183,.16) 50%,transparent 60%)}
-:root[data-theme="dark"] .scanbtn .sbi{background:linear-gradient(145deg,rgba(110,231,183,.22),rgba(110,231,183,.06))!important;border:1px solid rgba(110,231,183,.25)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn.scanbtn{background:linear-gradient(180deg,rgba(255,255,255,.34) 0,rgba(255,255,255,.08) 46%,rgba(255,255,255,0) 52%),linear-gradient(120deg,#0e8a66,#19c394,#12b886,#0e8a66)!important;background-size:100% 100%,260% 100%!important;border:1px solid rgba(190,255,225,.6)!important;color:#fff!important;box-shadow:0 12px 26px -10px rgba(16,185,129,.65),0 0 0 1px rgba(16,185,129,.25),inset 0 1px 0 rgba(255,255,255,.65),inset 0 -10px 18px rgba(0,60,40,.25)!important;animation:sbg 6s ease-in-out infinite alternate!important}
+:root:not([data-theme="light"]) .scanbtn .sbs{background:linear-gradient(115deg,transparent 36%,rgba(255,255,255,.5) 50%,transparent 64%)}
+:root:not([data-theme="light"]) .scanbtn .sbi{background:linear-gradient(145deg,rgba(255,255,255,.42),rgba(255,255,255,.12))!important;border:1px solid rgba(255,255,255,.5);box-shadow:inset 0 1px 0 rgba(255,255,255,.7)}}
+:root[data-theme="dark"] .btn.scanbtn{background:linear-gradient(180deg,rgba(255,255,255,.34) 0,rgba(255,255,255,.08) 46%,rgba(255,255,255,0) 52%),linear-gradient(120deg,#0e8a66,#19c394,#12b886,#0e8a66)!important;background-size:100% 100%,260% 100%!important;border:1px solid rgba(190,255,225,.6)!important;color:#fff!important;box-shadow:0 12px 26px -10px rgba(16,185,129,.65),0 0 0 1px rgba(16,185,129,.25),inset 0 1px 0 rgba(255,255,255,.65),inset 0 -10px 18px rgba(0,60,40,.25)!important;animation:sbg 6s ease-in-out infinite alternate!important}
+:root[data-theme="dark"] .scanbtn .sbs{background:linear-gradient(115deg,transparent 36%,rgba(255,255,255,.5) 50%,transparent 64%)}
+:root[data-theme="dark"] .scanbtn .sbi{background:linear-gradient(145deg,rgba(255,255,255,.42),rgba(255,255,255,.12))!important;border:1px solid rgba(255,255,255,.5);box-shadow:inset 0 1px 0 rgba(255,255,255,.7)}
 </style>
 <style id="mm-lockfix">
 html.mmlock,html.mmlock body{overflow:hidden!important;overscroll-behavior:none!important;height:100%}
