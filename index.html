@@ -3339,10 +3339,12 @@ function render(){
     html+=(({ringkasan:vRingkasan,simpanan:vSimpanan,komitmen:vKomitmen,bil:vBil,delivery:vDelivery,belanja:vBelanja})[tab]||(()=>vCustom(C,tab)))(C);
   }
   const ae=document.activeElement,key=ae&&ae.dataset?ae.dataset.k:null;let ss=null;try{ss=ae.selectionStart}catch(e){}
+  const sy0=window.scrollY,sameTab=render.lt===tab;render.lt=tab;
   main.innerHTML=html;
+  if(sameTab&&sy0>0){window.scrollTo(0,sy0);requestAnimationFrame(()=>{if(Math.abs(window.scrollY-sy0)>2)window.scrollTo(0,sy0)})}
   animEnter(tab);animNums(tab);popNew();applyBlFilter();
   if(pendingFocus){const el=[...main.querySelectorAll('[data-k]')].find(e=>e.type!=='checkbox'&&(e.dataset.k===pendingFocus||e.dataset.k.startsWith(pendingFocus+'.')||e.dataset.k.startsWith(pendingFocus)));pendingFocus=null;if(el){try{el.focus({preventScroll:true})}catch(e){el.focus()}setTimeout(()=>{try{if(document.activeElement===el)el.scrollIntoView({block:'center',behavior:'smooth'})}catch(e){}},320)}}
-  else if(key){const el=[...main.querySelectorAll('[data-k]')].find(e=>e.dataset.k===key);if(el){el.focus();try{if(ss!=null)el.setSelectionRange(ss,ss)}catch(e){}}}
+  else if(key){const el=[...main.querySelectorAll('[data-k]')].find(e=>e.dataset.k===key);if(el){try{el.focus({preventScroll:true})}catch(e2){el.focus()}try{if(ss!=null)el.setSelectionRange(ss,ss)}catch(e){}}}
   try{document.dispatchEvent(new Event('mm-sec'))}catch(e){}
 }
 document.addEventListener('scroll',e=>{const t=e.target;if(t&&t.id==='svSc')svX=t.scrollLeft},true);
