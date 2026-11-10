@@ -1,4 +1,4 @@
-const CACHE='mm-v5';
+const CACHE='mm-v6';
 const CORE=['./','index.html','manifest.json','kucing-192.png','kucing-512.png'];
 self.addEventListener('install',e=>{
   self.skipWaiting();
@@ -14,15 +14,27 @@ self.addEventListener('fetch',e=>{
   if(u.origin!==location.origin)return;
   const isPage=r.mode==='navigate'||u.pathname.endsWith('.html')||u.pathname.endsWith('/');
   const key=isPage?'index.html':r;
-  // cache first = opens instantly; fresh copy is fetched in the background for next time
+  const net=()=>fetch(r,{cache:'no-cache'}).then(res=>{
+    if(res&&res.ok){const copy=res.clone();caches.open(CACHE).then(c=>c.put(key,copy)).catch(()=>{})}
+    return res;
+  });
+  if(isPage){
+    e.respondWith(
+      caches.match(key).then(m=>{
+        const n=net();
+        if(!m)return n;
+        const slow=new Promise(ok=>setTimeout(()=>ok(m),2500));
+        e.waitUntil(n.catch(()=>{}));
+        return Promise.race([n.catch(()=>m),slow]);
+      })
+    );
+    return;
+  }
   e.respondWith(
     caches.match(key).then(m=>{
-      const net=fetch(r,{cache:'no-cache'}).then(res=>{
-        if(res&&res.ok){const copy=res.clone();caches.open(CACHE).then(c=>c.put(key,copy)).catch(()=>{})}
-        return res;
-      }).catch(()=>m);
-      if(m){e.waitUntil(net.catch(()=>{}));return m}
-      return net;
+      const n=net().catch(()=>m);
+      if(m){e.waitUntil(n.catch(()=>{}));return m}
+      return n;
     })
   );
 });
