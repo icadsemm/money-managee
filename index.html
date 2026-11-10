@@ -5537,6 +5537,16 @@ html.mm-bg .hstars *,html.mm-bg .voicebtn,html.mm-bg .voicebtn::after,html.mm-bg
 :root:not([data-theme="light"]) #blAdd .cats .cat>span{background:color-mix(in srgb,var(--mint) 14%,transparent);box-shadow:none;width:28px;height:28px;font-size:15px}
 :root:not([data-theme="light"]) #blAdd .sec-h .lnk{background:color-mix(in srgb,var(--mint) 10%,transparent);border-color:color-mix(in srgb,var(--mint) 32%,transparent);color:var(--mint)}
 }
+/* ===== prestasi: scroll & peralihan lebih lancar ===== */
+.bt>div,.rpt-hero,.rpt-hero::after,.bt>div::after,.banner,.pad button,.seg{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+:root:root:root:root:root .tabs{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:linear-gradient(160deg,color-mix(in srgb,var(--surface) 95%,transparent),color-mix(in srgb,var(--surface2) 95%,transparent))!important}
+/* panel jauh dari skrin tak dilukis sehingga hampir kelihatan */
+main>section.panel:nth-child(n+3){content-visibility:auto;contain-intrinsic-size:auto 560px}
+/* animasi masuk: ringan, cuma 3 kad pertama */
+main.enter>*{animation-duration:.38s}
+main.enter>*:nth-child(n+4){animation:none!important}
+/* hentikan animasi hiasan sepanjang scroll */
+html.mm-scr header.top *,html.mm-scr header.top *::before,html.mm-scr header.top *::after,html.mm-scr .voicebtn *,html.mm-scr .scanbtn *,html.mm-scr .scanbtn *::before,html.mm-scr .scanbtn *::after,html.mm-scr .h3d-coin *,html.mm-scr .cam *{animation-play-state:paused!important}
 </style>
 
 
@@ -5571,6 +5581,14 @@ html.mm-bg .hstars *,html.mm-bg .voicebtn,html.mm-bg .voicebtn::after,html.mm-bg
   addEventListener('resize',q);
   document.addEventListener('visibilitychange',function(){H.classList.toggle('mm-bg',document.hidden);if(!document.hidden)q()});
   q();setInterval(q,1500);
+})();
+</script>
+<script>
+(function(){var t=0,on=0,H=document.documentElement;
+function s(){if(!on){on=1;H.classList.add('mm-scr')}clearTimeout(t);t=setTimeout(function(){on=0;H.classList.remove('mm-scr')},160)}
+addEventListener('scroll',s,{passive:true,capture:true});
+addEventListener('touchmove',s,{passive:true});
+addEventListener('hashchange',function(){s()});
 })();
 </script>
 </body></html>
