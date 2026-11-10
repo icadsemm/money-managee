@@ -1,5 +1,28 @@
-const CACHE='mm-v6';
+const CACHE='mm-v7';
 const CORE=['./','index.html','manifest.json','kucing-192.png','kucing-512.png'];
+// ---- kesan versi baru secara automatik (bandingkan hash index.html) ----
+async function hashBuf(buf){
+  const d=await crypto.subtle.digest('SHA-256',buf);
+  return Array.from(new Uint8Array(d).slice(0,6)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+self.addEventListener('message',e=>{
+  const d=e.data||{},src=e.source;if(!src)return;
+  if(d.type==='GET_BUILD'){
+    e.waitUntil((async()=>{try{
+      const m=await caches.match('index.html');
+      if(m)src.postMessage({type:'BUILD',run:await hashBuf(await m.arrayBuffer())});
+    }catch(x){}})());
+  }else if(d.type==='CHECK_BUILD'){
+    e.waitUntil((async()=>{try{
+      const res=await fetch('index.html',{cache:'no-store'});
+      if(!res||!res.ok){src.postMessage({type:'BUILD',err:1});return}
+      const copy=res.clone();
+      const buf=await res.arrayBuffer();
+      const c=await caches.open(CACHE);await c.put('index.html',copy);
+      src.postMessage({type:'BUILD',latest:await hashBuf(buf)});
+    }catch(x){src.postMessage({type:'BUILD',err:1})}})());
+  }
+});
 self.addEventListener('install',e=>{
   self.skipWaiting();
   e.waitUntil(caches.open(CACHE).then(c=>Promise.all(CORE.map(u=>c.add(new Request(u,{cache:'reload'})).catch(()=>{})))));
