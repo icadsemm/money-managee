@@ -4913,6 +4913,9 @@ document.addEventListener('click',function(e){
    FOR WHOEVER EDITS THIS APP: on every change add ONE new entry at the TOP of CHANGELOG (unique id, date, short ms + en bullets). */
 (function(){
 var CHANGELOG=[
+ {id:'2026-11-11-q',d:'2026-11-11',
+  ms:['Candle graf pendapatan bersih dibuat semula: warna hijau/merah lebih pekat, kilau specular halus di tepi dan bayang cahaya (tiada lagi rupa kaca pudar)','Kotak Purata / Tertinggi / Capai target dibuat semula: kad hijau gelap kemas dengan garis cahaya halus di atas, tanpa kilau sudut'],
+  en:['Net income chart candles rebuilt: richer green/red, soft specular edge shine and glow (no more washed-out glass look)','Average / Highest / Hit target boxes rebuilt: clean dark-green cards with a thin top light line, no corner glow']},
  {id:'2026-11-11-p',d:'2026-11-11',
   ms:['Semua candle graf pendapatan bersih kini berkilau halus (bukan candle terkini sahaja); candle terkini masih paling terang'],
   en:['All net income chart candles now have a soft shine (not just the latest one); the latest is still the brightest']},
@@ -6345,6 +6348,23 @@ sch()})();
 :root:root:root:root:root:root:root:root:root:root:root .dvx .dvx-st>div::after{content:"";position:absolute;inset:0 auto 0 0;width:3px;border-radius:3px;background:linear-gradient(180deg,var(--sx-ac),transparent);z-index:-1}
 :root:root:root:root:root:root:root:root:root:root:root .dvx .dvx-st>div::before{content:"";position:absolute;right:-26px;top:-30px;width:80px;height:80px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--sx-ac) 28%,transparent),transparent 70%);z-index:-1;pointer-events:none}
 :root:root:root:root:root:root:root:root:root:root:root .dvx .dvx-st b{font-size:18px;font-weight:800;letter-spacing:-.01em}
+</style>
+<style id="mm-dvx-v3">
+/* Candle pekat berkilau + kotak ringkas kemas */
+:root:root:root:root:root:root:root:root:root:root:root:root .dvx .mchart .mb i{max-width:38px;border-radius:12px 12px 4px 4px;overflow:visible;background:linear-gradient(180deg,#5BEBB9 0,#1FC590 38%,#0A8F68 100%);box-shadow:0 12px 22px -10px rgba(16,185,129,.9),0 0 18px -6px rgba(52,211,153,.7)}
+:root:root:root:root:root:root:root:root:root:root:root:root .dvx .mchart .mb.low i{background:linear-gradient(180deg,#FF8DA1 0,#F0405F 38%,#B31E3D 100%);box-shadow:0 12px 22px -10px rgba(244,63,94,.9),0 0 18px -6px rgba(251,113,133,.7)}
+:root:root:root:root:root:root:root:root:root:root:root:root .dvx .mchart .mb i::before{content:none}
+:root:root:root:root:root:root:root:root:root:root:root:root .dvx .mchart .mb i::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;animation:none;background:linear-gradient(90deg,rgba(255,255,255,0) 8%,rgba(255,255,255,.4) 21%,rgba(255,255,255,0) 36%),linear-gradient(180deg,rgba(255,255,255,.3) 0,rgba(255,255,255,0) 28%),linear-gradient(180deg,rgba(0,0,0,0) 62%,rgba(0,40,28,.28) 100%)}
+:root:root:root:root:root:root:root:root:root:root:root:root .dvx .mchart .mb:last-child i{box-shadow:0 12px 22px -10px rgba(16,185,129,.95),0 0 26px -2px rgba(52,211,153,.85)}
+:root:root:root:root:root:root:root:root:root:root:root:root .dvx .mchart .mb.low:last-child i{box-shadow:0 12px 22px -10px rgba(244,63,94,.95),0 0 26px -2px rgba(251,113,133,.8)}
+:root:root:root:root:root:root:root:root:root:root:root:root .dvx .mchart .bv{color:var(--ink);font-weight:700;text-shadow:none}
+
+:root .dvx{--bx1:#FFFFFF;--bx2:#DDF3E8;--bxb:rgba(16,185,129,.38);--bxs:rgba(6,78,59,.32);--bxl:rgba(16,185,129,.65);--bxi:rgba(255,255,255,.95)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .dvx{--bx1:rgba(26,110,82,.55);--bx2:rgba(5,30,22,.95);--bxb:rgba(110,231,183,.26);--bxs:rgba(0,0,0,.8);--bxl:rgba(190,255,225,.7);--bxi:rgba(190,255,225,.22)}}
+:root[data-theme="dark"] .dvx{--bx1:rgba(26,110,82,.55);--bx2:rgba(5,30,22,.95);--bxb:rgba(110,231,183,.26);--bxs:rgba(0,0,0,.8);--bxl:rgba(190,255,225,.7);--bxi:rgba(190,255,225,.22)}
+:root:root:root:root:root:root:root:root:root:root:root:root .dvx .dvx-st>div{padding:12px 14px;border-radius:16px;border:1px solid var(--bxb);background:linear-gradient(165deg,var(--bx1),var(--bx2));box-shadow:0 10px 22px -14px var(--bxs),inset 0 1px 0 var(--bxi)}
+:root:root:root:root:root:root:root:root:root:root:root:root .dvx .dvx-st>div::before{content:"";position:absolute;left:16px;right:16px;top:0;width:auto;height:1px;border-radius:0;background:linear-gradient(90deg,transparent,var(--bxl),transparent);z-index:0}
+:root:root:root:root:root:root:root:root:root:root:root:root .dvx .dvx-st>div::after{content:none}
 </style>
 <!-- NOTA / NOTE: tambah entri baru di atas CHANGELOG setiap kali fail ni diubah; nombor versi automatik, jangan edit. / Add a new entry at the TOP of CHANGELOG on every change; version is automatic. -->
 </body></html>
