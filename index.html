@@ -2269,7 +2269,7 @@ const DEF={
 const state={};DOCS.forEach(n=>state[n]=DEF[n]());
 const last={},dirty=new Set(),writing={},again={},timers={};
 let fxBusy=false,fxMsg='';
-let blPick=-1,blTog={},blSel=todayISO(),blMonth=nowYm(),catEdit=false,blRange='h',blQ='',blCat='';
+let blPick=-1,blTog={},hiTog={},blSel=todayISO(),blMonth=nowYm(),catEdit=false,blRange='h',blQ='',blCat='';
 try{blRange=localStorage.getItem('blRange')||'h'}catch(e){}
 const DEFCATS=[{e:'🍽️',n:'Makan'},{e:'🥤',n:'Minum'},{e:'☕',n:'Kopi'},{e:'🧾',n:'Bil'},{e:'⛽',n:'Minyak'},{e:'🅿️',n:'Parking / Tol'},{e:'🛒',n:'Barang'},{e:'💊',n:'Ubat'},{e:'📱',n:'Topup'},{e:'📦',n:'Lain-lain'}];
 let dvMonth=nowYm(),dvSel=todayISO();
@@ -2772,11 +2772,11 @@ function vSimpanan(C){
     return `<div class="mrow"><span class="ml">${ymLab(x.m.ym)}</span>${inN(`saving.monthly.${x.i}.amt`,x.m.amt,'Simpanan '+ymLab(x.m.ym))}<span class="md num">${diff==null?'':`<em class="${diff>0?'up':diff<0?'dn':''}">${(diff>0?'+':'')+diff.toFixed(0)}</em> · `}${rm(cumMap[x.i],0)}</span>${del('saving.monthly',x.i,ymLab(x.m.ym))}</div>`});
   const MONN=3;const monRows=(monAll?monRowsA:monRowsA.slice(-MONN)).join('');
   const monBtn=mon.length>MONN?`<button type="button" class="btn ghost monmore" data-act="monall" aria-expanded="${monAll}" style="width:100%">${monAll?'Sembunyi ▴':'Tunjuk semua ('+mon.length+') ▾'}</button>`:'';
-  const hist=s.history.map((h,i)=>({h,i})).sort((x,y)=>x.h.ym<y.h.ym?-1:1).map(({h,i})=>{const pr=(+h.nilai||0)-(+h.modal||0),roi=h.modal>0?pr/h.modal:0;
+  const hSorted=s.history.map((h,i)=>({h,i})).sort((x,y)=>x.h.ym<y.h.ym?-1:1),hLast=hSorted.length?hSorted[hSorted.length-1].h.ym:'',hIsOpen=ym=>ym in hiTog?hiTog[ym]:ym===hLast,hist=hSorted.map(({h,i})=>{const hOpen=hIsOpen(h.ym),pr=(+h.nilai||0)-(+h.modal||0),roi=h.modal>0?pr/h.modal:0;
     const hmx=Math.max(+h.modal||0,+h.nilai||0,1);
-    return `<div class="acc histc ${pr<0?'dn':'up'}"><div class="acc-h"><b>${ymLab(h.ym)}</b>${del('saving.history',i,ymLab(h.ym))}</div>
-    <div class="hsum2"><div class="hbig ${pr<0?'dn':'up'}"><b>${pr<0?'−':'+'}${pc(Math.abs(roi),2)}</b><small>ROI</small></div><div class="hflow"><span class="hpf ${pr<0?'neg':pr>0?'pos':''}">${pr>0?'+':''}${rm(pr)}</span><span class="hmn"><small>Modal</small> ${rm(+h.modal||0,0)}</span><span class="hmn"><small>Nilai</small> ${rm(+h.nilai||0,0)}</span></div></div>
-    <div class="acc-g"><label class="lab">Modal (RM)${inN(`saving.history.${i}.modal`,h.modal,'Modal '+ymLab(h.ym))}</label><label class="lab">Nilai (RM)${inN(`saving.history.${i}.nilai`,h.nilai,'Nilai '+ymLab(h.ym))}</label></div></div>`}).join('');
+    return `<div class="acc histc ${pr<0?'dn':'up'}${hOpen?'':' shut'}"><div class="acc-h hh"><button type="button" class="hth" data-act="histog" data-ym="${esc(h.ym)}" aria-expanded="${hOpen}"><span class="dchev" aria-hidden="true">\u203A</span><b>${ymLab(h.ym)}</b><span class="hmini">${pr<0?'\u2212':'+'}${pc(Math.abs(roi),2)}</span></button>${del('saving.history',i,ymLab(h.ym))}</div>
+    <div class="hbody"><div class="hin"><div class="hsum2"><div class="hbig ${pr<0?'dn':'up'}"><b>${pr<0?'−':'+'}${pc(Math.abs(roi),2)}</b><small>ROI</small></div><div class="hflow"><span class="hpf ${pr<0?'neg':pr>0?'pos':''}">${pr>0?'+':''}${rm(pr)}</span><span class="hmn"><small>Modal</small> ${rm(+h.modal||0,0)}</span><span class="hmn"><small>Nilai</small> ${rm(+h.nilai||0,0)}</span></div></div>
+    <div class="acc-g"><label class="lab">Modal (RM)${inN(`saving.history.${i}.modal`,h.modal,'Modal '+ymLab(h.ym))}</label><label class="lab">Nilai (RM)${inN(`saving.history.${i}.nilai`,h.nilai,'Nilai '+ymLab(h.ym))}</label></div></div></div></div>`}).join(''),hAllOpen=hSorted.length>0&&hSorted.every(({h})=>hIsOpen(h.ym));
   const yrs={};s.monthly.forEach(m=>{if(m.amt>0){const y=m.ym.slice(0,4);(yrs[y]=yrs[y]||[]).push(+m.amt)}});
   return `
   <section class="panel">
@@ -2811,6 +2811,7 @@ function vSimpanan(C){
   <section class="panel">
     <div class="sec-h">${head('Sejarah modal vs nilai','Hujung bulan, simpan angka semasa.')}</div>
     <div class="btns"><button class="btn" data-act="snap">Simpan snapshot ${ymLab(nowYm())}</button>${add('saving.history','Bulan')}</div>
+    ${hSorted.length>1?`<div class="hall"><button type="button" class="btn ghost" data-act="hiall" data-v="${hAllOpen?0:1}">${hAllOpen?'Tutup semua':'Buka semua'}</button></div>`:''}
     ${hist||'<p class="empty">Belum ada sejarah.</p>'}
   </section>
   <section class="panel">
@@ -2822,6 +2823,7 @@ function vSimpanan(C){
 `;
 }
 
+function hiSync(){const b=document.querySelector('[data-act=hiall]');if(!b)return;const all=[...document.querySelectorAll('.acc.histc')],open=all.length>0&&all.every(a=>!a.classList.contains('shut')),T=window.mmTr||(x=>x);b.dataset.v=open?'0':'1';b.textContent=T(open?'Tutup semua':'Buka semua')}
 function vKomitmen(C){
   const k=state.komitmen;
   const ratioCls=C.k.income>0?(C.k.ratio<=.7?['Sihat','']:C.k.ratio<=.9?['Berhati-hati','warn']:['Bahaya','bad']):['-',''];
@@ -3152,7 +3154,7 @@ async function lpImage(){
     const V=n=>cs.getPropertyValue(n).trim(),disp=V('--display')||'sans-serif',body=V('--body')||'sans-serif';
     const col={bg:V('--surface')||'#fff',ink:V('--ink')||'#111',mute:V('--mute')||'#667',bad:V('--bad')||'#DC2626',good:V('--good')||'#15803D'};
     if(document.fonts&&document.fonts.ready)await document.fonts.ready;
-    const MINT=V('--mint')||'#34D399',CATA=[1,.8,.64,.5,.4,.32,.25,.18],ACC=V('--accent')||MINT,top=d.cats.slice(0,3),tiles=laporanTiles(d),W=1080,P=64,HDR=124,HERO=400,GAP=30,ROW=118,CATS=top.length?20+18+top.length*ROW+16:0,TH=128,TG=18,TROWS=(()=>{let r=0,k=0;tiles.forEach(q=>{if(q.w){if(k){r++;k=0}r++}else{k++;if(k===2){r++;k=0}}});return r+(k?1:0)})(),GRID=TROWS*TH+(TROWS-1)*TG,FOOT=124;
+    const MINT=V('--mint')||'#34D399',CATA=[1,.8,.64,.5,.4,.32,.25,.18],ACC=V('--accent')||MINT,top=d.cats.slice(0,3),tiles=laporanTiles(d),W=1080,P=64,HDR=124,HERO=400,GAP=30,ROW=118,CATS=top.length?20+18+top.length*ROW-14:0,TH=128,TG=18,TROWS=(()=>{let r=0,k=0;tiles.forEach(q=>{if(q.w){if(k){r++;k=0}r++}else{k++;if(k===2){r++;k=0}}});return r+(k?1:0)})(),GRID=TROWS*TH+(TROWS-1)*TG,FOOT=124;
     const H=P+HDR+HERO+GAP+(CATS?CATS+GAP:0)+GRID+FOOT,cv=document.createElement('canvas');cv.width=W;cv.height=H;
     const x=cv.getContext('2d');
     const rr=(a,b,w,h,r)=>{x.beginPath();x.moveTo(a+r,b);x.arcTo(a+w,b,a+w,b+h,r);x.arcTo(a+w,b+h,a,b+h,r);x.arcTo(a,b+h,a,b,r);x.arcTo(a,b,a+w,b,r);x.closePath()};
@@ -3198,20 +3200,19 @@ async function lpImage(){
       const gap=6,tw=parts.reduce((q,z)=>q+Math.max(z.v,T0*.02),0),avail=bw-gap*(parts.length-1);let sx=P;
       parts.forEach(z=>{const w=Math.max(14,avail*Math.max(z.v,T0*.02)/tw);rr(sx,y,w,20,10);x.fillStyle=z.c;x.globalAlpha=z.a;x.fill();x.globalAlpha=1;sx+=w+gap});
       y+=20+18;
-      glass(P,y,bw,top.length*ROW+16,30);
       top.forEach(([n,v],i)=>{
-        const y0=y+8+i*ROW,c=ACC,al=CATA[Math.min(i,CATA.length-1)],pct=d.tot>0?v/d.tot:0,cx=P+34+34,cy=y0+ROW/2,rx=P+bw-34;
-        if(i){x.beginPath();x.moveTo(P+34,y0);x.lineTo(P+bw-34,y0);x.lineWidth=2;x.strokeStyle=G.div;x.stroke()}
-        x.beginPath();x.arc(cx,cy,34,0,Math.PI*2);x.fillStyle=dark?'rgba(255,255,255,.08)':'rgba(15,23,42,.06)';x.fill();x.lineWidth=2;x.strokeStyle=G.brd;x.stroke();
+        const y0=y+i*ROW,RH=ROW-14,c=ACC,al=CATA[Math.min(i,CATA.length-1)],pct=d.tot>0?v/d.tot:0,cx=P+30+34,cy=y0+RH/2,rx=P+bw-30;
+        glass(P,y0,bw,RH,28);
+        x.beginPath();x.arc(cx,cy,34,0,Math.PI*2);x.fillStyle=dark?'rgba(52,211,153,.14)':'rgba(16,185,129,.12)';x.fill();x.lineWidth=2;x.strokeStyle=G.brd;x.stroke();
         x.fillStyle=col.ink;x.font='34px '+body;x.textAlign='center';x.fillText(catIcon(n),cx,cy+12);x.textAlign='left';
-        const nx=P+34+68+26;
-        x.fillStyle=col.ink;x.font='700 34px '+body;x.fillText(T(n),nx,y0+50);
-        x.font='800 34px '+disp;x.textAlign='right';x.fillText(rm(v),rx,y0+50);
-        x.fillStyle=col.mute;x.font='600 25px '+body;x.fillText(Math.round(pct*100)+'%',rx,y0+92);x.textAlign='left';
-        const trw=rx-110-nx;rr(nx,y0+76,trw,12,6);x.fillStyle=dark?'rgba(255,255,255,.10)':'rgba(15,23,42,.08)';x.fill();
-        if(pct>0){rr(nx,y0+76,Math.max(12,trw*pct),12,6);x.fillStyle=c;x.globalAlpha=al;x.fill();x.globalAlpha=1}
+        const nx=cx+34+24;
+        x.fillStyle=col.ink;x.font='700 34px '+body;x.fillText(T(n),nx,y0+46);
+        x.font='800 34px '+disp;x.textAlign='right';x.fillText(rm(v),rx,y0+46);
+        x.fillStyle=col.mute;x.font='600 25px '+body;x.fillText(Math.round(pct*100)+'%',rx,y0+88);x.textAlign='left';
+        const trw=rx-110-nx;rr(nx,y0+66,trw,12,6);x.fillStyle=dark?'rgba(255,255,255,.10)':'rgba(15,23,42,.08)';x.fill();
+        if(pct>0){rr(nx,y0+66,Math.max(12,trw*pct),12,6);x.fillStyle=c;x.globalAlpha=al;x.fill();x.globalAlpha=1}
       });
-      y+=top.length*ROW+16+GAP;
+      y+=top.length*ROW-14+GAP;
     }
     const cw=(W-2*P-TG)/2;let ty=y,k=0;
     const drawTile=(q,bx,by,w)=>{
@@ -3775,6 +3776,8 @@ document.addEventListener('click',e=>{
   if(act==='rcp'){rcpPick();return}
   if(act==='blf'){blCat=b.dataset.v||'';b.parentElement.querySelectorAll('.fchip').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));applyBlFilter();return}
   if(act==='bltog'){const a=b.closest('.acc'),o=a.classList.contains('shut');a.classList.toggle('shut',!o);b.setAttribute('aria-expanded',String(o));blTog[b.dataset.d]=o;return}
+  if(act==='histog'){const a=b.closest('.histc'),o=a.classList.contains('shut');a.classList.toggle('shut',!o);b.setAttribute('aria-expanded',String(o));hiTog[b.dataset.ym]=o;hiSync();return}
+  if(act==='hiall'){const o=b.dataset.v==='1';document.querySelectorAll('.acc.histc').forEach(a=>{a.classList.toggle('shut',!o);const h=a.querySelector('[data-act=histog]');if(h){h.setAttribute('aria-expanded',String(o));hiTog[h.dataset.ym]=o}});hiSync();return}
   if(act==='blall'){const o=b.dataset.v==='1';document.querySelectorAll('#blPanel .acc').forEach(a=>{a.classList.toggle('shut',!o);const h=a.querySelector('[data-act=bltog]');if(h){h.setAttribute('aria-expanded',String(o));blTog[h.dataset.d]=o}});return}
   if(act==='lpshare'){lpImage();return}
   if(act==='blp'){const i=+b.dataset.i,D=window.__blDet,svg=document.getElementById('acSvg');if(!D||!svg)return;blPick=i;
@@ -4910,6 +4913,12 @@ document.addEventListener('click',function(e){
    FOR WHOEVER EDITS THIS APP: on every change add ONE new entry at the TOP of CHANGELOG (unique id, date, short ms + en bullets). */
 (function(){
 var CHANGELOG=[
+ {id:'2026-11-11-m',d:'2026-11-11',
+  ms:['Sejarah modal vs nilai (tab Simpanan) kini premium dalam mod cerah dan gelap: kad hijau, garis aksen kiri, kotak ROI dan input lebih kemas','Setiap bulan boleh dibuka/ditutup (tekan tajuk bulan). Bila ditutup, ROI bulan itu kekal nampak','Butang \u201cBuka semua / Tutup semua\u201d untuk senarai yang panjang. Bulan terkini terbuka secara lalai'],
+  en:['History of capital vs value (Savings tab) is now premium in light and dark mode: green card, left accent line, tidier ROI box and inputs','Each month can be opened/closed (tap the month title). When closed, its ROI stays visible','\u201cOpen all / Close all\u201d button for long lists. The latest month is open by default']},
+ {id:'2026-11-11-l',d:'2026-11-11',
+  ms:['Kotak kategori (Makan, Minyak, dll) dalam Laporan belanja kini premium macam kotak lain: kad hijau lembut, garis aksen kiri, bayang halus','Gambar kongsi pun dikemas kini: setiap kategori jadi kad kaca sendiri, sama dengan rupa dalam app'],
+  en:['Category boxes (Food, Fuel, etc.) in the spending report are now premium like the other boxes: soft green card, left accent line, subtle shadow','The shared image is updated too: each category is its own glass card, matching the in-app look']},
  {id:'2026-11-11-k',d:'2026-11-11',
   ms:['Butang Imbas resit mod gelap: hijau lebih terang dengan kilau kaca dan kilat bergerak'],
   en:['Dark-mode Scan receipt button: brighter green with glass shine and moving sheen']},
@@ -5942,6 +5951,44 @@ sch()})();
 .lph-bars i{flex:1;min-width:0;border-radius:3px;background:var(--l-off)}
 .lph-bars i.on{background:var(--l-on)}.lph-bars i.pk{background:var(--l-pk)}
 .lph-ax{display:flex;justify-content:space-between;font:600 10px var(--body);color:var(--l-k)}
+</style>
+<style id="mm-cat2">
+:root:root:root:root .panel .cat2-r{--tp-a:#F2FCF7;--tp-b:#DDF3E8;--tp-brd:rgba(16,185,129,.30);--tp-gold:rgba(16,185,129,.9);--tp-sh:rgba(6,78,59,.38);--tp-in:rgba(255,255,255,.9);--tp-ac:#10B981;
+ position:relative;isolation:isolate;overflow:hidden;margin-top:8px;padding:12px 14px 12px 17px;border-radius:18px;border:1px solid var(--tp-brd);border-top:1px solid var(--tp-brd);background:linear-gradient(145deg,var(--tp-a),var(--tp-b));box-shadow:0 12px 22px -14px var(--tp-sh),inset 0 1px 0 var(--tp-in)}
+:root:root:root:root .panel .cat2-r:first-child{margin-top:12px}
+:root:root:root:root .panel .cat2-r::after{content:"";position:absolute;inset:0 auto 0 0;width:3px;border-radius:3px;background:linear-gradient(180deg,var(--tp-gold),transparent);pointer-events:none;z-index:-1}
+:root:root:root:root .panel .cat2-ic{background:color-mix(in srgb,var(--tp-ac) 14%,transparent);border:1px solid var(--tp-brd)}
+:root:root:root:root .panel .cat2-t{height:6px;background:color-mix(in srgb,var(--ink) 9%,transparent)}
+:root:root:root:root .panel .cat2-t i{box-shadow:0 0 10px -3px var(--c)}
+@media (prefers-color-scheme:dark){:root:root:root:root:not([data-theme="light"]) .panel .cat2-r{--tp-a:rgba(14,74,56,.62);--tp-b:rgba(4,28,21,.92);--tp-brd:rgba(110,231,183,.20);--tp-gold:rgba(110,231,183,.9);--tp-sh:rgba(0,0,0,.75);--tp-in:rgba(110,231,183,.16);--tp-ac:#34D399}}
+:root:root:root:root[data-theme="dark"] .panel .cat2-r{--tp-a:rgba(14,74,56,.62);--tp-b:rgba(4,28,21,.92);--tp-brd:rgba(110,231,183,.20);--tp-gold:rgba(110,231,183,.9);--tp-sh:rgba(0,0,0,.75);--tp-in:rgba(110,231,183,.16);--tp-ac:#34D399}
+</style>
+<style id="mm-hist">
+:root:root:root:root .panel .acc.histc{--hc-a:#F4FCF8;--hc-b:#DDF3E8;--hc-brd:rgba(16,185,129,.30);--hc-sh:rgba(6,78,59,.38);--hc-in:rgba(255,255,255,.9);--hc-ac:#10B981;--hs-a:#FFFFFF;--hs-b:#E4F9EF;--hs-brd:rgba(16,185,129,.28);--fi-bg:rgba(255,255,255,.88);--fi-brd:rgba(16,160,110,.26);--hc-lab:#4b5f56;position:relative;isolation:isolate;overflow:hidden;padding:14px 14px 14px 17px;border-radius:22px;border:1px solid var(--hc-brd);background:linear-gradient(145deg,var(--hc-a),var(--hc-b));box-shadow:0 12px 22px -14px var(--hc-sh),inset 0 1px 0 var(--hc-in)}
+@media (prefers-color-scheme:dark){:root:root:root:root:not([data-theme="light"]) .panel .acc.histc{--hc-a:rgba(14,74,56,.62);--hc-b:rgba(4,28,21,.92);--hc-brd:rgba(110,231,183,.20);--hc-sh:rgba(0,0,0,.75);--hc-in:rgba(110,231,183,.16);--hc-ac:#34D399;--hs-a:rgba(16,120,90,.40);--hs-b:rgba(4,28,21,.55);--hs-brd:rgba(110,231,183,.22);--fi-bg:rgba(0,0,0,.30);--fi-brd:rgba(110,231,183,.18);--hc-lab:rgba(232,251,243,.7)}}
+:root:root:root:root[data-theme="dark"] .panel .acc.histc{--hc-a:rgba(14,74,56,.62);--hc-b:rgba(4,28,21,.92);--hc-brd:rgba(110,231,183,.20);--hc-sh:rgba(0,0,0,.75);--hc-in:rgba(110,231,183,.16);--hc-ac:#34D399;--hs-a:rgba(16,120,90,.40);--hs-b:rgba(4,28,21,.55);--hs-brd:rgba(110,231,183,.22);--fi-bg:rgba(0,0,0,.30);--fi-brd:rgba(110,231,183,.18);--hc-lab:rgba(232,251,243,.7)}
+:root:root:root:root .panel .acc.histc::after{content:"";display:block;position:absolute;inset:0 auto 0 0;width:3px;border-radius:3px;background:linear-gradient(180deg,var(--hc-ac),transparent);z-index:-1;pointer-events:none}
+:root:root:root:root .panel .acc.histc.dn::after{background:linear-gradient(180deg,#F87171,transparent)}
+:root:root:root:root .panel .acc.histc .hsum2{background:linear-gradient(135deg,var(--hs-a),var(--hs-b));border:1px solid var(--hs-brd);box-shadow:inset 0 1px 0 var(--hc-in)}
+:root:root:root:root .panel .acc.histc .hflow{border-left-color:var(--hs-brd)}
+:root:root:root:root .panel .acc.histc .acc-g .lab{color:var(--hc-lab)}
+:root:root:root:root .panel .acc.histc .acc-g .lab .in.n{background:var(--fi-bg);border:1px solid var(--fi-brd);border-radius:12px;box-shadow:inset 0 1px 2px rgba(0,0,0,.12)}
+:root:root:root:root .panel .acc.histc .hh{display:flex;align-items:center;justify-content:space-between;gap:10px}
+:root:root:root:root .panel .acc.histc .hth{all:unset;box-sizing:border-box;flex:1;min-width:0;min-height:36px;display:flex;align-items:center;gap:10px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+:root:root:root:root .panel .acc.histc .hth:focus-visible{outline:2px solid var(--hc-ac);outline-offset:3px;border-radius:12px}
+:root:root:root:root .panel .acc.histc .hth b{font-family:var(--display);font-size:17px;font-weight:800}
+:root:root:root:root .panel .acc.histc .hmini{margin-left:auto;font:800 13px var(--display);padding:4px 10px;border-radius:99px;font-variant-numeric:tabular-nums;opacity:0;transform:translateY(2px);transition:opacity .2s,transform .2s;pointer-events:none}
+:root:root:root:root .panel .acc.histc.up .hmini{color:var(--accent);background:color-mix(in srgb,var(--hc-ac) 16%,transparent)}
+:root:root:root:root .panel .acc.histc.dn .hmini{color:var(--bad);background:color-mix(in srgb,#F87171 16%,transparent)}
+:root:root:root:root .panel .acc.histc.shut .hmini{opacity:1;transform:none}
+:root:root:root:root .panel .acc.histc .hbody{display:grid;grid-template-rows:1fr;transition:grid-template-rows .3s cubic-bezier(.4,0,.2,1)}
+:root:root:root:root .panel .acc.histc.shut .hbody{grid-template-rows:0fr}
+:root:root:root:root .panel .acc.histc .hin{min-height:0;overflow:hidden;padding:0 2px 2px;margin:0 -2px}
+:root:root:root:root .panel .acc.histc.shut .hin{visibility:hidden;transition:visibility 0s .3s}
+:root:root:root:root .panel .acc.histc .hin>.acc-g{margin-top:2px}
+@media (prefers-reduced-motion:reduce){:root:root:root:root .panel .acc.histc .hbody,:root:root:root:root .panel .acc.histc .hmini{transition:none}}
+.hall{display:flex;margin:0 0 12px}
+:root:root:root:root .panel .hall .btn,:root:root:root:root .panel .hall .btn.ghost{flex:1;min-height:42px;height:auto;padding:0 12px;border-radius:999px!important;font-size:13.5px;font-weight:700;box-shadow:none!important;background:color-mix(in srgb,var(--mint) 10%,transparent)!important;border:1px solid color-mix(in srgb,var(--mint) 35%,transparent)!important;color:var(--accent)!important}
 </style>
 <!-- NOTA / NOTE: tambah entri baru di atas CHANGELOG setiap kali fail ni diubah; nombor versi automatik, jangan edit. / Add a new entry at the TOP of CHANGELOG on every change; version is automatic. -->
 </body></html>
