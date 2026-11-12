@@ -2570,7 +2570,7 @@ function axSplit(C){
   let it=state.saving.accounts.map(x=>({n:x.name||'Akaun',v:(+x.nilai||0)*fx(x),logo:okLogo(x.logo)?x.logo:''})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v);
   const tot=it.reduce((a,x)=>a+x.v,0);if(!it.length||tot<=0)return '';
   if(it.length>6){const rest=it.slice(5);it=it.slice(0,5).concat([{n:'Lain-lain',v:rest.reduce((a,x)=>a+x.v,0),logo:''}])}
-  const A=['#6EE7B7','#A7F3D0','#99F6E4','#FDE68A','#BAE6FD','#C7D2FE'],B=['#059669','#34D399','#0D9488','#E2AE2C','#38BDF8','#818CF8'];
+  const A=['#6EE7B7','#FDE68A','#BAE6FD','#DDD6FE','#FDBA9B','#99F6E4'],B=['#059669','#E2AE2C','#38BDF8','#8B7CF6','#F08A5D','#0D9488'];
   const R=46,SW=11,G=3.2,CI=2*Math.PI*R;let off=0;
   const defs=it.map((x,i)=>`<linearGradient id="axg${i}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${A[i]}"/><stop offset="1" stop-color="${B[i]}"/></linearGradient>`).join('');
   const seg=it.map((x,i)=>{const span=x.v/tot*CI;let len,st,cap='butt';
@@ -2579,13 +2579,32 @@ function axSplit(C){
     else{len=Math.max(span-G,.8);st=off+G/2}
     off+=span;
     return `<circle class="axd-s" style="--i:${i}" cx="60" cy="60" r="${R}" fill="none" stroke="url(#axg${i})" stroke-width="${SW}" stroke-linecap="${cap}" stroke-dasharray="${len.toFixed(2)} ${(CI-len).toFixed(2)}" stroke-dashoffset="${(-st).toFixed(2)}" transform="rotate(-90 60 60)"/>`}).join('');
-  const rows=it.map((x,i)=>`<li style="--c:${B[i]};--c2:${A[i]};--w:${(x.v/tot*100).toFixed(1)}%;--i:${i}"><span class="axd-k">${x.logo?`<img src="${esc(x.logo)}" alt="">`:`<i>${i+1}</i>`}</span><span class="axd-n">${esc(x.n)}</span><b class="axd-p">${pc(x.v/tot,1)}</b><small>${rm(x.v,0)}</small><em></em></li>`).join('');
+  const rows=it.map((x,i)=>`<li tabindex="0" role="button" data-i="${i}" data-p="${pc(x.v/tot,0)}" data-n="${esc(x.n)}" style="--c:${B[i]};--c2:${A[i]};--w:${(x.v/tot*100).toFixed(1)}%;--i:${i}"><span class="axd-k">${x.logo?`<img src="${esc(x.logo)}" alt="">`:`<i>${i+1}</i>`}${x.logo?`<u>${i+1}</u>`:''}</span><span class="axd-n">${esc(x.n)}</span><b class="axd-p">${pc(x.v/tot,1)}</b><small>${rm(x.v,0)}</small><em></em></li>`).join('');
+  const strip=it.map((x,i)=>`<i data-i="${i}" style="--c:${B[i]};--c2:${A[i]};flex:${Math.max(x.v/tot,.012).toFixed(4)}"></i>`).join('');
+  const share=it[0].v/tot,lvl=share>=.7?0:share>=.5?1:2,pips=it.length>=2?Math.min(5,Math.max(1,Math.round((1-share)*6))):1;
+  const tone=['warn','mid','ok'][lvl],lab=['Tertumpu pada satu akaun','Agak tertumpu','Agihan seimbang'][lvl];
   const top=it[0];
   return `<section class="panel axd"><div class="sec-h">${head('Pecahan aset','Duit awak tersimpan kat mana.')}</div>
-    <div class="axd-hero"><div class="axd-d" role="img" aria-label="Pecahan aset ikut akaun"><svg viewBox="0 0 120 120"><defs>${defs}</defs><circle cx="60" cy="60" r="${R}" fill="none" stroke="rgba(127,160,145,.14)" stroke-width="${SW}"/>${seg}</svg><div class="axd-c"><b>${pc(top.v/tot,0)}</b><small>${esc(top.n)}</small></div></div>
+    <div class="axd-hero"><div class="axd-d" role="img" aria-label="Pecahan aset ikut akaun"><svg viewBox="0 0 120 120"><defs>${defs}</defs><circle cx="60" cy="60" r="${R}" fill="none" stroke="rgba(127,160,145,.14)" stroke-width="${SW}"/>${seg}<circle cx="60" cy="60" r="${R-SW/2-1}" fill="none" stroke="rgba(255,255,255,.28)" stroke-width=".8"/></svg><div class="axd-c" data-b="${pc(top.v/tot,0)}" data-s="${esc(top.n)}"><b>${pc(top.v/tot,0)}</b><small>${esc(top.n)}</small></div></div>
     <div class="axd-t"><small>Jumlah aset</small><b>${rm(tot,0)}</b><div class="axd-chips"><span>${it.length} akaun</span><span>Terbesar · ${esc(top.n)}</span></div></div></div>
+    <div class="axd-strip" aria-hidden="true">${strip}</div>
+    <div class="axd-ins ${tone}"><span class="axd-pips" aria-hidden="true">${[1,2,3,4,5].map(n=>`<i${n<=pips?' class="on"':''}></i>`).join('')}</span><span class="axd-it">${lab}</span><small>Kepelbagaian ${pips}/5</small></div>
     <ul class="axd-l">${rows}</ul></section>`;
 }
+(function(){
+  if(window.__axdTap)return;window.__axdTap=1;
+  function pick(li){
+    var sec=li.closest('.axd');if(!sec)return;
+    var on=li.classList.contains('on'),c=sec.querySelector('.axd-c');
+    sec.querySelectorAll('.axd-s.on,.axd-l li.on,.axd-strip i.on').forEach(function(e){e.classList.remove('on')});
+    if(on){sec.removeAttribute('data-f');c.firstChild.textContent=c.dataset.b;c.lastChild.textContent=c.dataset.s;return}
+    var i=li.dataset.i;sec.setAttribute('data-f','1');li.classList.add('on');
+    sec.querySelectorAll('[data-i="'+i+'"],.axd-s[style*="--i:'+i+'"]').forEach(function(e){e.classList.add('on')});
+    c.firstChild.textContent=li.dataset.p;c.lastChild.textContent=li.dataset.n;
+  }
+  document.addEventListener('click',function(e){var li=e.target.closest&&e.target.closest('.axd-l li');if(li)pick(li)});
+  document.addEventListener('keydown',function(e){if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('.axd-l li')){e.preventDefault();pick(e.target)}});
+})();
 function vRingkasan(C){
   const s=state.saving,k=state.komitmen,p=state.spaylater,a=state.advance;
   const serial=Math.floor(Date.UTC(new Date().getFullYear(),new Date().getMonth(),new Date().getDate())/86400000)+25569;
@@ -4913,6 +4932,15 @@ document.addEventListener('click',function(e){
    FOR WHOEVER EDITS THIS APP: on every change add ONE new entry at the TOP of CHANGELOG (unique id, date, short ms + en bullets). */
 (function(){
 var CHANGELOG=[
+ {id:'2026-11-12-g',d:'2026-11-12',
+  ms:['Kotak jumlah aset dalam Pecahan aset dikecilkan (lebih ringkas), cincin lebih kecil dengan kilauan halus sahaja, tak berlebihan'],
+  en:['The total-assets box in Asset breakdown is smaller and more compact; the ring is smaller with only a subtle sheen, not overdone']},
+ {id:'2026-11-12-f',d:'2026-11-12',
+  ms:['Pecahan aset kini guna warna lebih pelbagai tapi lembut (hijau, emas, biru langit, ungu pastel, peach, teal) supaya tiap akaun mudah dibezakan dan tak menyakitkan mata'],
+  en:['Asset breakdown now uses a softer, more varied palette (green, gold, sky blue, pastel violet, peach, teal) so each account is easy to tell apart without being harsh on the eyes']},
+ {id:'2026-11-12-e',d:'2026-11-12',
+  ms:['Pecahan aset direka semula, lebih premium dan padu: cincin lebih besar, jalur agihan satu baris, penunjuk kepelbagaian aset (Tertumpu / Agak tertumpu / Seimbang), dan baris akaun dengan nombor ranking serta bar lebih kemas','Tekan mana-mana akaun untuk fokus: cincin, jalur dan baris lain malap dan peratus akaun itu keluar di tengah cincin. Tekan lagi untuk batal'],
+  en:['Asset breakdown redesigned, more premium and cohesive: bigger ring, one-line allocation strip, an asset diversification indicator (Concentrated / Fairly concentrated / Balanced), and account rows with rank badges and cleaner bars','Tap any account to focus: the ring, strip and other rows dim and that account\u2019s share shows in the ring centre. Tap again to clear']},
  {id:'2026-11-12-d',d:'2026-11-12',
   ms:['Baiki highlight biru yang tertinggal pada kotak tarikh/bulan lepas pilih dari kalendar dan tekan OK. Kini fokus dilepaskan automatik, dan bila menaip tarikh highlight guna warna hijau app'],
   en:['Fixed the leftover blue highlight on date/month fields after picking from the calendar and pressing OK. Focus is now released automatically, and highlights use the app green while typing']},
@@ -5669,6 +5697,51 @@ html.mm-bg .hstars *,html.mm-bg .voicebtn,html.mm-bg .voicebtn::after,html.mm-bg
 .axd-l em::after{content:"";position:absolute;inset:0 auto 0 0;width:var(--w);border-radius:5px;background:linear-gradient(90deg,var(--c),var(--c2));box-shadow:0 0 10px -2px var(--c);transform-origin:left;animation:axdBar .8s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i)*80ms + 150ms)}
 @media (prefers-reduced-motion:reduce){.axd-s,.axd-l em::after{animation:none}}
 @media (max-width:360px){.axd-hero{grid-template-columns:1fr;justify-items:center;text-align:center}.axd-chips{justify-content:center}}
+</style>
+<style id="axd2">
+/* Pecahan aset v2: premium, selaras dengan kad lain */
+.axd{position:relative;overflow:hidden}
+.axd::before{content:"";position:absolute;inset:-40% -20% auto auto;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,#F6D77B 22%,transparent),transparent 65%);pointer-events:none;opacity:.7}
+.axd>*{position:relative}
+.axd-hero{padding:10px 14px;border-radius:20px;grid-template-columns:84px minmax(0,1fr);gap:14px}
+.axd-d{width:84px;height:84px}
+.axd-d::before{inset:14%;background:radial-gradient(circle,color-mix(in srgb,var(--accent) 12%,transparent),transparent 70%)}
+.axd-d svg{overflow:visible}
+.axd-s{transition:opacity .25s,stroke-width .25s}
+.axd[data-f] .axd-s:not(.on){opacity:.22}
+.axd[data-f] .axd-s.on{stroke-width:13}
+.axd-c b{font-size:17px}
+.axd-c small{font-size:8px;max-width:46px}
+.axd-t b{font-size:22px;margin:1px 0 6px}
+.axd .axd-d svg{filter:drop-shadow(0 0 3px color-mix(in srgb,var(--accent) 30%,transparent))!important}
+.axd-s{stroke-opacity:.96}
+.axd-strip{display:flex;gap:3px;height:7px;margin:10px 2px 0}
+.axd-strip i{display:block;min-width:4px;border-radius:99px;background:linear-gradient(90deg,var(--c2),var(--c));box-shadow:0 2px 8px -3px var(--c);transition:opacity .25s,transform .25s;animation:axdBar .8s cubic-bezier(.2,.7,.2,1) both;transform-origin:left}
+.axd[data-f] .axd-strip i:not(.on){opacity:.22}
+.axd-ins{display:flex;align-items:center;gap:10px;margin:12px 0 2px;padding:9px 12px;border-radius:14px;font-size:12px;border:1px solid color-mix(in srgb,var(--g) 30%,transparent);background:color-mix(in srgb,var(--g) 9%,transparent);--g:var(--accent)}
+.axd-ins.warn{--g:#E2AE2C}.axd-ins.mid{--g:#38BDF8}
+.axd-it{font-weight:700;color:var(--ink);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.axd-ins small{font-size:10.5px;font-weight:700;color:var(--mute);white-space:nowrap}
+.axd-pips{display:flex;gap:3px}
+.axd-pips i{width:5px;height:14px;border-radius:3px;background:color-mix(in srgb,var(--mute) 28%,transparent)}
+.axd-pips i.on{background:var(--g);box-shadow:0 0 8px -1px var(--g)}
+.axd-l{gap:8px;margin-top:12px}
+.axd-l li{padding:11px 14px 17px;border-radius:18px;cursor:pointer;transition:transform .18s,box-shadow .25s,border-color .25s,opacity .25s;-webkit-tap-highlight-color:transparent;outline:none;
+ background:linear-gradient(135deg,color-mix(in srgb,var(--c) 7%,transparent),transparent 55%),color-mix(in srgb,var(--surface2,transparent) 70%,transparent)}
+.axd-l li:active{transform:scale(.985)}
+.axd-l li:focus-visible{border-color:var(--c)}
+.axd-l li.on{border-color:color-mix(in srgb,var(--c) 60%,transparent);box-shadow:0 12px 26px -16px var(--c),inset 0 0 0 1px color-mix(in srgb,var(--c) 25%,transparent)}
+.axd[data-f] .axd-l li:not(.on){opacity:.55}
+.axd-k{width:34px;height:34px;position:relative}
+.axd-k u{position:absolute;right:-4px;bottom:-4px;width:15px;height:15px;border-radius:50%;display:grid;place-items:center;text-decoration:none;font:800 8.5px var(--display);color:#fff;background:linear-gradient(135deg,var(--c),color-mix(in srgb,var(--c) 70%,#000));border:1.5px solid var(--surface,#fff)}
+.axd-k i{font-size:13px}
+.axd-l li{grid-template-columns:34px minmax(0,1fr) auto}
+.axd-n{font-size:14px}
+.axd-l small{font-size:12.5px;font-weight:600;color:color-mix(in srgb,var(--ink) 70%,var(--mute))}
+.axd-l em{left:58px;right:14px;bottom:7px;height:5px}
+.axd-p{font-size:11.5px}
+@media (prefers-reduced-motion:reduce){.axd-strip i{animation:none}}
+@media (max-width:360px){.axd-hero{grid-template-columns:1fr}}
 </style>
 <style id="axcalm">
 /* kurangkan kesan berat: tiada animasi berterusan dalam bahagian baharu */
