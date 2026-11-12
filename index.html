@@ -4913,6 +4913,9 @@ document.addEventListener('click',function(e){
    FOR WHOEVER EDITS THIS APP: on every change add ONE new entry at the TOP of CHANGELOG (unique id, date, short ms + en bullets). */
 (function(){
 var CHANGELOG=[
+ {id:'2026-11-12-d',d:'2026-11-12',
+  ms:['Baiki highlight biru yang tertinggal pada kotak tarikh/bulan lepas pilih dari kalendar dan tekan OK. Kini fokus dilepaskan automatik, dan bila menaip tarikh highlight guna warna hijau app'],
+  en:['Fixed the leftover blue highlight on date/month fields after picking from the calendar and pressing OK. Focus is now released automatically, and highlights use the app green while typing']},
  {id:'2026-11-12-c',d:'2026-11-12',
   ms:['Kotak \u201cBayar bulan ni\u201d dalam Ansuran kembali hijau penuh supaya senang nampak; kotak Baki ansuran kekal ringkas'],
   en:['The \u201cPay this month\u201d box in Installments is solid green again so it is easy to spot; the Balance box stays minimal']},
@@ -6121,5 +6124,20 @@ sch()})();
 :root[data-theme="dark"]:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root .am-sum>div:first-child{--hi-ink:#04130C;--hi-a:#5EEAB4;--hi-b:#2DBE8A}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]):root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root .am-sum>div:first-child{--hi-ink:#04130C;--hi-a:#5EEAB4;--hi-b:#2DBE8A}}
 </style>
+<style id="date-focus-fix">
+/* Highlight bahagian tarikh yang fokus: guna warna app (bukan biru sistem) */
+input[type=date]::-webkit-datetime-edit-field:focus,input[type=month]::-webkit-datetime-edit-field:focus,input[type=time]::-webkit-datetime-edit-field:focus,input[type=datetime-local]::-webkit-datetime-edit-field:focus{background:color-mix(in srgb,var(--accent) 22%,transparent)!important;color:var(--ink)!important;outline:0!important;border-radius:6px}
+input[type=date]::-webkit-datetime-edit-ampm-field:focus,input[type=time]::-webkit-datetime-edit-ampm-field:focus{background:color-mix(in srgb,var(--accent) 22%,transparent)!important;color:var(--ink)!important}
+</style>
+<script>
+/* Lepas pilih tarikh guna kalendar dan tekan OK, lepaskan fokus supaya tiada highlight tertinggal. Menaip dengan papan kekunci tak terjejas. */
+(function(){var lastKey=0;
+document.addEventListener('keydown',function(){lastKey=Date.now()},true);
+document.addEventListener('change',function(e){var t=e.target;
+ if(!t||t.tagName!=='INPUT'||!/^(date|month|time|datetime-local)$/.test(t.type))return;
+ if(Date.now()-lastKey<1000)return;
+ setTimeout(function(){try{if(document.activeElement===t)t.blur()}catch(_){}},0)},true);
+})();
+</script>
 <!-- NOTA / NOTE: tambah entri baru di atas CHANGELOG setiap kali fail ni diubah; nombor versi automatik, jangan edit. / Add a new entry at the TOP of CHANGELOG on every change; version is automatic. -->
 </body></html>
