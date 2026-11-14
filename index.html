@@ -1318,7 +1318,7 @@ main.enter>*{will-change:transform,opacity}
 /* Butang padam bila ditekan sekali: pil merah Pasti? */
 :root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root .panel.alloc .alrow button.btn.x[data-armed][data-act][data-act][data-act][data-act][data-act][data-act][data-act][data-act][data-act][data-act]{width:auto !important;min-width:56px !important;height:30px !important;min-height:30px !important;padding:0 12px !important;border-radius:99px !important;background:var(--bad-tint) !important;color:var(--bad) !important;font-size:12px !important;font-weight:800 !important;letter-spacing:.02em !important;white-space:nowrap !important;opacity:1 !important;justify-self:end !important;position:relative !important;z-index:3 !important;box-shadow:0 0 0 1px color-mix(in srgb,var(--bad) 45%,transparent) !important}
 /* Indikator: premium (gelap & terang) */
-.ix{--ix-bg:linear-gradient(180deg,#fff,rgba(255,255,255,.72));--ix-bd:rgba(16,185,129,.24);--ix-sh:0 1px 0 rgba(255,255,255,.9) inset,0 8px 22px -12px rgba(15,60,40,.28);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+.ix{--ix-bg:linear-gradient(180deg,rgba(255,255,255,.8),rgba(222,249,236,.55));--ix-bd:rgba(16,160,110,.26);--ix-sh:0 1px 0 rgba(255,255,255,.95) inset,0 10px 22px -14px rgba(6,78,59,.4);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .ix{--ix-bg:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));--ix-bd:rgba(52,211,153,.2);--ix-sh:0 1px 0 rgba(255,255,255,.06) inset,0 10px 24px -14px rgba(0,0,0,.8)}}
 :root[data-theme="dark"] .ix{--ix-bg:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));--ix-bd:rgba(52,211,153,.2);--ix-sh:0 1px 0 rgba(255,255,255,.06) inset,0 10px 24px -14px rgba(0,0,0,.8)}
 .ix>div{position:relative;min-width:0;border-radius:18px;border:1px solid var(--ix-bd);background:var(--ix-bg);box-shadow:var(--ix-sh);padding:13px 14px}
@@ -1345,6 +1345,24 @@ main.enter>*{will-change:transform,opacity}
 .ix .ix-row>div{display:flex;flex-direction:column;align-items:flex-end;gap:2px;min-width:0;text-align:right}
 .ix .ix-row b{font-size:15px;overflow-wrap:anywhere}
 .ix .ix-row em{font-size:13px}
+/* Pendapatan dalam kad Komitmen bulanan: premium */
+.cm-inc{--ix-bg:linear-gradient(180deg,rgba(255,255,255,.8),rgba(222,249,236,.55));--ix-bd:rgba(16,160,110,.26);--ix-sh:0 1px 0 rgba(255,255,255,.95) inset,0 10px 22px -14px rgba(6,78,59,.4);margin:16px 0 4px;padding:14px 14px 6px;border-radius:18px;border:1px solid var(--ix-bd);background:var(--ix-bg);box-shadow:var(--ix-sh)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .cm-inc{--ix-bg:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));--ix-bd:rgba(52,211,153,.2);--ix-sh:0 1px 0 rgba(255,255,255,.06) inset,0 10px 24px -14px rgba(0,0,0,.8)}}
+:root[data-theme="dark"] .cm-inc{--ix-bg:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));--ix-bd:rgba(52,211,153,.2);--ix-sh:0 1px 0 rgba(255,255,255,.06) inset,0 10px 24px -14px rgba(0,0,0,.8)}
+.cm-inc-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px}
+.cm-inc-h>span{display:flex;align-items:center;gap:8px;font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--mute)}
+.cm-inc-h>span i{width:8px;height:8px;border-radius:50%;background:var(--good);box-shadow:0 0 0 3px color-mix(in srgb,var(--good) 20%,transparent)}
+:root:root:root:root:root:root:root:root:root:root:root:root .cm-inc .cm-inc-h .btn{min-height:32px !important;height:32px !important;padding:0 13px !important;font-size:12.5px !important;border-radius:99px !important}
+:root:root:root:root:root:root:root:root:root:root:root:root .cm-inc .cm-inc-l{gap:0 !important}
+:root:root:root:root:root:root:root:root:root:root:root:root .cm-inc .row{grid-template-columns:minmax(0,1fr) 118px minmax(24px,auto) !important;gap:8px !important;padding:0 !important;min-height:46px !important;border:0 !important;border-bottom:1px solid color-mix(in srgb,var(--ink) 8%,transparent) !important;border-radius:0 !important;background:none !important;box-shadow:none !important;align-items:center !important}
+:root:root:root:root:root:root:root:root:root:root:root:root .cm-inc .row:last-child{border-bottom:0 !important}
+:root:root:root:root:root:root:root:root:root:root:root:root .cm-inc .row input.in[data-k][data-k][data-k][data-k][data-k][data-k][data-k][data-k][data-k][data-k]{background:none !important;background-image:none !important;border:0 !important;border-bottom:1px solid transparent !important;border-radius:0 !important;box-shadow:none !important;padding:10px 2px !important;min-height:0 !important;font-size:14.5px !important;font-weight:600 !important;transition:border-color .15s !important}
+:root:root:root:root:root:root:root:root:root:root:root:root .cm-inc .row input.in.n[data-k][data-k][data-k][data-k][data-k][data-k][data-k][data-k][data-k][data-k]{text-align:right !important;font-weight:750 !important;font-variant-numeric:tabular-nums !important}
+:root:root:root:root:root:root:root:root:root:root:root:root .cm-inc .row input.in[data-k][data-k][data-k][data-k][data-k][data-k][data-k][data-k][data-k][data-k]:focus{background:none !important;box-shadow:none !important;border-bottom-color:#F6D77B !important}
+:root:root:root:root:root:root:root:root:root:root:root:root .cm-inc .row input.in[data-k][data-k][data-k][data-k][data-k][data-k][data-k][data-k][data-k][data-k]::placeholder{opacity:.38 !important;font-weight:500 !important}
+:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root .cm-inc .row button.btn.x[data-act][data-act][data-act][data-act][data-act][data-act][data-act][data-act][data-act][data-act]{width:24px !important;height:24px !important;min-width:24px !important;min-height:24px !important;padding:0 !important;border:0 !important;border-radius:50% !important;background:none !important;background-image:none !important;box-shadow:none !important;font-size:16px !important;line-height:1 !important;opacity:.45 !important;color:var(--mute) !important}
+:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root .cm-inc .row button.btn.x[data-armed][data-act][data-act][data-act][data-act][data-act][data-act][data-act][data-act][data-act][data-act]{width:auto !important;min-width:56px !important;height:30px !important;min-height:30px !important;padding:0 12px !important;border-radius:99px !important;background:var(--bad-tint) !important;color:var(--bad) !important;font-size:12px !important;font-weight:800 !important;white-space:nowrap !important;opacity:1 !important;box-shadow:0 0 0 1px color-mix(in srgb,var(--bad) 45%,transparent) !important}
+:root:root:root:root:root:root:root:root:root:root:root:root .cm-inc .empty{margin:0 0 8px !important;padding:10px 4px 12px !important;border:0 !important;background:none !important;font-size:13px !important;text-align:left !important}
 /* Pil sasaran: jelas dalam mod gelap */
 @media (prefers-color-scheme:dark){
 :root:root:root:root:root:root:root:root:not([data-theme="light"]) .panel.alloc .al-pill.ok{color:#86EFAC !important;background:rgba(16,185,129,.22) !important;border-color:rgba(52,211,153,.55) !important}
@@ -2972,6 +2990,10 @@ function vKomitmen(C){
       </div>
       <div class="cmh-pay"><span><b data-nk="cm-paid">${rm(C.k.paid)}</b> / <b data-nk="cm-com2">${rm(C.k.commit)}</b></span>${bar(C.k.payProg)}</div>
     </div>
+    <div class="cm-inc">
+      <div class="cm-inc-h"><span><i aria-hidden="true"></i>Pendapatan</span>${add('komitmen.income','Sumber')}</div>
+      <div class="list cm-inc-l">${inc||'<p class="empty">Belum ada sumber pendapatan.</p>'}</div>
+    </div>
   </section>
 
   <section class="panel">
@@ -2982,10 +3004,6 @@ function vKomitmen(C){
     <p class="hint">Bulan baru: simpan ringkasan bulan ni, tukar nama bulan, kosongkan tanda bayar DAN semua jumlah (nama komitmen kekal). Nak kosongkan tanda bayar je? Guna Reset tanda bayar.</p>
   </section>
 
-  <section class="panel">
-    <div class="sec-h">${head('Pendapatan')}${add('komitmen.income','Sumber')}</div>
-    <div class="list">${inc||'<p class="empty">Belum ada sumber pendapatan.</p>'}</div>
-  </section>
 
   <section class="panel">
     ${head('Indikator')}
@@ -5044,6 +5062,9 @@ document.addEventListener('click',function(e){
    FOR WHOEVER EDITS THIS APP: on every change add ONE new entry at the TOP of CHANGELOG (unique id, date, short ms + en bullets). */
 (function(){
 var CHANGELOG=[
+ {id:'2026-11-14-g',d:'2026-11-14',
+  ms:['Pendapatan digabungkan ke dalam kad Komitmen bulanan, diletak di bawah kad Baki dan ringkasan','Kotak Pendapatan direka semula premium: kad kaca lembut, baris tanpa kotak dengan garis pemisah, butang + Sumber kecil dan butang padam Pasti? yang jelas','Bahagian Pendapatan yang berasingan dibuang','Kotak Pendapatan dan kad Indikator dalam mod terang timbul lembut dengan warna hijau pucat (bukan putih melepak, bukan masuk ke dalam)'],
+  en:['Income merged into the Monthly commitments card, placed below the Balance card and summary','Income box redesigned to feel premium: soft glass card, box-free rows with dividers, a small + Source button and a clear Sure? delete pill','The separate Income section was removed','In light mode the Income box and Indicators cards now sit softly raised with a pale green tint (not plain white, not sunken)']},
  {id:'2026-11-14-f',d:'2026-11-14',
   ms:['Bahagian Indikator di tab Komitmen direka semula premium untuk mod gelap dan terang','Komitmen / pendapatan jadi kad utama dengan nombor besar, pil status dan tolok warna (garis 70% dan 90%); Item dibayar ada bar kemajuan; Komitmen terbesar jadi baris kemas'],
   en:['Indicators section on the Commitments tab redesigned to feel premium in dark and light modes','Commitments / income is now a hero card with a big number, status pill and colour gauge (70% and 90% marks); Items paid has a progress bar; Largest commitment is a tidy row']},
