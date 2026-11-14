@@ -1312,6 +1312,16 @@ main.enter>*{will-change:transform,opacity}
 :root:root:root:root:root:root:root:root:root:root .panel.alloc .alrow input.in.n{border:0 !important}
 :root:root:root:root:root:root:root:root:root:root .panel.alloc .alrow button.btn.x{background:transparent !important;border:0 !important;box-shadow:none !important;color:var(--mute) !important}
 :root:root:root:root:root:root:root:root:root:root .panel.alloc .sec-h .btn{white-space:nowrap !important;flex:none}
+/* Pil sasaran: jelas dalam mod gelap */
+@media (prefers-color-scheme:dark){
+:root:root:root:root:root:root:root:root:not([data-theme="light"]) .panel.alloc .al-pill.ok{color:#86EFAC !important;background:rgba(16,185,129,.22) !important;border-color:rgba(52,211,153,.55) !important}
+:root:root:root:root:root:root:root:root:not([data-theme="light"]) .panel.alloc .al-pill.ov{color:#FDE68A !important;background:rgba(245,158,11,.22) !important;border-color:rgba(251,191,36,.55) !important}
+:root:root:root:root:root:root:root:root:not([data-theme="light"]) .panel.alloc .al-pill.lo{color:#FDA4AF !important;background:rgba(244,63,94,.20) !important;border-color:rgba(251,113,133,.5) !important}
+}
+:root:root:root:root:root:root:root:root[data-theme="dark"] .panel.alloc .al-pill.ok{color:#86EFAC !important;background:rgba(16,185,129,.22) !important;border-color:rgba(52,211,153,.55) !important}
+:root:root:root:root:root:root:root:root[data-theme="dark"] .panel.alloc .al-pill.ov{color:#FDE68A !important;background:rgba(245,158,11,.22) !important;border-color:rgba(251,191,36,.55) !important}
+:root:root:root:root:root:root:root:root[data-theme="dark"] .panel.alloc .al-pill.lo{color:#FDA4AF !important;background:rgba(244,63,94,.20) !important;border-color:rgba(251,113,133,.5) !important}
+:root:root:root:root:root:root:root:root .panel.alloc .al-pill{font-size:11px !important;font-weight:700 !important;padding:3px 11px !important;letter-spacing:.01em !important;opacity:1 !important;filter:none !important}
 /* Agihan: premium & padat (override) */
 :root:root:root:root:root:root:root:root:root:root:root:root .panel.alloc .al-hero{margin:10px 0 8px !important;padding:0 2px !important;background:none !important;border:0 !important;box-shadow:none !important;border-radius:0 !important;align-items:flex-end !important}
 :root:root:root:root:root:root:root:root:root:root:root:root .panel.alloc .al-hl{flex-direction:column !important;align-items:flex-start !important;gap:1px !important}
@@ -3802,7 +3812,7 @@ document.addEventListener('input',e=>{const t=e.target;if(t&&t.dataset&&t.datase
   const vis=e=>e.getClientRects().length>0;
   const list=t=>[...box(t).querySelectorAll('input')].filter(e=>!e.matches(SK)&&vis(e));
   /* Next hanya kalau kotak seterusnya dalam baris/kumpulan yang sama (cth nama komitmen -> harga, modal -> nilai). Dalam dialog, ikut urutan borang. Selain tu Done. */
-  const GRP='.row,.plan,.am,.acc,.edtx';
+  const GRP='.row,.plan,.am,.acc,.edtx,.alrow';
   const nxt=(t,it,i)=>{const n=it[i+1];if(!n)return null;if(t.closest('[role=dialog]'))return n;const g=t.closest(GRP);return g&&g.contains(n)?n:null};
   const hint=t=>{
     if(!t||t.tagName!=='INPUT'||t.matches(SK))return;
@@ -4999,6 +5009,9 @@ document.addEventListener('click',function(e){
    FOR WHOEVER EDITS THIS APP: on every change add ONE new entry at the TOP of CHANGELOG (unique id, date, short ms + en bullets). */
 (function(){
 var CHANGELOG=[
+ {id:'2026-11-14-b',d:'2026-11-14',
+  ms:['Pil Tepat sasaran / lebih / kurang kini jelas dibaca dalam mod gelap','Lepas taip nama agihan dan tekan Seterusnya, kursor terus pergi ke kotak jumlah'],
+  en:['The On target / over / short pill is now clearly readable in dark mode','After typing an allocation name and tapping Next, the cursor jumps straight to the amount field']},
  {id:'2026-11-14-a',d:'2026-11-14',
   ms:['Kad Agihan direka semula lebih premium: jumlah diagih kemas, bar warna nipis bercahaya, baris tanpa kotak dan butang x halus','Medan nama dan jumlah tak lagi berkotak; garis emas keluar bila tekan untuk menaip'],
   en:['Allocation card redesigned to feel more premium: tidy total, slim glowing colour bar, box-free rows and a subtle x button','Name and amount fields no longer sit in boxes; a gold underline appears when you tap to type']},
