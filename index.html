@@ -5069,6 +5069,9 @@ document.addEventListener('click',function(e){
    FOR WHOEVER EDITS THIS APP: on every change add ONE new entry at the TOP of CHANGELOG (unique id, date, short ms + en bullets). */
 (function(){
 var CHANGELOG=[
+ {id:'2026-11-15-c',d:'2026-11-15',
+  ms:['Tab Simpanan (mod gelap): kad akaun kurang emas: emas nipis sahaja di tepi kad, garis atas dan hujung bar; butang lungsur dan Buang logo ikut hijau mint app'],
+  en:['Savings tab (dark mode): account cards use less gold: only a faint gold touch on the card edge, top line and bar end; the dropdown button and Remove logo follow the app mint green']},
  {id:'2026-11-15-b',d:'2026-11-15',
   ms:['Tab Komitmen: peratus pendapatan bawah setiap baris kini teks biasa, tanpa kotak'],
   en:['Commitments tab: the % of income under each row is now plain text, without a box']},
@@ -6377,6 +6380,19 @@ sch()})();
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]):root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root .am-sum>div:first-child{--hi-ink:#04130C;--hi-a:#5EEAB4;--hi-b:#2DBE8A}}
 </style>
 <style id="sv-flag">
+/* kad akaun Simpanan: kurangkan emas (mod gelap) */
+@media (prefers-color-scheme:dark){
+:root:not([data-theme="light"]):root:root:root:root:root .acc.accc{background:radial-gradient(120% 90% at 100% 0%,rgba(52,211,153,.07),transparent 52%),radial-gradient(110% 100% at 0% 100%,rgba(16,185,129,.16),transparent 58%),linear-gradient(165deg,#10302a 0%,#0b1d18 52%,#07120e 100%) padding-box,linear-gradient(140deg,rgba(246,215,123,.38),rgba(52,211,153,.2) 38%,rgba(255,255,255,.05) 64%,rgba(52,211,153,.3)) border-box!important}
+:root:not([data-theme="light"]):root:root:root:root:root .acc.accc::after{background:linear-gradient(90deg,transparent,rgba(246,215,123,.5),transparent)!important}
+:root:not([data-theme="light"]):root:root:root:root:root .acc.accc .accx{color:#6EE7B7;border:1px solid rgba(52,211,153,.3);background:linear-gradient(180deg,rgba(52,211,153,.13),rgba(52,211,153,.04))}
+:root:not([data-theme="light"]):root:root:root:root:root .acc.accc .share .bar i{background:linear-gradient(90deg,#059669,#34D399 80%,#F6D77B)!important;box-shadow:0 0 12px rgba(52,211,153,.5)!important}
+:root:not([data-theme="light"]):root:root:root:root:root .acc.accc .lnk{color:var(--mute);font-weight:600;border-bottom:1px dashed color-mix(in srgb,var(--mute) 55%,transparent)}
+}
+:root[data-theme="dark"]:root:root:root:root:root .acc.accc{background:radial-gradient(120% 90% at 100% 0%,rgba(52,211,153,.07),transparent 52%),radial-gradient(110% 100% at 0% 100%,rgba(16,185,129,.16),transparent 58%),linear-gradient(165deg,#10302a 0%,#0b1d18 52%,#07120e 100%) padding-box,linear-gradient(140deg,rgba(246,215,123,.38),rgba(52,211,153,.2) 38%,rgba(255,255,255,.05) 64%,rgba(52,211,153,.3)) border-box!important}
+:root[data-theme="dark"]:root:root:root:root:root .acc.accc::after{background:linear-gradient(90deg,transparent,rgba(246,215,123,.5),transparent)!important}
+:root[data-theme="dark"]:root:root:root:root:root .acc.accc .accx{color:#6EE7B7;border:1px solid rgba(52,211,153,.3);background:linear-gradient(180deg,rgba(52,211,153,.13),rgba(52,211,153,.04))}
+:root[data-theme="dark"]:root:root:root:root:root .acc.accc .share .bar i{background:linear-gradient(90deg,#059669,#34D399 80%,#F6D77B)!important;box-shadow:0 0 12px rgba(52,211,153,.5)!important}
+:root[data-theme="dark"]:root:root:root:root:root .acc.accc .lnk{color:var(--mute);font-weight:600;border-bottom:1px dashed color-mix(in srgb,var(--mute) 55%,transparent)}
 /* bahagian Simpanan dalam panel Komitmen */
 .sv-sub{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:14px 2px 8px}
 .sv-sub>span{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--mute)}
