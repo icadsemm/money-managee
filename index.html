@@ -1312,6 +1312,8 @@ main.enter>*{will-change:transform,opacity}
 :root:root:root:root:root:root:root:root:root:root .panel.alloc .alrow input.in.n{border:0 !important}
 :root:root:root:root:root:root:root:root:root:root .panel.alloc .alrow button.btn.x{background:transparent !important;border:0 !important;box-shadow:none !important;color:var(--mute) !important}
 :root:root:root:root:root:root:root:root:root:root .panel.alloc .sec-h .btn{white-space:nowrap !important;flex:none}
+/* Butang padam bila ditekan sekali: pil merah Pasti? */
+:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root .panel.alloc .alrow button.btn.x[data-armed][data-act][data-act][data-act][data-act][data-act][data-act][data-act][data-act][data-act][data-act]{width:auto !important;min-width:56px !important;height:30px !important;min-height:30px !important;padding:0 12px !important;border-radius:99px !important;background:var(--bad-tint) !important;color:var(--bad) !important;font-size:12px !important;font-weight:800 !important;letter-spacing:.02em !important;white-space:nowrap !important;opacity:1 !important;justify-self:end !important;position:relative !important;z-index:3 !important;box-shadow:0 0 0 1px color-mix(in srgb,var(--bad) 45%,transparent) !important}
 /* Pil sasaran: jelas dalam mod gelap */
 @media (prefers-color-scheme:dark){
 :root:root:root:root:root:root:root:root:not([data-theme="light"]) .panel.alloc .al-pill.ok{color:#86EFAC !important;background:rgba(16,185,129,.22) !important;border-color:rgba(52,211,153,.55) !important}
@@ -1331,7 +1333,7 @@ main.enter>*{will-change:transform,opacity}
 :root:root:root:root:root:root:root:root:root:root:root:root .panel.alloc .al-bar{height:6px !important;gap:3px !important;margin:0 2px 8px !important;background:color-mix(in srgb,var(--mute) 12%,transparent) !important;border-radius:99px !important}
 :root:root:root:root:root:root:root:root:root:root:root:root .panel.alloc .al-bar i{box-shadow:0 0 8px -1px color-mix(in srgb,var(--c) 55%,transparent) !important;background:var(--c) !important;min-width:4px !important}
 :root:root:root:root:root:root:root:root:root:root:root:root .panel.alloc .al-list{gap:0 !important}
-:root:root:root:root:root:root:root:root:root:root:root:root .panel.alloc .alrow{grid-template-columns:10px minmax(0,1fr) auto 84px 24px !important;gap:8px !important;padding:0 0 0 2px !important;min-height:46px !important;border:0 !important;border-bottom:1px solid color-mix(in srgb,var(--ink) 8%,transparent) !important;border-radius:0 !important;background:none !important;box-shadow:none !important}
+:root:root:root:root:root:root:root:root:root:root:root:root .panel.alloc .alrow{grid-template-columns:10px minmax(0,1fr) auto 84px minmax(24px,auto) !important;gap:8px !important;padding:0 0 0 2px !important;min-height:46px !important;border:0 !important;border-bottom:1px solid color-mix(in srgb,var(--ink) 8%,transparent) !important;border-radius:0 !important;background:none !important;box-shadow:none !important}
 :root:root:root:root:root:root:root:root:root:root:root:root .panel.alloc .alrow:last-child{border-bottom:0 !important}
 :root:root:root:root:root:root:root:root:root:root:root:root .panel.alloc .alrow:focus-within{background:none !important;box-shadow:none !important}
 :root:root:root:root:root:root:root:root:root:root:root:root .panel.alloc .al-dot{width:8px !important;height:8px !important;border-radius:50% !important;background:var(--c) !important;box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 18%,transparent) !important}
@@ -5009,6 +5011,9 @@ document.addEventListener('click',function(e){
    FOR WHOEVER EDITS THIS APP: on every change add ONE new entry at the TOP of CHANGELOG (unique id, date, short ms + en bullets). */
 (function(){
 var CHANGELOG=[
+ {id:'2026-11-14-c',d:'2026-11-14',
+  ms:['Butang padam agihan: bila tekan sekali, keluar pil merah Pasti? yang jelas (sebelum ni terpotong dan tak nampak)'],
+  en:['Allocation delete button: first tap now shows a clear red Sure? pill (it used to be clipped and unreadable)']},
  {id:'2026-11-14-b',d:'2026-11-14',
   ms:['Pil Tepat sasaran / lebih / kurang kini jelas dibaca dalam mod gelap','Lepas taip nama agihan dan tekan Seterusnya, kursor terus pergi ke kotak jumlah'],
   en:['The On target / over / short pill is now clearly readable in dark mode','After typing an allocation name and tapping Next, the cursor jumps straight to the amount field']},
