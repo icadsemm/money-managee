@@ -40,6 +40,7 @@
 .dvm-f em{font-style:normal;font-weight:700}.dvm-f .u{color:var(--good)}.dvm-f .l{color:var(--bad)}
 body.kbd main{padding-bottom:45vh}
 :root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root:root .am-top .btn.x[data-armed]{width:auto;min-width:64px;height:34px;min-height:34px;padding:0 12px;border-radius:99px!important;background:var(--bad-tint)!important;color:var(--bad)!important;opacity:1;position:relative;z-index:3;box-shadow:0 0 0 1px color-mix(in srgb,var(--bad) 40%,transparent)!important;border:1px solid color-mix(in srgb,var(--bad) 45%,transparent)!important;font-size:12px;font-weight:800;letter-spacing:.02em;white-space:nowrap}
+main{overflow-anchor:none}
 </style><link rel="manifest" href="manifest.json"><meta name="theme-color" content="#0c2c20"><script>try{var _t=localStorage.getItem("mm-theme");if(_t==="light"||_t==="dark")document.documentElement.setAttribute("data-theme",_t);if(localStorage.getItem("mm-lang")==="en")document.documentElement.lang="en"}catch(e){}</script><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Money Manage"><link rel="apple-touch-icon" href="kucing-192.png"><style id="emojifix">button,input,textarea,select,.emj button,.cat,.cat span,#sheet button{font-family:var(--body)}.emj button,.cat span{font-synthesis:none;font-weight:400}</style><style id="calglass">
 .calp{position:relative;overflow:hidden;isolation:isolate;border:1px solid color-mix(in srgb,#fff 55%,transparent);border-radius:24px;padding:18px 16px;
  background:
@@ -3696,8 +3697,9 @@ function render(){
   }
   const ae=document.activeElement,key=ae&&ae.dataset?ae.dataset.k:null;let ss=null;try{ss=ae.selectionStart}catch(e){}
   const sy0=window.scrollY,sameTab=render.lt===tab;render.lt=tab;
+  if(sameTab&&sy0>0){main.style.minHeight=main.offsetHeight+'px'}
   main.innerHTML=html;
-  if(sameTab&&sy0>0){window.scrollTo(0,sy0);requestAnimationFrame(()=>{if(Math.abs(window.scrollY-sy0)>2)window.scrollTo(0,sy0)})}
+  if(sameTab&&sy0>0){window.scrollTo(0,sy0);requestAnimationFrame(()=>{if(Math.abs(window.scrollY-sy0)>2)window.scrollTo(0,sy0);main.style.minHeight=''})}else main.style.minHeight=''
   animEnter(tab);animNums(tab);popNew();applyBlFilter();
   if(pendingFocus){const el=[...main.querySelectorAll('[data-k]')].find(e=>e.type!=='checkbox'&&(e.dataset.k===pendingFocus||e.dataset.k.startsWith(pendingFocus+'.')||e.dataset.k.startsWith(pendingFocus)));pendingFocus=null;if(el){try{el.focus({preventScroll:true})}catch(e){el.focus()}}}
   else if(key){const el=[...main.querySelectorAll('[data-k]')].find(e=>e.dataset.k===key);if(el){try{el.focus({preventScroll:true})}catch(e2){el.focus()}try{if(ss!=null)el.setSelectionRange(ss,ss)}catch(e){}}}
@@ -3937,8 +3939,9 @@ document.addEventListener('input',e=>{const t=e.target;if(t&&t.dataset&&t.datase
       clearTimeout(kt);if(!inOv(t))document.body.classList.add('kbd');run(t);
     });
     document.addEventListener('focusout',()=>{
-      clearTimeout(kt);kt=setTimeout(()=>{if(!isF(document.activeElement))document.body.classList.remove('kbd')},1200);
+      
     });
+    window.addEventListener('hashchange',()=>document.body.classList.remove('kbd'));
     if(window.visualViewport)visualViewport.addEventListener('resize',()=>{const a=document.activeElement;if(isF(a))run(a)});
   })();
 })();
@@ -5109,8 +5112,8 @@ document.addEventListener('click',function(e){
 (function(){
 var CHANGELOG=[
  {id:'2026-11-21-a',d:'2026-11-21',
-  ms:['Semua tab & popup (sheet/tetapan): bila tekan kotak untuk menaip, skrin kini auto scroll sekali sahaja (tak lompat/berkelip) supaya kotak tak lagi tertutup keyboard atau bar tab bawah','Kad ansuran (tab Bil): butang "Pasti?" bila nak padam kini jadi kotak merah macam butang padam lain, tak lagi besar dan bertindih dengan teks'],
-  en:['All tabs & popups (sheets/settings): tapping a field to type now auto-scrolls once (no jumping or flicker) so it is no longer hidden behind the keyboard or the bottom tab bar','Instalment cards (Bills tab): the "Sure?" delete button now shows as a red box like the other delete buttons instead of oversized text overlapping the card']},
+  ms:['Semua tab & popup (sheet/tetapan): bila tekan kotak untuk menaip, skrin kini auto scroll sekali sahaja (tak lompat/berkelip) supaya kotak tak lagi tertutup keyboard atau bar tab bawah','Tekan Tanda dah bayar / tick: skrin tak lagi lompat atas-tengah-bawah, kekal di tempat yang sama','Kad ansuran (tab Bil): butang "Pasti?" bila nak padam kini jadi kotak merah macam butang padam lain, tak lagi besar dan bertindih dengan teks'],
+  en:['All tabs & popups (sheets/settings): tapping a field to type now auto-scrolls once (no jumping or flicker) so it is no longer hidden behind the keyboard or the bottom tab bar','Tapping Mark as paid / ticks: the screen no longer jumps up and down, it stays where you are','Instalment cards (Bills tab): the "Sure?" delete button now shows as a red box like the other delete buttons instead of oversized text overlapping the card']},
  {id:'2026-11-20-a',d:'2026-11-20',
   ms:['Tab Bil: Tarikh bayar kini ikut bulan yang dipilih (bil bulan Disember dibayar pada hari tu di bulan Januari), bukan lagi tersangkut pada tarikh terdekat','Kotak belanja (semua tab Bil): bulatan tick macam Komitmen untuk tanda dah bayar, baris jadi hijau dan nama bergaris bila ditanda','Penunjuk baru di atas Kotak belanja: berapa kotak dah dibayar (cth 2 / 3), jumlah dibayar berbanding jumlah, dan bar kemajuan','Semak terjemahan English: teks baru (Tanda bulatan bila dah bayar, Dah lepas) ditambah ke kamus'],
   en:['Bills tab: Due date now follows the selected month (the December bill is paid on that day in January) instead of sticking to the nearest date','Spending boxes (all Bills tabs): a tick circle like Commitments to mark as paid; a ticked row turns green and its name is struck through','New indicator above Spending boxes: how many boxes are paid (e.g. 2 / 3), the amount paid vs the total, and a progress bar','English translation check: new texts (Tick the circle once paid, Already passed) added to the dictionary']},
