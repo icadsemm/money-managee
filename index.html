@@ -3699,7 +3699,7 @@ function render(){
   main.innerHTML=html;
   if(sameTab&&sy0>0){window.scrollTo(0,sy0);requestAnimationFrame(()=>{if(Math.abs(window.scrollY-sy0)>2)window.scrollTo(0,sy0)})}
   animEnter(tab);animNums(tab);popNew();applyBlFilter();
-  if(pendingFocus){const el=[...main.querySelectorAll('[data-k]')].find(e=>e.type!=='checkbox'&&(e.dataset.k===pendingFocus||e.dataset.k.startsWith(pendingFocus+'.')||e.dataset.k.startsWith(pendingFocus)));pendingFocus=null;if(el){try{el.focus({preventScroll:true})}catch(e){el.focus()}setTimeout(()=>{try{if(document.activeElement===el)el.scrollIntoView({block:'center',behavior:'smooth'})}catch(e){}},320)}}
+  if(pendingFocus){const el=[...main.querySelectorAll('[data-k]')].find(e=>e.type!=='checkbox'&&(e.dataset.k===pendingFocus||e.dataset.k.startsWith(pendingFocus+'.')||e.dataset.k.startsWith(pendingFocus)));pendingFocus=null;if(el){try{el.focus({preventScroll:true})}catch(e){el.focus()}}}
   else if(key){const el=[...main.querySelectorAll('[data-k]')].find(e=>e.dataset.k===key);if(el){try{el.focus({preventScroll:true})}catch(e2){el.focus()}try{if(ss!=null)el.setSelectionRange(ss,ss)}catch(e){}}}
   try{document.dispatchEvent(new Event('mm-sec'))}catch(e){}
 }
@@ -3910,7 +3910,6 @@ document.addEventListener('input',e=>{const t=e.target;if(t&&t.dataset&&t.datase
     if(n){
       n.focus();
       try{const L=n.value.length;n.setSelectionRange(L,L)}catch(_){}
-      try{n.scrollIntoView({block:'center',behavior:'smooth'})}catch(_){}
     }else t.blur();
   });
   /* Auto-scroll kotak yang sedang ditaip supaya tak tertutup keyboard / bar tab */
@@ -3927,9 +3926,9 @@ document.addEventListener('input',e=>{const t=e.target;if(t&&t.dataset&&t.datase
                 const topLim=(hd?hd.getBoundingClientRect().bottom:0)+12;
         const botLim=top0+vh-(tb?tb.offsetHeight:0)-12;
         const r=el.getBoundingClientRect();
-        if(r.top>=topLim&&r.bottom<=botLim)return;
-        const mid=(topLim+botLim)/2;
-        window.scrollBy(0,(r.top+r.height/2)-mid);
+        const span=botLim-topLim,want=topLim+span*0.3;
+        if(r.top>=topLim&&r.bottom<=topLim+span*0.65)return;
+        window.scrollBy(0,r.top-want);
       }catch(_){}
     };
     const run=el=>{clearTimeout(tm);tm=setTimeout(()=>fit(document.activeElement===el?el:null),260)};
