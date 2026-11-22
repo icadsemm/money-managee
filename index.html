@@ -46,6 +46,8 @@ main{overflow-anchor:none}
 main.enter>*:nth-child(-n+3),main.enter.fwd>*:nth-child(-n+3),main.enter.back>*:nth-child(-n+3){animation:fadeQ .18s ease-out both!important;animation-delay:0s!important;will-change:auto!important}
 main.enter>*{will-change:auto!important;animation-delay:0s!important}
 main.enter>section.panel{content-visibility:visible!important}
+textarea.in.tw{width:100%;min-width:0;box-sizing:border-box;min-height:0;overflow:hidden;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;line-height:1.3;align-self:center;resize:none;field-sizing:content}
+.row textarea.in.tw{padding-top:9px;padding-bottom:9px}
 </style><link rel="manifest" href="manifest.json"><meta name="theme-color" content="#0c2c20"><script>try{var _t=localStorage.getItem("mm-theme");if(_t==="light"||_t==="dark")document.documentElement.setAttribute("data-theme",_t);if(localStorage.getItem("mm-lang")==="en")document.documentElement.lang="en"}catch(e){}</script><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Money Manage"><link rel="apple-touch-icon" href="kucing-192.png"><style id="emojifix">button,input,textarea,select,.emj button,.cat,.cat span,#sheet button{font-family:var(--body)}.emj button,.cat span{font-synthesis:none;font-weight:400}</style><style id="calglass">
 .calp{position:relative;overflow:hidden;isolation:isolate;border:1px solid color-mix(in srgb,#fff 55%,transparent);border-radius:24px;padding:18px 16px;
  background:
@@ -2476,6 +2478,7 @@ coin:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="6.200"/><path d=
 const GEMO={"target": "🎯", "car": "🚗", "bike": "🏍️", "ring": "💍", "house": "🏠", "umrah": "🕋", "plane": "✈️", "edu": "🎓", "safe": "🏦", "phone": "📱", "health": "❤️", "biz": "💼", "gift": "🎁", "coin": "💰"};
 const gIcoSvg=k=>`<span class="gemo">${GEMO[k]||GEMO.target}</span>`;
 const inT=(k,v,label,ph='')=>`<input class="in t" autocomplete="off" data-k="${k}" data-t="t" value="${esc(v)}" placeholder="${esc(ph)}" aria-label="${esc(label)}">`;
+const inW=(k,v,label,ph='')=>`<textarea class="in t tw" rows="1" enterkeyhint="next" autocomplete="off" data-k="${k}" data-t="t" placeholder="${esc(ph)}" aria-label="${esc(label)}">${esc(v)}</textarea>`;
 const inA=(k,v,label,ph='')=>`<textarea class="in t" rows="2" enterkeyhint="done" data-k="${k}" data-t="t" placeholder="${esc(ph)}" aria-label="${esc(label)}">${esc(v)}</textarea>`;
 const del=(arr,i,label)=>`<button class="btn x" data-act="del" data-k="${arr}" data-i="${i}" aria-label="Padam ${esc(label)}">&times;</button>`;
 const add=(k,label)=>`<button class="btn ghost" data-act="add" data-k="${k}">+ ${label}</button>`;
@@ -2981,8 +2984,8 @@ function hiSync(){const b=document.querySelector('[data-act=hiall]');if(!b)retur
 function vKomitmen(C){
   const k=state.komitmen;
   const ratioCls=C.k.income>0?(C.k.ratio<=.7?['Sihat','']:C.k.ratio<=.9?['Berhati-hati','warn']:['Bahaya','bad']):['-',''];
-  const inc=k.income.map((x,i)=>`<div class="row">${inT(`komitmen.income.${i}.name`,x.name,'Sumber pendapatan','Sumber')}${inN(`komitmen.income.${i}.amt`,x.amt,'Jumlah '+(x.name||'pendapatan'))}${del('komitmen.income',i,x.name||'pendapatan')}</div>`).join('');
-  const rowH=(x,i)=>`<div class="row chk ${x.paid?'paid':''} ${x.sv?'sv':''}"><input type="checkbox" class="tick" data-k="komitmen.items.${i}.paid" data-t="b" ${x.paid?'checked':''} aria-label="Dah bayar ${esc(x.name)}">${inT(`komitmen.items.${i}.name`,x.name,'Nama komitmen','Nama')}${inN(`komitmen.items.${i}.amt`,x.amt,'Jumlah '+(x.name||'komitmen'))}${del('komitmen.items',i,x.name||'komitmen')}<span class="pc">${C.k.income>0&&x.amt>0?pc(x.amt/C.k.income,1)+' pendapatan':''}</span></div>`;
+  const inc=k.income.map((x,i)=>`<div class="row">${inW(`komitmen.income.${i}.name`,x.name,'Sumber pendapatan','Sumber')}${inN(`komitmen.income.${i}.amt`,x.amt,'Jumlah '+(x.name||'pendapatan'))}${del('komitmen.income',i,x.name||'pendapatan')}</div>`).join('');
+  const rowH=(x,i)=>`<div class="row chk ${x.paid?'paid':''} ${x.sv?'sv':''}"><input type="checkbox" class="tick" data-k="komitmen.items.${i}.paid" data-t="b" ${x.paid?'checked':''} aria-label="Dah bayar ${esc(x.name)}">${inW(`komitmen.items.${i}.name`,x.name,'Nama komitmen','Nama')}${inN(`komitmen.items.${i}.amt`,x.amt,'Jumlah '+(x.name||'komitmen'))}${del('komitmen.items',i,x.name||'komitmen')}<span class="pc">${C.k.income>0&&x.amt>0?pc(x.amt/C.k.income,1)+' pendapatan':''}</span></div>`;
   const items=k.items.map((x,i)=>x.sv?'':rowH(x,i)).join(''),saves=k.items.map((x,i)=>x.sv?rowH(x,i):'').join('');
   const notes=k.notes.map((x,i)=>`<div class="row note pinned">${PIN}${inA(`komitmen.notes.${i}`,String(x==null?'':x).replace(/^\s*\uD83D\uDCCC\uFE0F?\s*/,''),'Nota','Tulis nota')}${del('komitmen.notes',i,'nota')}</div>`).join('');
   return `
@@ -3887,7 +3890,7 @@ document.addEventListener('input',e=>{const t=e.target;if(t&&t.dataset&&t.datase
   const SK='input[type=date],input[type=month],input[type=checkbox],input[type=radio],input[type=file],input[type=button],input[type=submit],input[type=password],input[type=hidden],input[data-bq],input[disabled],input[readonly],#shN';
   const box=t=>t.closest('[role=dialog]:not([hidden])')||main;
   const vis=e=>e.getClientRects().length>0;
-  const list=t=>[...box(t).querySelectorAll('input')].filter(e=>!e.matches(SK)&&vis(e));
+  const list=t=>[...box(t).querySelectorAll('input,textarea.tw')].filter(e=>!e.matches(SK)&&vis(e));
   /* Next hanya kalau kotak seterusnya dalam baris/kumpulan yang sama (cth nama komitmen -> harga, modal -> nilai). Dalam dialog, ikut urutan borang. Selain tu Done. */
   const GRP='.row,.plan,.am,.acc,.edtx,.alrow';
   const nxt=(t,it,i)=>{const n=it[i+1];if(!n)return null;if(t.closest('[role=dialog]'))return n;const g=t.closest(GRP);return g&&g.contains(n)?n:null};
@@ -3900,12 +3903,13 @@ document.addEventListener('input',e=>{const t=e.target;if(t&&t.dataset&&t.datase
   document.addEventListener('pointerdown',e=>hint(e.target.closest&&e.target.closest('input')),true);
   document.addEventListener('focusin',e=>{const t=e.target;if(t&&t.tagName==='INPUT')t._fv=t.value;hint(t)});
   /* Enter pada nota = siap (tutup keyboard), bukan baris baru. Shift+Enter kekal baris baru di desktop */
-  document.addEventListener('keydown',e=>{const t=e.target;if(t&&t.matches&&t.matches('textarea.in.t')&&e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();t.blur()}},true);
-  document.addEventListener('beforeinput',e=>{const t=e.target;if(t&&t.matches&&t.matches('textarea.in.t')&&(e.inputType==='insertLineBreak'||e.inputType==='insertParagraph')){e.preventDefault();t.blur()}},true);
+  document.addEventListener('keydown',e=>{const t=e.target;if(t&&t.matches&&t.matches('textarea.in.t:not(.tw)')&&e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();t.blur()}},true);
+  document.addEventListener('beforeinput',e=>{const t=e.target;if(t&&t.matches&&t.matches('textarea.in.t:not(.tw)')&&(e.inputType==='insertLineBreak'||e.inputType==='insertParagraph')){e.preventDefault();t.blur()}},true);
+  document.addEventListener('beforeinput',e=>{const t=e.target;if(t&&t.matches&&t.matches('textarea.tw')&&(e.inputType==='insertLineBreak'||e.inputType==='insertParagraph')){e.preventDefault();t.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true,cancelable:true}))}},true);
   document.addEventListener('keydown',e=>{
     if(e.key!=='Enter'||e.isComposing||e.defaultPrevented||e.shiftKey||e.ctrlKey||e.altKey||e.metaKey)return;
     const t=e.target;
-    if(!t||t.tagName!=='INPUT')return;
+    if(!t||!(t.tagName==='INPUT'||(t.matches&&t.matches('textarea.tw'))))return;
     if(t.dataset&&t.dataset.bq!==undefined){e.preventDefault();t.blur();return}
     if(t.matches(SK))return;
     const it=list(t),i=it.indexOf(t);
@@ -5117,8 +5121,8 @@ document.addEventListener('click',function(e){
 (function(){
 var CHANGELOG=[
  {id:'2026-11-21-a',d:'2026-11-21',
-  ms:['Semua tab & popup (sheet/tetapan): bila tekan kotak untuk menaip, skrin kini auto scroll sekali sahaja (tak lompat/berkelip) supaya kotak tak lagi tertutup keyboard atau bar tab bawah','Tekan Tanda dah bayar / tick: skrin tak lagi lompat atas-tengah-bawah, kekal di tempat yang sama','Tukar tab: animasi masuk kini fade ringkas, tak lagi berkelip hitam atau menggelongsor','Kad ansuran (tab Bil): butang "Pasti?" bila nak padam kini jadi kotak merah macam butang padam lain, tak lagi besar dan bertindih dengan teks'],
-  en:['All tabs & popups (sheets/settings): tapping a field to type now auto-scrolls once (no jumping or flicker) so it is no longer hidden behind the keyboard or the bottom tab bar','Tapping Mark as paid / ticks: the screen no longer jumps up and down, it stays where you are','Switching tabs: the enter animation is now a short fade, no more black flicker or sliding','Instalment cards (Bills tab): the "Sure?" delete button now shows as a red box like the other delete buttons instead of oversized text overlapping the card']},
+  ms:['Semua tab & popup (sheet/tetapan): bila tekan kotak untuk menaip, skrin kini auto scroll sekali sahaja (tak lompat/berkelip) supaya kotak tak lagi tertutup keyboard atau bar tab bawah','Tekan Tanda dah bayar / tick: skrin tak lagi lompat atas-tengah-bawah, kekal di tempat yang sama','Tukar tab: animasi masuk kini fade ringkas, tak lagi berkelip hitam atau menggelongsor','Nama komitmen & sumber pendapatan: kalau teks panjang, kotak kini jadi berbaris ke bawah (tak lagi terpotong ke tepi)','Nama komitmen: tekan Enter terus pergi ke kotak harga','Kad ansuran (tab Bil): butang "Pasti?" bila nak padam kini jadi kotak merah macam butang padam lain, tak lagi besar dan bertindih dengan teks'],
+  en:['All tabs & popups (sheets/settings): tapping a field to type now auto-scrolls once (no jumping or flicker) so it is no longer hidden behind the keyboard or the bottom tab bar','Tapping Mark as paid / ticks: the screen no longer jumps up and down, it stays where you are','Switching tabs: the enter animation is now a short fade, no more black flicker or sliding','Commitment & income names: long text now wraps onto more lines instead of being cut off at the edge','Commitment name: pressing Enter now jumps to the amount field','Instalment cards (Bills tab): the "Sure?" delete button now shows as a red box like the other delete buttons instead of oversized text overlapping the card']},
  {id:'2026-11-20-a',d:'2026-11-20',
   ms:['Tab Bil: Tarikh bayar kini ikut bulan yang dipilih (bil bulan Disember dibayar pada hari tu di bulan Januari), bukan lagi tersangkut pada tarikh terdekat','Kotak belanja (semua tab Bil): bulatan tick macam Komitmen untuk tanda dah bayar, baris jadi hijau dan nama bergaris bila ditanda','Penunjuk baru di atas Kotak belanja: berapa kotak dah dibayar (cth 2 / 3), jumlah dibayar berbanding jumlah, dan bar kemajuan','Semak terjemahan English: teks baru (Tanda bulatan bila dah bayar, Dah lepas) ditambah ke kamus'],
   en:['Bills tab: Due date now follows the selected month (the December bill is paid on that day in January) instead of sticking to the nearest date','Spending boxes (all Bills tabs): a tick circle like Commitments to mark as paid; a ticked row turns green and its name is struck through','New indicator above Spending boxes: how many boxes are paid (e.g. 2 / 3), the amount paid vs the total, and a progress bar','English translation check: new texts (Tick the circle once paid, Already passed) added to the dictionary']},
